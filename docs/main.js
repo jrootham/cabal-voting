@@ -9681,10 +9681,13 @@ var _jrootham$cabal_voting$Main$myvotes = function (name) {
 			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'Main',
 				{
-					start: {line: 264, column: 17},
-					end: {line: 264, column: 28}
+					start: {line: 273, column: 17},
+					end: {line: 273, column: 28}
 				})('This should be impossible'))));
 		});
+};
+var _jrootham$cabal_voting$Main$setEnabled = function (enabled) {
+	return enabled ? _elm_lang$html$Html_Attributes$class('flat-enabled') : _elm_lang$html$Html_Attributes$class('flat-disabled');
 };
 var _jrootham$cabal_voting$Main$checkVote = F2(
 	function (login, vote) {
@@ -9692,6 +9695,7 @@ var _jrootham$cabal_voting$Main$checkVote = F2(
 	});
 var _jrootham$cabal_voting$Main$displayPaper = F3(
 	function (model, votable, paper) {
+		var belongsTo = _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
 		var testVote = _jrootham$cabal_voting$Main$checkVote(model.name);
 		var on = A2(_elm_lang$core$List$any, testVote, paper.votes);
 		return A2(
@@ -9717,12 +9721,15 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$button,
+										_elm_lang$html$Html$div,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$disabled(
-												!_elm_lang$core$Native_Utils.eq(model.name, paper.submitter)),
-											_1: {ctor: '[]'}
+											_0: _elm_lang$html$Html_Attributes$class('flat-button'),
+											_1: {
+												ctor: '::',
+												_0: _jrootham$cabal_voting$Main$setEnabled(belongsTo),
+												_1: {ctor: '[]'}
+											}
 										},
 										{
 											ctor: '::',
@@ -9732,12 +9739,15 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$button,
+											_elm_lang$html$Html$div,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$disabled(
-													!_elm_lang$core$Native_Utils.eq(model.name, paper.submitter)),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html_Attributes$class('flat-button'),
+												_1: {
+													ctor: '::',
+													_0: _jrootham$cabal_voting$Main$setEnabled(belongsTo),
+													_1: {ctor: '[]'}
+												}
 											},
 											{
 												ctor: '::',

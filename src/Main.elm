@@ -163,6 +163,12 @@ checkVote : String -> String -> Bool
 checkVote login vote =
     login == vote
 
+setEnabled: Bool -> Html.Attribute msg
+setEnabled enabled =
+    if enabled then
+        class "flat-enabled"
+    else
+        class "flat-disabled"
 
 displayPaper : Model -> Bool -> Paper -> Html Msg
 displayPaper model votable paper =
@@ -172,13 +178,16 @@ displayPaper model votable paper =
 
         on =
             List.any testVote paper.votes
+        
+        belongsTo = 
+            model.name == paper.submitter
     in
         tr [class "entry"]
             [ td [] [div [] 
                 [
                     text paper.submitter
-                    , button [disabled (model.name /= paper.submitter)] [text "Edit"]
-                    , button [disabled (model.name /= paper.submitter)] [text "Close"]
+                    , div [class "flat-button", setEnabled belongsTo ] [text "Edit"]
+                    , div [class "flat-button", setEnabled belongsTo] [text "Close"]
                 ]]
             , td []
                 [ (div [] [ h5 [] [text paper.title] ])
