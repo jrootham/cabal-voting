@@ -1,14 +1,11 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, input, button, text, h1, table, tr, td, label, fieldset)
+import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
 import Http
 import Date
 import BasicAuth exposing (buildAuthorizationHeader)
-import Json.Decode exposing (Decoder, decodeString, at, int, field, string)
-import Json.Decode.Pipeline exposing (decode, required)
-import Json.Encode exposing (..)
 import Config
 import Payload exposing (..)
 import Parse exposing (parse, Paper)
@@ -36,7 +33,7 @@ type alias Password =
 -- Types
 
 type PaperOrder 
-    = Title | Earliest | Latest | LeastVotes | MostVotes | Submittor
+    = Title | Earliest | Latest | LeastVotes | MostVotes | Submitter | MyVotes
 
 -- MODEL
 
@@ -138,7 +135,7 @@ formatError error =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [class "outer"]
         [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
         , div []
             [ if model.loggedin then
@@ -152,12 +149,13 @@ view model =
 passwordPage : Model -> Html Msg
 passwordPage model =
     div []
-        [ div [] [ text "Use github user name and password" ]
-        , div [] [ input [ placeholder "Name", onInput Name ] [] ]
-        , div [] [ input [ type_ "password", placeholder "Password", onInput Password ] [] ]
-        , div [] [ button [ onClick Login ] [ text "Login" ] ]
-        , div [] [ text model.loginError ]
-        , div [] [ button [ onClick Clear ] [ text "Clear error" ] ]
+        [ div [] [h2 [] [ text "Use github user name and password" ]]
+        , div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
+        , div [class "password-line"] 
+            [ input [ type_ "password", placeholder "Password", onInput Password ] [] ]
+        , div [class "password-line"] [ button [ onClick Login ] [ text "Login" ] ]
+        , div [class "password-line"] [ text model.loginError ]
+        , div [class "password-line"] [ button [ onClick Clear ] [ text "Clear error" ] ]
         ]
 
 
@@ -175,12 +173,13 @@ displayPaper model votable paper =
         on =
             List.any testVote paper.votes
     in
-        tr []
-            [ td []
-                [ (div [] [ text paper.title ])
-                , (div [] [ text paper.body ])
-                ]
+        tr [class "entry"]
+            [ td [] [text paper.submitter]
             , td []
+                [ (div [] [ h5 [] [text paper.title] ])
+                , (div [class "contents"] [ text paper.body ])
+                ]
+            , td [class "vote"]
                 [ label []
                     [ input
                         [ type_ "checkbox"
@@ -191,6 +190,7 @@ displayPaper model votable paper =
                     , text "Vote"
                     ]
                 ]
+            , td [] (List.map (\ login -> div [] [text login]) paper.votes)
             ]
 
 
@@ -215,7 +215,7 @@ userLine : Model -> String
 userLine model =
     let
         paperCount =
-            List.length (List.filter (\paper -> model.name == paper.submittor) model.papers)
+            List.length (List.filter (\paper -> model.name == paper.submitter) model.papers)
 
         paperString =
             toString paperCount
@@ -237,6 +237,28 @@ userLine model =
     in
         "User: " ++ model.name ++ submitString ++ votingString
 
+nameIn: String -> Paper -> Bool
+nameIn name paper = 
+    List.member name paper.votes
+
+myvotes: String -> (Paper -> Paper -> Order)
+myvotes name = 
+    let
+        voterIn = nameIn name
+    in
+        \ left right ->
+            if (voterIn left) && (voterIn right) then
+                EQ
+            else if (not (voterIn left)) && (voterIn right) then
+                GT
+            else if (voterIn left) && (not(voterIn right)) then
+                LT
+            else if (not (voterIn left)) && (not(voterIn right)) then
+                EQ
+            else
+                Debug.crash "This should be impossible"
+
+
 totalOrder: (a -> a -> Bool) -> a -> a -> Order
 totalOrder lessThan left right =
     if (lessThan left right) then
@@ -251,38 +273,46 @@ loggedinPage model =
     let
         radio = radioBase model.order
         compare = 
-            (totalOrder 
-                (case model.order of
-                    Title ->
-                        \ left right -> left.title < right.title
-                    Earliest ->
-                        \ left right -> (Date.toTime left.createdAt) < (Date.toTime right.createdAt)
-                    Latest ->
-                        \ left right -> (Date.toTime right.createdAt) < (Date.toTime left.createdAt)
-                    MostVotes -> 
-                        \ left right -> (List.length right.votes) < (List.length left.votes)
-                    LeastVotes -> 
-                        \ left right -> (List.length left.votes) < (List.length right.votes)
-                    Submittor ->
-                        \ left right -> left.submittor < right.submittor
-                )
-            )
+            case model.order of
+                Title ->
+                    totalOrder (\ left right -> left.title < right.title)
+                Earliest ->
+                    totalOrder (\ left right -> (Date.toTime left.createdAt) < (Date.toTime right.createdAt))
+                Latest ->
+                    totalOrder (\ left right -> (Date.toTime right.createdAt) < (Date.toTime left.createdAt))
+                MostVotes -> 
+                    totalOrder (\ left right -> (List.length right.votes) < (List.length left.votes))
+                LeastVotes -> 
+                    totalOrder (\ left right -> (List.length left.votes) < (List.length right.votes))
+                Submitter ->
+                    totalOrder (\ left right -> left.submitter < right.submitter)
+                MyVotes ->
+                    myvotes model.name  
+
     in        
         div []
-            [ (div [] [ text (userLine model) ])
-            ,div []
+            [ (div [] [ h3 [] [text (userLine model)] ])
+            ,div [class "order"]
                 [text "Order "
                 , radio " Title " Title
                 , radio " Earliest " Earliest
                 , radio " Latest " Latest
                 , radio " Most votes " MostVotes
                 , radio " Least votes " LeastVotes
-                , radio " Submittor " Submittor
+                , radio " Submitter " Submitter
+                , radio " My votes " MyVotes
                 ]   
             , (div [] 
                 [ 
                     table [] 
-                        (List.map (displayPaper model (voteLimit model)) (List.sortWith compare model.papers)) 
+                        ((thead [] [tr [] 
+                        [
+                              th [] [text "Submitter"]
+                            , th [] [text "Contents"]
+                            , th [] [text "Vote"]
+                            , th [] [text "Voters"]]
+                        ]) ::
+                        (List.map (displayPaper model (voteLimit model)) (List.sortWith compare model.papers))) 
                 ])
         ]
 

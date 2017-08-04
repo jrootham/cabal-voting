@@ -1,6 +1,4 @@
-<!DOCTYPE HTML>
-<html><head><meta charset="UTF-8"><title>Main</title><style>html,head,body { padding:0; margin:0; }
-body { font-family: calibri, helvetica, arial, sans-serif; }</style><script type="text/javascript">
+
 (function() {
 'use strict';
 
@@ -136,6 +134,7 @@ function A9(fun, a, b, c, d, e, f, g, h, i)
     ? fun.func(a, b, c, d, e, f, g, h, i)
     : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 }
+
 //import Native.List //
 
 var _elm_lang$core$Native_Array = function() {
@@ -1102,7 +1101,8 @@ return {
 	fromJSArray: fromJSArray
 };
 
-}();//import Native.Utils //
+}();
+//import Native.Utils //
 
 var _elm_lang$core$Native_Basics = function() {
 
@@ -1242,7 +1242,8 @@ return {
 	isInfinite: isInfinite
 };
 
-}();//import //
+}();
+//import //
 
 var _elm_lang$core$Native_Utils = function() {
 
@@ -1729,7 +1730,8 @@ return {
 	toString: toString
 };
 
-}();var _elm_lang$core$Basics$never = function (_p0) {
+}();
+var _elm_lang$core$Basics$never = function (_p0) {
 	never:
 	while (true) {
 		var _p1 = _p0;
@@ -1854,6 +1856,7 @@ var _elm_lang$core$Basics$LT = {ctor: 'LT'};
 var _elm_lang$core$Basics$JustOneMore = function (a) {
 	return {ctor: 'JustOneMore', _0: a};
 };
+
 var _elm_lang$core$Maybe$withDefault = F2(
 	function ($default, maybe) {
 		var _p0 = maybe;
@@ -1926,6 +1929,7 @@ var _elm_lang$core$Maybe$map5 = F6(
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
+
 //import Native.Utils //
 
 var _elm_lang$core$Native_List = function() {
@@ -2062,7 +2066,8 @@ return {
 	sortWith: F2(sortWith)
 };
 
-}();var _elm_lang$core$List$sortWith = _elm_lang$core$Native_List.sortWith;
+}();
+var _elm_lang$core$List$sortWith = _elm_lang$core$Native_List.sortWith;
 var _elm_lang$core$List$sortBy = _elm_lang$core$Native_List.sortBy;
 var _elm_lang$core$List$sort = function (xs) {
 	return A2(_elm_lang$core$List$sortBy, _elm_lang$core$Basics$identity, xs);
@@ -2614,6 +2619,7 @@ var _elm_lang$core$List$indexedMap = F2(
 				_elm_lang$core$List$length(xs) - 1),
 			xs);
 	});
+
 var _elm_lang$core$Array$append = _elm_lang$core$Native_Array.append;
 var _elm_lang$core$Array$length = _elm_lang$core$Native_Array.length;
 var _elm_lang$core$Array$isEmpty = function (array) {
@@ -2668,6 +2674,7 @@ var _elm_lang$core$Array$repeat = F2(
 			_elm_lang$core$Basics$always(e));
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
+
 //import Native.Utils //
 
 var _elm_lang$core$Native_Debug = function() {
@@ -2697,7 +2704,8 @@ return {
 	log: F2(log)
 };
 
-}();//import Maybe, Native.List, Native.Utils, Result //
+}();
+//import Maybe, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_String = function() {
 
@@ -3036,6 +3044,7 @@ return {
 };
 
 }();
+
 //import Native.Utils //
 
 var _elm_lang$core$Native_Char = function() {
@@ -3049,7 +3058,8 @@ return {
 	toLocaleLower: function(c) { return _elm_lang$core$Native_Utils.chr(c.toLocaleLowerCase()); }
 };
 
-}();var _elm_lang$core$Char$fromCode = _elm_lang$core$Native_Char.fromCode;
+}();
+var _elm_lang$core$Char$fromCode = _elm_lang$core$Native_Char.fromCode;
 var _elm_lang$core$Char$toCode = _elm_lang$core$Native_Char.toCode;
 var _elm_lang$core$Char$toLocaleLower = _elm_lang$core$Native_Char.toLocaleLower;
 var _elm_lang$core$Char$toLocaleUpper = _elm_lang$core$Native_Char.toLocaleUpper;
@@ -3091,6 +3101,7 @@ var _elm_lang$core$Char$isHexDigit = function ($char) {
 		_elm_lang$core$Native_Utils.chr('F'),
 		$char));
 };
+
 var _elm_lang$core$Result$toMaybe = function (result) {
 	var _p0 = result;
 	if (_p0.ctor === 'Ok') {
@@ -3232,6 +3243,7 @@ var _elm_lang$core$Result$fromMaybe = F2(
 			return _elm_lang$core$Result$Err(err);
 		}
 	});
+
 var _elm_lang$core$String$fromList = _elm_lang$core$Native_String.fromList;
 var _elm_lang$core$String$toList = _elm_lang$core$Native_String.toList;
 var _elm_lang$core$String$toFloat = _elm_lang$core$Native_String.toFloat;
@@ -3275,6 +3287,7 @@ var _elm_lang$core$String$fromChar = function ($char) {
 	return A2(_elm_lang$core$String$cons, $char, '');
 };
 var _elm_lang$core$String$isEmpty = _elm_lang$core$Native_String.isEmpty;
+
 var _elm_lang$core$Dict$foldr = F3(
 	function (f, acc, t) {
 		foldr:
@@ -4191,6 +4204,7 @@ var _elm_lang$core$Dict$diff = F2(
 			t1,
 			t2);
 	});
+
 //import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_Json = function() {
@@ -4766,6 +4780,7 @@ return {
 };
 
 }();
+
 var _elm_lang$core$Json_Encode$list = _elm_lang$core$Native_Json.encodeList;
 var _elm_lang$core$Json_Encode$array = _elm_lang$core$Native_Json.encodeArray;
 var _elm_lang$core$Json_Encode$object = _elm_lang$core$Native_Json.encodeObject;
@@ -4776,6 +4791,7 @@ var _elm_lang$core$Json_Encode$int = _elm_lang$core$Native_Json.identity;
 var _elm_lang$core$Json_Encode$string = _elm_lang$core$Native_Json.identity;
 var _elm_lang$core$Json_Encode$encode = _elm_lang$core$Native_Json.encode;
 var _elm_lang$core$Json_Encode$Value = {ctor: 'Value'};
+
 var _elm_lang$core$Json_Decode$null = _elm_lang$core$Native_Json.decodeNull;
 var _elm_lang$core$Json_Decode$value = _elm_lang$core$Native_Json.decodePrimitive('value');
 var _elm_lang$core$Json_Decode$andThen = _elm_lang$core$Native_Json.andThen;
@@ -4838,8 +4854,10 @@ var _elm_lang$core$Json_Decode$int = _elm_lang$core$Native_Json.decodePrimitive(
 var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive('bool');
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
+
 var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
 var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
+
 var _elm_lang$core$Tuple$mapSecond = F2(
 	function (func, _p0) {
 		var _p1 = _p0;
@@ -4866,6 +4884,7 @@ var _elm_lang$core$Tuple$first = function (_p6) {
 	var _p7 = _p6;
 	return _p7._0;
 };
+
 //import //
 
 var _elm_lang$core$Native_Platform = function() {
@@ -5425,6 +5444,7 @@ return {
 };
 
 }();
+
 //import Native.Utils //
 
 var _elm_lang$core$Native_Scheduler = function() {
@@ -5705,7 +5725,8 @@ return {
 	rawSend: rawSend
 };
 
-}();var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
+}();
+var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
 var _elm_lang$core$Platform_Cmd$none = _elm_lang$core$Platform_Cmd$batch(
 	{ctor: '[]'});
 var _elm_lang$core$Platform_Cmd_ops = _elm_lang$core$Platform_Cmd_ops || {};
@@ -5719,11 +5740,13 @@ _elm_lang$core$Platform_Cmd_ops['!'] = F2(
 	});
 var _elm_lang$core$Platform_Cmd$map = _elm_lang$core$Native_Platform.map;
 var _elm_lang$core$Platform_Cmd$Cmd = {ctor: 'Cmd'};
+
 var _elm_lang$core$Platform_Sub$batch = _elm_lang$core$Native_Platform.batch;
 var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
 	{ctor: '[]'});
 var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
 var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
+
 var _elm_lang$core$Platform$hack = _elm_lang$core$Native_Scheduler.succeed;
 var _elm_lang$core$Platform$sendToSelf = _elm_lang$core$Native_Platform.sendToSelf;
 var _elm_lang$core$Platform$sendToApp = _elm_lang$core$Native_Platform.sendToApp;
@@ -5733,6 +5756,7 @@ var _elm_lang$core$Platform$Program = {ctor: 'Program'};
 var _elm_lang$core$Platform$Task = {ctor: 'Task'};
 var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
 var _elm_lang$core$Platform$Router = {ctor: 'Router'};
+
 var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode = _elm_lang$core$Json_Decode$succeed;
 var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$resolve = _elm_lang$core$Json_Decode$andThen(_elm_lang$core$Basics$identity);
 var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom = _elm_lang$core$Json_Decode$map2(
@@ -5812,6 +5836,7 @@ var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
 			A2(_elm_lang$core$Json_Decode$field, key, valDecoder),
 			decoder);
 	});
+
 //import Result //
 
 var _elm_lang$core$Native_Date = function() {
@@ -5844,7 +5869,8 @@ return {
 	dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
 };
 
-}();var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+}();
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
 var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
 var _elm_lang$core$Task$spawnCmd = F2(
 	function (router, _p0) {
@@ -6040,6 +6066,7 @@ var _elm_lang$core$Task$cmdMap = F2(
 			A2(_elm_lang$core$Task$map, tagger, _p11._0));
 	});
 _elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
+
 //import Native.Scheduler //
 
 var _elm_lang$core$Native_Time = function() {
@@ -6066,7 +6093,8 @@ return {
 	setInterval_: F2(setInterval_)
 };
 
-}();var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
 var _elm_lang$core$Time$spawnHelp = F3(
 	function (router, intervals, processes) {
 		var _p0 = intervals;
@@ -6253,6 +6281,7 @@ var _elm_lang$core$Time$subMap = F2(
 			});
 	});
 _elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
 var _elm_lang$core$Date$millisecond = _elm_lang$core$Native_Date.millisecond;
 var _elm_lang$core$Date$second = _elm_lang$core$Native_Date.second;
 var _elm_lang$core$Date$minute = _elm_lang$core$Native_Date.minute;
@@ -6285,6 +6314,7 @@ var _elm_lang$core$Date$Apr = {ctor: 'Apr'};
 var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
 var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
 var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
+
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -8166,6 +8196,7 @@ return {
 };
 
 }();
+
 var _elm_lang$virtual_dom$VirtualDom$programWithFlags = function (impl) {
 	return A2(_elm_lang$virtual_dom$Native_VirtualDom.programWithFlags, _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags, impl);
 };
@@ -8196,6 +8227,7 @@ var _elm_lang$virtual_dom$VirtualDom$Options = F2(
 	});
 var _elm_lang$virtual_dom$VirtualDom$Node = {ctor: 'Node'};
 var _elm_lang$virtual_dom$VirtualDom$Property = {ctor: 'Property'};
+
 var _elm_lang$html$Html$programWithFlags = _elm_lang$virtual_dom$VirtualDom$programWithFlags;
 var _elm_lang$html$Html$program = _elm_lang$virtual_dom$VirtualDom$program;
 var _elm_lang$html$Html$beginnerProgram = function (_p0) {
@@ -8320,6 +8352,7 @@ var _elm_lang$html$Html$details = _elm_lang$html$Html$node('details');
 var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
 var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
 var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
+
 var _elm_lang$html$Html_Attributes$map = _elm_lang$virtual_dom$VirtualDom$mapProperty;
 var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$attribute;
 var _elm_lang$html$Html_Attributes$contextmenu = function (value) {
@@ -8669,6 +8702,7 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 				A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$second, list))));
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
+
 var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
 var _elm_lang$html$Html_Events$targetChecked = A2(
 	_elm_lang$core$Json_Decode$at,
@@ -8783,6 +8817,7 @@ var _elm_lang$html$Html_Events$Options = F2(
 	function (a, b) {
 		return {stopPropagation: a, preventDefault: b};
 	});
+
 var _elm_lang$http$Native_Http = function() {
 
 
@@ -9021,6 +9056,7 @@ return {
 };
 
 }();
+
 var _elm_lang$http$Http_Internal$map = F2(
 	function (func, request) {
 		return _elm_lang$core$Native_Utils.update(
@@ -9047,6 +9083,7 @@ var _elm_lang$http$Http_Internal$Header = F2(
 	function (a, b) {
 		return {ctor: 'Header', _0: a, _1: b};
 	});
+
 var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
 var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
 var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
@@ -9141,10 +9178,12 @@ var _elm_lang$http$Http$StringPart = F2(
 		return {ctor: 'StringPart', _0: a, _1: b};
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
 var _jrootham$cabal_voting$Config$maxVotes = 5;
 var _jrootham$cabal_voting$Config$maxPapers = 5;
-var _jrootham$cabal_voting$Config$repository = 'cabal-voting';
-var _jrootham$cabal_voting$Config$owner = 'jrootham';
+var _jrootham$cabal_voting$Config$repository = 'SMRTYPRTY';
+var _jrootham$cabal_voting$Config$owner = 'CompSciCabal';
+
 var _truqu$elm_base64$BitList$partition = F2(
 	function (size, list) {
 		if (_elm_lang$core$Native_Utils.cmp(
@@ -9235,6 +9274,7 @@ var _truqu$elm_base64$BitList$fromNumberWithSize = F2(
 var _truqu$elm_base64$BitList$fromByte = function ($byte) {
 	return A2(_truqu$elm_base64$BitList$fromNumberWithSize, $byte, 8);
 };
+
 var _truqu$elm_base64$Base64$dropLast = F2(
 	function (number, list) {
 		return _elm_lang$core$List$reverse(
@@ -9470,6 +9510,7 @@ var _truqu$elm_base64$Base64$encode = function (s) {
 				_truqu$elm_base64$Base64$toTupleList(
 					_truqu$elm_base64$Base64$toCodeList(s)))));
 };
+
 var _kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationToken = F2(
 	function (username, password) {
 		var result = _truqu$elm_base64$Base64$encode(
@@ -9494,6 +9535,7 @@ var _kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationHeader = F2(
 				'Basic ',
 				A2(_kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationToken, username, password)));
 	});
+
 var _jrootham$cabal_voting$Payload$makePayload = F2(
 	function (owner, name) {
 		var vars = _elm_lang$core$Json_Encode$object(
@@ -9537,6 +9579,7 @@ var _jrootham$cabal_voting$Payload$makePayload = F2(
 					}
 				}));
 	});
+
 var _jrootham$cabal_voting$Parse$voteDecoder = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -9570,7 +9613,7 @@ var _jrootham$cabal_voting$Parse$dateDecoder = A2(
 	_elm_lang$core$Json_Decode$string);
 var _jrootham$cabal_voting$Parse$Paper = F5(
 	function (a, b, c, d, e) {
-		return {title: a, body: b, createdAt: c, submittor: d, votes: e};
+		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
 	});
 var _jrootham$cabal_voting$Parse$decodePaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
@@ -9622,10 +9665,27 @@ var _jrootham$cabal_voting$Parse$Votes = F2(
 	function (a, b) {
 		return {user: a, votes: b};
 	});
+
 var _jrootham$cabal_voting$Main$totalOrder = F3(
 	function (lessThan, left, right) {
 		return A2(lessThan, left, right) ? _elm_lang$core$Basics$LT : (A2(lessThan, right, left) ? _elm_lang$core$Basics$GT : _elm_lang$core$Basics$EQ);
 	});
+var _jrootham$cabal_voting$Main$nameIn = F2(
+	function (name, paper) {
+		return A2(_elm_lang$core$List$member, name, paper.votes);
+	});
+var _jrootham$cabal_voting$Main$myvotes = function (name) {
+	var voterIn = _jrootham$cabal_voting$Main$nameIn(name);
+	return F2(
+		function (left, right) {
+			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
+				'Main',
+				{
+					start: {line: 259, column: 17},
+					end: {line: 259, column: 28}
+				})('This should be impossible'))));
+		});
+};
 var _jrootham$cabal_voting$Main$checkVote = F2(
 	function (login, vote) {
 		return _elm_lang$core$Native_Utils.eq(login, vote);
@@ -9636,7 +9696,11 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 		var on = A2(_elm_lang$core$List$any, testVote, paper.votes);
 		return A2(
 			_elm_lang$html$Html$tr,
-			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('entry'),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
@@ -9644,26 +9708,8 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(paper.title),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(paper.body),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html$text(paper.submitter),
+						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
@@ -9673,35 +9719,98 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 						{
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$label,
+								_elm_lang$html$Html$div,
 								{ctor: '[]'},
 								{
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$input,
+										_elm_lang$html$Html$h5,
+										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-											_1: {
+											_0: _elm_lang$html$Html$text(paper.title),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('contents'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(paper.body),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('vote'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$label,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$input,
+											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$checked(on),
+												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled(!(on || votable)),
-													_1: {ctor: '[]'}
+													_0: _elm_lang$html$Html_Attributes$checked(on),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$disabled(!(on || votable)),
+														_1: {ctor: '[]'}
+													}
 												}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Vote'),
-										_1: {ctor: '[]'}
-									}
-								}),
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Vote'),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								A2(
+									_elm_lang$core$List$map,
+									function (login) {
+										return A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(login),
+												_1: {ctor: '[]'}
+											});
+									},
+									paper.votes)),
 							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
+						}
+					}
 				}
 			});
 	});
@@ -9737,7 +9846,7 @@ var _jrootham$cabal_voting$Main$userLine = function (model) {
 		A2(
 			_elm_lang$core$List$filter,
 			function (paper) {
-				return _elm_lang$core$Native_Utils.eq(model.name, paper.submittor);
+				return _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
 			},
 			model.papers));
 	var paperString = _elm_lang$core$Basics$toString(paperCount);
@@ -9807,7 +9916,8 @@ var _jrootham$cabal_voting$Main$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {loggedin: a, name: b, password: c, loginError: d, papers: e, order: f};
 	});
-var _jrootham$cabal_voting$Main$Submittor = {ctor: 'Submittor'};
+var _jrootham$cabal_voting$Main$MyVotes = {ctor: 'MyVotes'};
+var _jrootham$cabal_voting$Main$Submitter = {ctor: 'Submitter'};
 var _jrootham$cabal_voting$Main$MostVotes = {ctor: 'MostVotes'};
 var _jrootham$cabal_voting$Main$LeastVotes = {ctor: 'LeastVotes'};
 var _jrootham$cabal_voting$Main$Latest = {ctor: 'Latest'};
@@ -9865,50 +9975,57 @@ var _jrootham$cabal_voting$Main$radioBase = F3(
 			});
 	});
 var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
-	var compare = _jrootham$cabal_voting$Main$totalOrder(
-		function () {
-			var _p3 = model.order;
-			switch (_p3.ctor) {
-				case 'Title':
-					return F2(
+	var compare = function () {
+		var _p3 = model.order;
+		switch (_p3.ctor) {
+			case 'Title':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(left.title, right.title) < 0;
-						});
-				case 'Earliest':
-					return F2(
+						}));
+			case 'Earliest':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(
 								_elm_lang$core$Date$toTime(left.createdAt),
 								_elm_lang$core$Date$toTime(right.createdAt)) < 0;
-						});
-				case 'Latest':
-					return F2(
+						}));
+			case 'Latest':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(
 								_elm_lang$core$Date$toTime(right.createdAt),
 								_elm_lang$core$Date$toTime(left.createdAt)) < 0;
-						});
-				case 'MostVotes':
-					return F2(
+						}));
+			case 'MostVotes':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(
 								_elm_lang$core$List$length(right.votes),
 								_elm_lang$core$List$length(left.votes)) < 0;
-						});
-				case 'LeastVotes':
-					return F2(
+						}));
+			case 'LeastVotes':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(
 								_elm_lang$core$List$length(left.votes),
 								_elm_lang$core$List$length(right.votes)) < 0;
-						});
-				default:
-					return F2(
+						}));
+			case 'Submitter':
+				return _jrootham$cabal_voting$Main$totalOrder(
+					F2(
 						function (left, right) {
-							return _elm_lang$core$Native_Utils.cmp(left.submittor, right.submittor) < 0;
-						});
-			}
-		}());
+							return _elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0;
+						}));
+			default:
+				return _jrootham$cabal_voting$Main$myvotes(model.name);
+		}
+	}();
 	var radio = _jrootham$cabal_voting$Main$radioBase(model.order);
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9920,15 +10037,26 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						_jrootham$cabal_voting$Main$userLine(model)),
+					_0: A2(
+						_elm_lang$html$Html$h3,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_jrootham$cabal_voting$Main$userLine(model)),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('order'),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text('Order '),
@@ -9949,8 +10077,12 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 											_0: A2(radio, ' Least votes ', _jrootham$cabal_voting$Main$LeastVotes),
 											_1: {
 												ctor: '::',
-												_0: A2(radio, ' Submittor ', _jrootham$cabal_voting$Main$Submittor),
-												_1: {ctor: '[]'}
+												_0: A2(radio, ' Submitter ', _jrootham$cabal_voting$Main$Submitter),
+												_1: {
+													ctor: '::',
+													_0: A2(radio, ' My votes ', _jrootham$cabal_voting$Main$MyVotes),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									}
@@ -9968,13 +10100,71 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 							_0: A2(
 								_elm_lang$html$Html$table,
 								{ctor: '[]'},
-								A2(
-									_elm_lang$core$List$map,
-									A2(
-										_jrootham$cabal_voting$Main$displayPaper,
-										model,
-										_jrootham$cabal_voting$Main$voteLimit(model)),
-									A2(_elm_lang$core$List$sortWith, compare, model.papers))),
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$thead,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$th,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Submitter'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$th,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Contents'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$th,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Vote'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$th,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Voters'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: A2(
+										_elm_lang$core$List$map,
+										A2(
+											_jrootham$cabal_voting$Main$displayPaper,
+											model,
+											_jrootham$cabal_voting$Main$voteLimit(model)),
+										A2(_elm_lang$core$List$sortWith, compare, model.papers))
+								}),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -10084,14 +10274,25 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Use github user name and password'),
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Use github user name and password'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('password-line'),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: A2(
@@ -10112,7 +10313,11 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$div,
-						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('password-line'),
+							_1: {ctor: '[]'}
+						},
 						{
 							ctor: '::',
 							_0: A2(
@@ -10137,7 +10342,11 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$div,
-							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('password-line'),
+								_1: {ctor: '[]'}
+							},
 							{
 								ctor: '::',
 								_0: A2(
@@ -10158,7 +10367,11 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$div,
-								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('password-line'),
+									_1: {ctor: '[]'}
+								},
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(model.loginError),
@@ -10168,7 +10381,11 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$div,
-									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('password-line'),
+										_1: {ctor: '[]'}
+									},
 									{
 										ctor: '::',
 										_0: A2(
@@ -10196,7 +10413,11 @@ var _jrootham$cabal_voting$Main$passwordPage = function (model) {
 var _jrootham$cabal_voting$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('outer'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
@@ -10230,6 +10451,7 @@ var _jrootham$cabal_voting$Main$view = function (model) {
 };
 var _jrootham$cabal_voting$Main$main = _elm_lang$html$Html$program(
 	{init: _jrootham$cabal_voting$Main$init, view: _jrootham$cabal_voting$Main$view, update: _jrootham$cabal_voting$Main$update, subscriptions: _jrootham$cabal_voting$Main$subscriptions})();
+
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _jrootham$cabal_voting$Main$main !== 'undefined') {
@@ -10265,4 +10487,4 @@ for (var publicModule in Elm)
 }
 
 }).call(this);
-</script></head><body><script type="text/javascript">Elm.Main.fullscreen()</script></body></html>
+

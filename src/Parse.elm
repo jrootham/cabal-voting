@@ -10,7 +10,7 @@ type alias Paper =
     { title : String
     , body : String
     , createdAt : Date.Date
-    , submittor : String
+    , submitter : String
     , votes : List String
     }
 
