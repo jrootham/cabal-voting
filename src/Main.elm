@@ -174,7 +174,12 @@ displayPaper model votable paper =
             List.any testVote paper.votes
     in
         tr [class "entry"]
-            [ td [] [text paper.submitter]
+            [ td [] [div [] 
+                [
+                    text paper.submitter
+                    , button [disabled (model.name /= paper.submitter)] [text "Edit"]
+                    , button [disabled (model.name /= paper.submitter)] [text "Close"]
+                ]]
             , td []
                 [ (div [] [ h5 [] [text paper.title] ])
                 , (div [class "contents"] [ text paper.body ])
