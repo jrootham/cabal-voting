@@ -1,6 +1,17 @@
-module Config exposing(..)
+module Config exposing (..)
 
-login = "jrootham"
-repository = "cabal-voting"
-maxIssues = 5
-maxVotes = 5
+
+owner =
+    "jrootham"
+
+
+repository =
+    "cabal-voting"
+
+
+maxPapers =
+    5
+
+
+maxVotes =
+    5
