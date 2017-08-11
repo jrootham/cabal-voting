@@ -9335,7 +9335,7 @@ var _jrootham$cabal_voting$Payload$makePayload = F2(
 					_1: {ctor: '[]'}
 				}
 			});
-		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        bodyHTML\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
+		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        body\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
 		var ship = A2(
 			_elm_lang$core$String$join,
 			' ',
@@ -9404,7 +9404,7 @@ var _jrootham$cabal_voting$Parse$Paper = F7(
 	});
 var _jrootham$cabal_voting$Parse$RawPaper = F5(
 	function (a, b, c, d, e) {
-		return {title: a, bodyHTML: b, createdAt: c, submitter: d, votes: e};
+		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
 	});
 var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
@@ -9478,8 +9478,16 @@ var _jrootham$cabal_voting$Parse$translateRawPaper = function (raw) {
 		_jrootham$cabal_voting$Parse$Paper,
 		raw.title,
 		A2(_jrootham$cabal_voting$Parse$Link, 'Paper', 'https://xkcd.com/1875/'),
-		raw.bodyHTML,
-		{ctor: '[]'},
+		raw.body,
+		{
+			ctor: '::',
+			_0: A2(_jrootham$cabal_voting$Parse$Link, 'Reference 1', 'https://xkcd.com/1052/'),
+			_1: {
+				ctor: '::',
+				_0: A2(_jrootham$cabal_voting$Parse$Link, 'Reference 2', 'https://xkcd.com/1271/'),
+				_1: {ctor: '[]'}
+			}
+		},
 		raw.createdAt,
 		raw.submitter,
 		raw.votes);

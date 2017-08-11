@@ -30,7 +30,7 @@ type alias Paper =
 
 type alias RawPaper =
     { title : String
-    , bodyHTML : String
+    , body : String
     , createdAt : Date.Date
     , submitter : String
     , votes : List String
@@ -57,8 +57,8 @@ translateRawPaper : RawPaper-> Paper
 translateRawPaper raw = 
     Paper raw.title 
             (Link "Paper" "https://xkcd.com/1875/") 
-            raw.bodyHTML 
-            [] 
+            raw.body 
+            [(Link "Reference 1" "https://xkcd.com/1052/"), (Link "Reference 2" "https://xkcd.com/1271/")] 
             raw.createdAt 
             raw.submitter 
             raw.votes
