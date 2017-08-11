@@ -68,7 +68,7 @@ decodeRawPaper : Decoder RawPaper
 decodeRawPaper =
     decode RawPaper
         |> required "title" string
-        |> required "bodyHTML" string
+        |> required "body" string
         |> required "createdAt" dateDecoder
         |> required "author" (field "login" string)
         |> required "reactions" voteDecoder

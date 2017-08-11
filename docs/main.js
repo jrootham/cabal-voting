@@ -9420,7 +9420,7 @@ var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
 			_jrootham$cabal_voting$Parse$dateDecoder,
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'bodyHTML',
+				'body',
 				_elm_lang$core$Json_Decode$string,
 				A3(
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
