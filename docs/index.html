@@ -10,10 +10,18 @@
 <body>
 Foo
 <script>
-OAuth.initialize(key);
+	OAuth.initialize('9RCAn9KzV9GuG_ZKl2MpWMXgdFA');
 
-OAuth.redirect('github', "main.html");
-
+	OAuth.popup('github')
+	.done(function(result) {
+		console.log(result);
+	 //use result.access_token in your API request 
+	 //or use result.get|post|put|del|patch|me methods (see below)
+	})
+	.fail(function (err) {
+		console.log(err);
+	 //handle error with err
+	});
 </script>
 
 </body>
