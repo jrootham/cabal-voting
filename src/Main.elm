@@ -174,7 +174,7 @@ setEnabled enabled =
 
 makeLink: Link -> Html msg
 makeLink link =
-    a [href link.link] [text link.text]
+    a [(href link.link), (target "_blank")] [text link.text]
 
 displayPaper : Model -> Bool -> Paper -> Html Msg
 displayPaper model votable paper =
@@ -187,7 +187,7 @@ displayPaper model votable paper =
 
         belongsTo =
             model.name == paper.submitter
-        
+
     in
         tr [ class "entry" ]
             [ td []

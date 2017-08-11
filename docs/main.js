@@ -9544,7 +9544,11 @@ var _jrootham$cabal_voting$Main$makeLink = function (link) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$href(link.link),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$target('_blank'),
+				_1: {ctor: '[]'}
+			}
 		},
 		{
 			ctor: '::',
