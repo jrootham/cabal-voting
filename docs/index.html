@@ -6,21 +6,20 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 	<script src="oauth.js"></script>
 	<script src="stuff.js"></script>
+	<script src="main.js"></script>
 </head>
 <body>
-Foo
+If you see this there was an error.  Look at the console for the error message.
 <script>
-	OAuth.initialize('9RCAn9KzV9GuG_ZKl2MpWMXgdFA');
+	OAuth.initialize(key);
 
 	OAuth.popup('github')
 	.done(function(result) {
 		console.log(result);
-	 //use result.access_token in your API request 
-	 //or use result.get|post|put|del|patch|me methods (see below)
+		Elm.Main.fullscreen(result.access_token);
 	})
 	.fail(function (err) {
 		console.log(err);
-	 //handle error with err
 	});
 </script>
 

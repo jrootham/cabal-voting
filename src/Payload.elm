@@ -21,6 +21,9 @@ makePayload owner name =
         fromGraphQLi =
             """
   query repo($owner: String!, $name: String!) {
+    viewer {
+    login
+  }
   repository(owner: $owner, name: $name) {
     issues(first: 100, states: [OPEN]) {
       nodes {

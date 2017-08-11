@@ -1,9 +1,15 @@
-module Parse exposing (parse, Paper)
+module Parse exposing (parse, NameAndPaperList, Paper)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 import Result
 import Date
+
+
+type alias NameAndPaperList =
+    {name : String
+     , papers : List Paper
+    }
 
 
 type alias Paper =
@@ -54,10 +60,15 @@ voteDecoder =
     at [ "nodes" ] (list (at [ "user", "login" ] string))
 
 
+decodeNameAndPaperList : Decoder NameAndPaperList
+decodeNameAndPaperList =
+    decode NameAndPaperList
+        |> requiredAt [ "viewer", "login"] string 
+        |> requiredAt [ "repository", "issues", "nodes" ] (list decodePaper)
 
 --parse: String -> (Result, Data)
 
 
-parse : String -> Result String (List Paper)
+parse : String -> Result String NameAndPaperList
 parse response =
-    decodeString (at [ "data", "repository", "issues", "nodes" ] (list decodePaper)) response
+    decodeString (at [ "data" ] decodeNameAndPaperList) response

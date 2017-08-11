@@ -1,20 +1,18 @@
 module Main exposing (main)
 
-import Html exposing 
-    (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, select, option)
+import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, select, option)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, on)
 import Http
 import Date
 import Set
-import BasicAuth exposing (buildAuthorizationHeader)
 import Config
 import Payload exposing (..)
 import Parse exposing (parse, Paper)
 
 
 main =
-    Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
+    Html.programWithFlags { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
 
@@ -25,26 +23,33 @@ type alias ResponseString =
     String
 
 
-type alias Login =
+type alias Key =
     String
 
 
-type alias Password =
-    String
 
 -- Types
 
-type PaperOrder 
-    = Title | Earliest | Latest | LeastVotes | MostVotes | Submitter | MyVotes | Voter
+
+type PaperOrder
+    = Title
+    | Earliest
+    | Latest
+    | LeastVotes
+    | MostVotes
+    | Submitter
+    | MyVotes
+    | Voter
+
+
 
 -- MODEL
 
 
 type alias Model =
-    { loggedin : Bool
+    { key : String
     , name : String
-    , password : String
-    , loginError : String
+    , fetchError : String
     , papers : List Paper
     , order : PaperOrder
     , voter : String
@@ -52,9 +57,9 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( (Model False "" "" "" [] Title "" []), Cmd.none )
+init : String -> ( Model, Cmd Msg )
+init key =
+    ( (Model key "" "" [] Title "" []), githubFetch key )
 
 
 
@@ -71,41 +76,30 @@ subscriptions model =
 
 
 type Msg
-    = Name String
-    | Password String
-    | Login
-    | LoginResult (Result Http.Error String)
-    | Clear
-    | ChangeOrder PaperOrder
+    = ChangeOrder PaperOrder
     | ChangeVoter String
+    | FetchResult (Result Http.Error ResponseString)
+    | Clear
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Name newname ->
-            ( { model | name = newname }, Cmd.none )
-
-        Password newpassword ->
-            ( { model | password = newpassword }, Cmd.none )
-
-        Login ->
-            ( model, githubLogin model.name model.password )
-
-        LoginResult (Ok response) ->
+        FetchResult (Ok response) ->
             updateModel model response
 
-        LoginResult (Err error) ->
-            ( { model | loginError = formatError error }, Cmd.none )
+        FetchResult (Err error) ->
+            ( { model | fetchError = formatError error }, Cmd.none )
 
         Clear ->
-            ( { model | loginError = "" }, Cmd.none )
+            ( { model | fetchError = "" }, Cmd.none )
 
         ChangeOrder newOrder ->
-            ( { model | order = newOrder}, Cmd.none )
+            ( { model | order = newOrder }, Cmd.none )
 
         ChangeVoter newVoter ->
-            ( { model | voter = newVoter }, Cmd.none)
+            ( { model | voter = newVoter }, Cmd.none )
+
 
 
 updateModel : Model -> ResponseString -> ( Model, Cmd Msg )
@@ -115,17 +109,24 @@ updateModel model response =
             parse response
     in
         case result of
-            Ok papers ->
+            Ok data ->
                 let
-                    raw = List.foldr (\ paper voterList -> List.append voterList paper.votes) [""] papers
-                    voters = List.sort (Set.toList (Set.fromList raw)) 
-                
+                    name =
+                        data.name
+
+                    papers =
+                        data.papers
+
+                    raw =
+                        List.foldr (\paper voterList -> List.append voterList paper.votes) [ "" ] papers
+
+                    voters =
+                        List.sort (Set.toList (Set.fromList raw))
                 in
-                        
-                    ( { model | loggedin = True, papers = papers, voters = voters }, Cmd.none )
+                    ( { model | name = name, papers = papers, voters = voters }, Cmd.none )
 
             Err error ->
-                ( { model | loginError = error }, Cmd.none )
+                ( { model | fetchError = error }, Cmd.none )
 
 
 formatError : Http.Error -> String
@@ -149,27 +150,12 @@ formatError error =
 
 view : Model -> Html Msg
 view model =
-    div [class "outer"]
+    div [ class "outer" ]
         [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
-        , div []
-            [ if model.loggedin then
-                loggedinPage model
-              else
-                passwordPage model
-            ]
-        ]
-
-
-passwordPage : Model -> Html Msg
-passwordPage model =
-    div []
-        [ div [] [h2 [] [ text "Use github user name and password" ]]
-        , div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
-        , div [class "password-line"] 
-            [ input [ type_ "password", placeholder "Password", onInput Password ] [] ]
-        , div [class "password-line"] [ button [ onClick Login ] [ text "Login" ] ]
-        , div [class "password-line"] [ text model.loginError ]
-        , div [class "password-line"] [ button [ onClick Clear ] [ text "Clear error" ] ]
+        , if model.fetchError == "" then
+            div [] [ page model ]
+        else
+            div [] [text model.fetchError]
         ]
 
 
@@ -177,12 +163,14 @@ checkVote : String -> String -> Bool
 checkVote login vote =
     login == vote
 
-setEnabled: Bool -> Html.Attribute msg
+
+setEnabled : Bool -> Html.Attribute msg
 setEnabled enabled =
     if enabled then
         class "flat-enabled"
     else
         class "flat-disabled"
+
 
 displayPaper : Model -> Bool -> Paper -> Html Msg
 displayPaper model votable paper =
@@ -192,21 +180,22 @@ displayPaper model votable paper =
 
         on =
             List.any testVote paper.votes
-        
-        belongsTo = 
+
+        belongsTo =
             model.name == paper.submitter
     in
-        tr [class "entry"]
-            [ td [] [div [] 
-                [
-                    div [class "submitter"] [text paper.submitter]
-                    , div [class "flat-button", setEnabled belongsTo ] [text "Edit"]
-                ]]
-            , td []
-                [ (div [] [ h5 [] [text paper.title] ])
-                , (div [class "contents"] [ text paper.body ])
+        tr [ class "entry" ]
+            [ td []
+                [ div []
+                    [ div [ class "submitter" ] [ text paper.submitter ]
+                    , div [ class "flat-button", setEnabled belongsTo ] [ text "Edit" ]
+                    ]
                 ]
-            , td [class "vote"]
+            , td []
+                [ (div [] [ h5 [] [ text paper.title ] ])
+                , (div [ class "contents" ] [ text paper.body ])
+                ]
+            , td [ class "vote" ]
                 [ label []
                     [ input
                         [ type_ "checkbox"
@@ -217,7 +206,7 @@ displayPaper model votable paper =
                     , text "Vote"
                     ]
                 ]
-            , td [] (List.map (\ login -> div [] [text login]) paper.votes)
+            , td [] (List.map (\login -> div [] [ text login ]) paper.votes)
             ]
 
 
@@ -262,33 +251,37 @@ userLine model =
         votingString =
             " voted for  " ++ voteString ++ " of " ++ maxVoteString ++ " possible, "
 
-        totalString = "out of " ++ (toString (List.length model.papers)) ++ " total."
+        totalString =
+            "out of " ++ (toString (List.length model.papers)) ++ " total."
     in
         "User: " ++ model.name ++ submitString ++ votingString ++ totalString
 
-nameIn: String -> Paper -> Bool
-nameIn name paper = 
+
+nameIn : String -> Paper -> Bool
+nameIn name paper =
     List.member name paper.votes
 
-votes: String -> (Paper -> Paper -> Order)
-votes name = 
+
+votes : String -> (Paper -> Paper -> Order)
+votes name =
     let
-        voterIn = nameIn name
+        voterIn =
+            nameIn name
     in
-        \ left right ->
+        \left right ->
             if (voterIn left) && (voterIn right) then
                 EQ
             else if (not (voterIn left)) && (voterIn right) then
                 GT
-            else if (voterIn left) && (not(voterIn right)) then
+            else if (voterIn left) && (not (voterIn right)) then
                 LT
-            else if (not (voterIn left)) && (not(voterIn right)) then
+            else if (not (voterIn left)) && (not (voterIn right)) then
                 EQ
             else
                 Debug.crash "This should be impossible"
 
 
-totalOrder: (a -> a -> Bool) -> a -> a -> Order
+totalOrder : (a -> a -> Bool) -> a -> a -> Order
 totalOrder lessThan left right =
     if (lessThan left right) then
         LT
@@ -297,36 +290,46 @@ totalOrder lessThan left right =
     else
         EQ
 
-loggedinPage : Model -> Html Msg
-loggedinPage model =
+
+page : Model -> Html Msg
+page model =
     let
-        radioSelected = radioBase model.order
-        radio = radioSelected True
-        compare = 
+        radioSelected =
+            radioBase model.order
+
+        radio =
+            radioSelected True
+
+        compare =
             case model.order of
                 Title ->
-                    totalOrder (\ left right -> left.title < right.title)
+                    totalOrder (\left right -> left.title < right.title)
+
                 Earliest ->
-                    totalOrder (\ left right -> (Date.toTime left.createdAt) < (Date.toTime right.createdAt))
+                    totalOrder (\left right -> (Date.toTime left.createdAt) < (Date.toTime right.createdAt))
+
                 Latest ->
-                    totalOrder (\ left right -> (Date.toTime right.createdAt) < (Date.toTime left.createdAt))
-                MostVotes -> 
-                    totalOrder (\ left right -> (List.length right.votes) < (List.length left.votes))
-                LeastVotes -> 
-                    totalOrder (\ left right -> (List.length left.votes) < (List.length right.votes))
+                    totalOrder (\left right -> (Date.toTime right.createdAt) < (Date.toTime left.createdAt))
+
+                MostVotes ->
+                    totalOrder (\left right -> (List.length right.votes) < (List.length left.votes))
+
+                LeastVotes ->
+                    totalOrder (\left right -> (List.length left.votes) < (List.length right.votes))
+
                 Submitter ->
-                    totalOrder (\ left right -> left.submitter < right.submitter)
+                    totalOrder (\left right -> left.submitter < right.submitter)
+
                 MyVotes ->
                     votes model.name
+
                 Voter ->
                     votes model.voter
-
-
-    in        
+    in
         div []
-            [ (div [] [ h3 [] [text (userLine model)] ])
-            ,div [class "order"]
-                [text "Order: "
+            [ (div [] [ h3 [] [ text (userLine model) ] ])
+            , div [ class "order" ]
+                [ text "Order: "
                 , radio " Title " Title
                 , radio " Earliest " Earliest
                 , radio " Latest " Latest
@@ -335,48 +338,54 @@ loggedinPage model =
                 , radio " Submitter " Submitter
                 , radio " My votes " MyVotes
                 , radioSelected (not (model.voter == "")) " Voter " Voter
-                , select [] 
-                    (List.map 
-                        (\ voter -> option [value voter, onClick (ChangeVoter voter)] [text voter] ) 
-                        model.voters)
-                ]   
-            , (div [] 
-                [ 
-                    table [] 
-                        ((thead [] [tr [] 
-                        [
-                              th [] [text "Submitter"]
-                            , th [] [text "Contents"]
-                            , th [] [text "Vote"]
-                            , th [] [text "Voters"]]
-                        ]) ::
-                        (List.map (displayPaper model (voteLimit model)) (List.sortWith compare model.papers))) 
-                ])
-        ]
+                , select []
+                    (List.map
+                        (\voter -> option [ value voter, onClick (ChangeVoter voter) ] [ text voter ])
+                        model.voters
+                    )
+                ]
+            , (div []
+                [ table []
+                    ((thead []
+                        [ tr []
+                            [ th [] [ text "Submitter" ]
+                            , th [] [ text "Contents" ]
+                            , th [] [ text "Vote" ]
+                            , th [] [ text "Voters" ]
+                            ]
+                        ]
+                     )
+                        :: (List.map (displayPaper model (voteLimit model)) (List.sortWith compare model.papers))
+                    )
+                ]
+              )
+            ]
+
 
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
 radioBase current enable labelText order =
-  label [] 
-    [ input 
-        [ type_ "radio"
-        , name "change-order"
-        , onClick (ChangeOrder order)
-        , checked (current == order) 
-        , disabled (not enable)
-        ] 
-        []
-    , text labelText
-    ]
+    label []
+        [ input
+            [ type_ "radio"
+            , name "change-order"
+            , onClick (ChangeOrder order)
+            , checked (current == order)
+            , disabled (not enable)
+            ]
+            []
+        , text labelText
+        ]
+
 
 
 -- Commands
 
 
-githubLogin : Login -> Password -> Cmd Msg
-githubLogin login password =
+githubFetch : Key -> Cmd Msg
+githubFetch key =
     let
-        header =
-            [ buildAuthorizationHeader login password ]
+        headers =
+            [ Http.header "Authorization" ("bearer" ++ key) ]
 
         mime =
             "application/json"
@@ -390,7 +399,7 @@ githubLogin login password =
         req =
             Http.request
                 { method = "POST"
-                , headers = header
+                , headers = headers
                 , url = url
                 , body = Http.stringBody mime payload
                 , expect = Http.expectString
@@ -398,4 +407,4 @@ githubLogin login password =
                 , withCredentials = False
                 }
     in
-        Http.send LoginResult req
+        Http.send FetchResult req

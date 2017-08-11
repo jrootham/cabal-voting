@@ -6315,6 +6315,137 @@ var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
 var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
 var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
 
+var _elm_lang$core$Set$foldr = F3(
+	function (f, b, _p0) {
+		var _p1 = _p0;
+		return A3(
+			_elm_lang$core$Dict$foldr,
+			F3(
+				function (k, _p2, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p1._0);
+	});
+var _elm_lang$core$Set$foldl = F3(
+	function (f, b, _p3) {
+		var _p4 = _p3;
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, _p5, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p4._0);
+	});
+var _elm_lang$core$Set$toList = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Dict$keys(_p7._0);
+};
+var _elm_lang$core$Set$size = function (_p8) {
+	var _p9 = _p8;
+	return _elm_lang$core$Dict$size(_p9._0);
+};
+var _elm_lang$core$Set$member = F2(
+	function (k, _p10) {
+		var _p11 = _p10;
+		return A2(_elm_lang$core$Dict$member, k, _p11._0);
+	});
+var _elm_lang$core$Set$isEmpty = function (_p12) {
+	var _p13 = _p12;
+	return _elm_lang$core$Dict$isEmpty(_p13._0);
+};
+var _elm_lang$core$Set$Set_elm_builtin = function (a) {
+	return {ctor: 'Set_elm_builtin', _0: a};
+};
+var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
+var _elm_lang$core$Set$singleton = function (k) {
+	return _elm_lang$core$Set$Set_elm_builtin(
+		A2(
+			_elm_lang$core$Dict$singleton,
+			k,
+			{ctor: '_Tuple0'}));
+};
+var _elm_lang$core$Set$insert = F2(
+	function (k, _p14) {
+		var _p15 = _p14;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A3(
+				_elm_lang$core$Dict$insert,
+				k,
+				{ctor: '_Tuple0'},
+				_p15._0));
+	});
+var _elm_lang$core$Set$fromList = function (xs) {
+	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
+};
+var _elm_lang$core$Set$map = F2(
+	function (f, s) {
+		return _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				f,
+				_elm_lang$core$Set$toList(s)));
+	});
+var _elm_lang$core$Set$remove = F2(
+	function (k, _p16) {
+		var _p17 = _p16;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$remove, k, _p17._0));
+	});
+var _elm_lang$core$Set$union = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
+	});
+var _elm_lang$core$Set$intersect = F2(
+	function (_p23, _p22) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
+	});
+var _elm_lang$core$Set$diff = F2(
+	function (_p27, _p26) {
+		var _p28 = _p27;
+		var _p29 = _p26;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
+	});
+var _elm_lang$core$Set$filter = F2(
+	function (p, _p30) {
+		var _p31 = _p30;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(
+				_elm_lang$core$Dict$filter,
+				F2(
+					function (k, _p32) {
+						return p(k);
+					}),
+				_p31._0));
+	});
+var _elm_lang$core$Set$partition = F2(
+	function (p, _p33) {
+		var _p34 = _p33;
+		var _p35 = A2(
+			_elm_lang$core$Dict$partition,
+			F2(
+				function (k, _p36) {
+					return p(k);
+				}),
+			_p34._0);
+		var p1 = _p35._0;
+		var p2 = _p35._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
+			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
+		};
+	});
+
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -9184,358 +9315,6 @@ var _jrootham$cabal_voting$Config$maxPapers = 5;
 var _jrootham$cabal_voting$Config$repository = 'cabal-voting';
 var _jrootham$cabal_voting$Config$owner = 'jrootham';
 
-var _truqu$elm_base64$BitList$partition = F2(
-	function (size, list) {
-		if (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(list),
-			size) < 1) {
-			return {
-				ctor: '::',
-				_0: list,
-				_1: {ctor: '[]'}
-			};
-		} else {
-			var partitionTail = F3(
-				function (size, list, res) {
-					partitionTail:
-					while (true) {
-						var _p0 = list;
-						if (_p0.ctor === '[]') {
-							return res;
-						} else {
-							var _v1 = size,
-								_v2 = A2(_elm_lang$core$List$drop, size, list),
-								_v3 = {
-								ctor: '::',
-								_0: A2(_elm_lang$core$List$take, size, list),
-								_1: res
-							};
-							size = _v1;
-							list = _v2;
-							res = _v3;
-							continue partitionTail;
-						}
-					}
-				});
-			return _elm_lang$core$List$reverse(
-				A3(
-					partitionTail,
-					size,
-					list,
-					{ctor: '[]'}));
-		}
-	});
-var _truqu$elm_base64$BitList$toByteReverse = function (bitList) {
-	var _p1 = bitList;
-	if (_p1.ctor === '[]') {
-		return 0;
-	} else {
-		if (_p1._0.ctor === 'Off') {
-			return 2 * _truqu$elm_base64$BitList$toByteReverse(_p1._1);
-		} else {
-			return 1 + (2 * _truqu$elm_base64$BitList$toByteReverse(_p1._1));
-		}
-	}
-};
-var _truqu$elm_base64$BitList$toByte = function (bitList) {
-	return _truqu$elm_base64$BitList$toByteReverse(
-		_elm_lang$core$List$reverse(bitList));
-};
-var _truqu$elm_base64$BitList$Off = {ctor: 'Off'};
-var _truqu$elm_base64$BitList$On = {ctor: 'On'};
-var _truqu$elm_base64$BitList$fromNumber = function ($int) {
-	return _elm_lang$core$Native_Utils.eq($int, 0) ? {ctor: '[]'} : (_elm_lang$core$Native_Utils.eq(
-		A2(_elm_lang$core$Basics_ops['%'], $int, 2),
-		1) ? A2(
-		_elm_lang$core$List$append,
-		_truqu$elm_base64$BitList$fromNumber(($int / 2) | 0),
-		{
-			ctor: '::',
-			_0: _truqu$elm_base64$BitList$On,
-			_1: {ctor: '[]'}
-		}) : A2(
-		_elm_lang$core$List$append,
-		_truqu$elm_base64$BitList$fromNumber(($int / 2) | 0),
-		{
-			ctor: '::',
-			_0: _truqu$elm_base64$BitList$Off,
-			_1: {ctor: '[]'}
-		}));
-};
-var _truqu$elm_base64$BitList$fromNumberWithSize = F2(
-	function (number, size) {
-		var bitList = _truqu$elm_base64$BitList$fromNumber(number);
-		var paddingSize = size - _elm_lang$core$List$length(bitList);
-		return A2(
-			_elm_lang$core$List$append,
-			A2(_elm_lang$core$List$repeat, paddingSize, _truqu$elm_base64$BitList$Off),
-			bitList);
-	});
-var _truqu$elm_base64$BitList$fromByte = function ($byte) {
-	return A2(_truqu$elm_base64$BitList$fromNumberWithSize, $byte, 8);
-};
-
-var _truqu$elm_base64$Base64$dropLast = F2(
-	function (number, list) {
-		return _elm_lang$core$List$reverse(
-			A2(
-				_elm_lang$core$List$drop,
-				number,
-				_elm_lang$core$List$reverse(list)));
-	});
-var _truqu$elm_base64$Base64$partitionBits = function (list) {
-	var list_ = A3(
-		_elm_lang$core$List$foldr,
-		_elm_lang$core$List$append,
-		{ctor: '[]'},
-		A2(_elm_lang$core$List$map, _truqu$elm_base64$BitList$fromByte, list));
-	return A2(
-		_elm_lang$core$List$map,
-		_truqu$elm_base64$BitList$toByte,
-		A2(_truqu$elm_base64$BitList$partition, 6, list_));
-};
-var _truqu$elm_base64$Base64$base64CharsList = _elm_lang$core$String$toList('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-var _truqu$elm_base64$Base64$base64Map = function () {
-	var insert = F2(
-		function (_p0, dict) {
-			var _p1 = _p0;
-			return A3(_elm_lang$core$Dict$insert, _p1._1, _p1._0, dict);
-		});
-	return A3(
-		_elm_lang$core$List$foldl,
-		insert,
-		_elm_lang$core$Dict$empty,
-		A2(
-			_elm_lang$core$List$indexedMap,
-			F2(
-				function (v0, v1) {
-					return {ctor: '_Tuple2', _0: v0, _1: v1};
-				}),
-			_truqu$elm_base64$Base64$base64CharsList));
-}();
-var _truqu$elm_base64$Base64$isValid = function (string) {
-	var string_ = A2(_elm_lang$core$String$endsWith, '==', string) ? A2(_elm_lang$core$String$dropRight, 2, string) : (A2(_elm_lang$core$String$endsWith, '=', string) ? A2(_elm_lang$core$String$dropRight, 1, string) : string);
-	var isBase64Char = function ($char) {
-		return A2(_elm_lang$core$Dict$member, $char, _truqu$elm_base64$Base64$base64Map);
-	};
-	return A2(_elm_lang$core$String$all, isBase64Char, string_);
-};
-var _truqu$elm_base64$Base64$toBase64BitList = function (string) {
-	var endingEquals = A2(_elm_lang$core$String$endsWith, '==', string) ? 2 : (A2(_elm_lang$core$String$endsWith, '=', string) ? 1 : 0);
-	var stripped = _elm_lang$core$String$toList(
-		A2(_elm_lang$core$String$dropRight, endingEquals, string));
-	var base64ToInt = function ($char) {
-		var _p2 = A2(_elm_lang$core$Dict$get, $char, _truqu$elm_base64$Base64$base64Map);
-		if (_p2.ctor === 'Just') {
-			return _p2._0;
-		} else {
-			return -1;
-		}
-	};
-	var numberList = A2(_elm_lang$core$List$map, base64ToInt, stripped);
-	return A2(
-		_truqu$elm_base64$Base64$dropLast,
-		endingEquals * 2,
-		A2(
-			_elm_lang$core$List$concatMap,
-			A2(_elm_lang$core$Basics$flip, _truqu$elm_base64$BitList$fromNumberWithSize, 6),
-			numberList));
-};
-var _truqu$elm_base64$Base64$toCharList = function (bitList) {
-	var array = _elm_lang$core$Array$fromList(_truqu$elm_base64$Base64$base64CharsList);
-	var toBase64Char = function (index) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			_elm_lang$core$Native_Utils.chr('!'),
-			A2(_elm_lang$core$Array$get, index, array));
-	};
-	var toChars = function (_p3) {
-		var _p4 = _p3;
-		var _p5 = {ctor: '_Tuple3', _0: _p4._0, _1: _p4._1, _2: _p4._2};
-		if (_p5._2 === -1) {
-			if (_p5._1 === -1) {
-				return A2(
-					_elm_lang$core$List$append,
-					A2(
-						_truqu$elm_base64$Base64$dropLast,
-						2,
-						A2(
-							_elm_lang$core$List$map,
-							toBase64Char,
-							_truqu$elm_base64$Base64$partitionBits(
-								{
-									ctor: '::',
-									_0: _p5._0,
-									_1: {
-										ctor: '::',
-										_0: 0,
-										_1: {
-											ctor: '::',
-											_0: 0,
-											_1: {ctor: '[]'}
-										}
-									}
-								}))),
-					{
-						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.chr('='),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Native_Utils.chr('='),
-							_1: {ctor: '[]'}
-						}
-					});
-			} else {
-				return A2(
-					_elm_lang$core$List$append,
-					A2(
-						_truqu$elm_base64$Base64$dropLast,
-						1,
-						A2(
-							_elm_lang$core$List$map,
-							toBase64Char,
-							_truqu$elm_base64$Base64$partitionBits(
-								{
-									ctor: '::',
-									_0: _p5._0,
-									_1: {
-										ctor: '::',
-										_0: _p5._1,
-										_1: {
-											ctor: '::',
-											_0: 0,
-											_1: {ctor: '[]'}
-										}
-									}
-								}))),
-					{
-						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.chr('='),
-						_1: {ctor: '[]'}
-					});
-			}
-		} else {
-			return A2(
-				_elm_lang$core$List$map,
-				toBase64Char,
-				_truqu$elm_base64$Base64$partitionBits(
-					{
-						ctor: '::',
-						_0: _p5._0,
-						_1: {
-							ctor: '::',
-							_0: _p5._1,
-							_1: {
-								ctor: '::',
-								_0: _p5._2,
-								_1: {ctor: '[]'}
-							}
-						}
-					}));
-		}
-	};
-	return A2(_elm_lang$core$List$concatMap, toChars, bitList);
-};
-var _truqu$elm_base64$Base64$toTupleList = function () {
-	var toTupleListHelp = F2(
-		function (acc, list) {
-			toTupleListHelp:
-			while (true) {
-				var _p6 = list;
-				if (_p6.ctor === '::') {
-					if (_p6._1.ctor === '::') {
-						if (_p6._1._1.ctor === '::') {
-							var _v5 = {
-								ctor: '::',
-								_0: {ctor: '_Tuple3', _0: _p6._0, _1: _p6._1._0, _2: _p6._1._1._0},
-								_1: acc
-							},
-								_v6 = _p6._1._1._1;
-							acc = _v5;
-							list = _v6;
-							continue toTupleListHelp;
-						} else {
-							return {
-								ctor: '::',
-								_0: {ctor: '_Tuple3', _0: _p6._0, _1: _p6._1._0, _2: -1},
-								_1: acc
-							};
-						}
-					} else {
-						return {
-							ctor: '::',
-							_0: {ctor: '_Tuple3', _0: _p6._0, _1: -1, _2: -1},
-							_1: acc
-						};
-					}
-				} else {
-					return acc;
-				}
-			}
-		});
-	return function (_p7) {
-		return _elm_lang$core$List$reverse(
-			A2(
-				toTupleListHelp,
-				{ctor: '[]'},
-				_p7));
-	};
-}();
-var _truqu$elm_base64$Base64$toCodeList = function (string) {
-	return A2(
-		_elm_lang$core$List$map,
-		_elm_lang$core$Char$toCode,
-		_elm_lang$core$String$toList(string));
-};
-var _truqu$elm_base64$Base64$decode = function (s) {
-	if (!_truqu$elm_base64$Base64$isValid(s)) {
-		return _elm_lang$core$Result$Err('Error while decoding');
-	} else {
-		var bitList = A2(
-			_elm_lang$core$List$map,
-			_truqu$elm_base64$BitList$toByte,
-			A2(
-				_truqu$elm_base64$BitList$partition,
-				8,
-				_truqu$elm_base64$Base64$toBase64BitList(s)));
-		var charList = A2(_elm_lang$core$List$map, _elm_lang$core$Char$fromCode, bitList);
-		return _elm_lang$core$Result$Ok(
-			_elm_lang$core$String$fromList(charList));
-	}
-};
-var _truqu$elm_base64$Base64$encode = function (s) {
-	return _elm_lang$core$Result$Ok(
-		_elm_lang$core$String$fromList(
-			_truqu$elm_base64$Base64$toCharList(
-				_truqu$elm_base64$Base64$toTupleList(
-					_truqu$elm_base64$Base64$toCodeList(s)))));
-};
-
-var _kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationToken = F2(
-	function (username, password) {
-		var result = _truqu$elm_base64$Base64$encode(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				username,
-				A2(_elm_lang$core$Basics_ops['++'], ':', password)));
-		var _p0 = result;
-		if (_p0.ctor === 'Ok') {
-			return _p0._0;
-		} else {
-			return A2(_elm_lang$core$Basics_ops['++'], 'error: ', _p0._0);
-		}
-	});
-var _kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationHeader = F2(
-	function (username, password) {
-		return A2(
-			_elm_lang$http$Http$header,
-			'Authorization',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'Basic ',
-				A2(_kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationToken, username, password)));
-	});
-
 var _jrootham$cabal_voting$Payload$makePayload = F2(
 	function (owner, name) {
 		var vars = _elm_lang$core$Json_Encode$object(
@@ -9556,7 +9335,7 @@ var _jrootham$cabal_voting$Payload$makePayload = F2(
 					_1: {ctor: '[]'}
 				}
 			});
-		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        body\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
+		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        body\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
 		var ship = A2(
 			_elm_lang$core$String$join,
 			' ',
@@ -9611,6 +9390,10 @@ var _jrootham$cabal_voting$Parse$dateDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
+var _jrootham$cabal_voting$Parse$NameAndPaperList = F2(
+	function (a, b) {
+		return {name: a, papers: b};
+	});
 var _jrootham$cabal_voting$Parse$Paper = F5(
 	function (a, b, c, d, e) {
 		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
@@ -9636,6 +9419,35 @@ var _jrootham$cabal_voting$Parse$decodePaper = A3(
 					'title',
 					_elm_lang$core$Json_Decode$string,
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Paper))))));
+var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
+	{
+		ctor: '::',
+		_0: 'repository',
+		_1: {
+			ctor: '::',
+			_0: 'issues',
+			_1: {
+				ctor: '::',
+				_0: 'nodes',
+				_1: {ctor: '[]'}
+			}
+		}
+	},
+	_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodePaper),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
+		{
+			ctor: '::',
+			_0: 'viewer',
+			_1: {
+				ctor: '::',
+				_0: 'login',
+				_1: {ctor: '[]'}
+			}
+		},
+		_elm_lang$core$Json_Decode$string,
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndPaperList)));
 var _jrootham$cabal_voting$Parse$parse = function (response) {
 	return A2(
 		_elm_lang$core$Json_Decode$decodeString,
@@ -9644,21 +9456,9 @@ var _jrootham$cabal_voting$Parse$parse = function (response) {
 			{
 				ctor: '::',
 				_0: 'data',
-				_1: {
-					ctor: '::',
-					_0: 'repository',
-					_1: {
-						ctor: '::',
-						_0: 'issues',
-						_1: {
-							ctor: '::',
-							_0: 'nodes',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
+				_1: {ctor: '[]'}
 			},
-			_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodePaper)),
+			_jrootham$cabal_voting$Parse$decodeNameAndPaperList),
 		response);
 };
 var _jrootham$cabal_voting$Parse$Votes = F2(
@@ -9674,15 +9474,15 @@ var _jrootham$cabal_voting$Main$nameIn = F2(
 	function (name, paper) {
 		return A2(_elm_lang$core$List$member, name, paper.votes);
 	});
-var _jrootham$cabal_voting$Main$myvotes = function (name) {
+var _jrootham$cabal_voting$Main$votes = function (name) {
 	var voterIn = _jrootham$cabal_voting$Main$nameIn(name);
 	return F2(
 		function (left, right) {
 			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'Main',
 				{
-					start: {line: 274, column: 17},
-					end: {line: 274, column: 28}
+					start: {line: 281, column: 17},
+					end: {line: 281, column: 28}
 				})('This should be impossible'))));
 		});
 };
@@ -9944,11 +9744,29 @@ var _jrootham$cabal_voting$Main$updateModel = F2(
 		var result = _jrootham$cabal_voting$Parse$parse(response);
 		var _p2 = result;
 		if (_p2.ctor === 'Ok') {
+			var _p3 = _p2._0;
+			var papers = _p3.papers;
+			var raw = A3(
+				_elm_lang$core$List$foldr,
+				F2(
+					function (paper, voterList) {
+						return A2(_elm_lang$core$List$append, voterList, paper.votes);
+					}),
+				{
+					ctor: '::',
+					_0: '',
+					_1: {ctor: '[]'}
+				},
+				papers);
+			var voters = _elm_lang$core$List$sort(
+				_elm_lang$core$Set$toList(
+					_elm_lang$core$Set$fromList(raw)));
+			var name = _p3.name;
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
 					model,
-					{loggedin: true, papers: _p2._0}),
+					{name: name, papers: papers, voters: voters}),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
@@ -9956,18 +9774,63 @@ var _jrootham$cabal_voting$Main$updateModel = F2(
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
 					model,
-					{loginError: _p2._0}),
+					{fetchError: _p2._0}),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
+		}
+	});
+var _jrootham$cabal_voting$Main$update = F2(
+	function (msg, model) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'FetchResult':
+				if (_p4._0.ctor === 'Ok') {
+					return A2(_jrootham$cabal_voting$Main$updateModel, model, _p4._0._0);
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								fetchError: _jrootham$cabal_voting$Main$formatError(_p4._0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			case 'Clear':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{fetchError: ''}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeOrder':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{order: _p4._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{voter: _p4._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _jrootham$cabal_voting$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _jrootham$cabal_voting$Main$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {loggedin: a, name: b, password: c, loginError: d, papers: e, order: f};
+var _jrootham$cabal_voting$Main$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {key: a, name: b, fetchError: c, papers: d, order: e, voter: f, voters: g};
 	});
+var _jrootham$cabal_voting$Main$Voter = {ctor: 'Voter'};
 var _jrootham$cabal_voting$Main$MyVotes = {ctor: 'MyVotes'};
 var _jrootham$cabal_voting$Main$Submitter = {ctor: 'Submitter'};
 var _jrootham$cabal_voting$Main$MostVotes = {ctor: 'MostVotes'};
@@ -9975,23 +9838,57 @@ var _jrootham$cabal_voting$Main$LeastVotes = {ctor: 'LeastVotes'};
 var _jrootham$cabal_voting$Main$Latest = {ctor: 'Latest'};
 var _jrootham$cabal_voting$Main$Earliest = {ctor: 'Earliest'};
 var _jrootham$cabal_voting$Main$Title = {ctor: 'Title'};
-var _jrootham$cabal_voting$Main$init = {
-	ctor: '_Tuple2',
-	_0: A6(
-		_jrootham$cabal_voting$Main$Model,
-		false,
-		'',
-		'',
-		'',
-		{ctor: '[]'},
-		_jrootham$cabal_voting$Main$Title),
-	_1: _elm_lang$core$Platform_Cmd$none
+var _jrootham$cabal_voting$Main$Clear = {ctor: 'Clear'};
+var _jrootham$cabal_voting$Main$FetchResult = function (a) {
+	return {ctor: 'FetchResult', _0: a};
+};
+var _jrootham$cabal_voting$Main$githubFetch = function (key) {
+	var payload = A2(_jrootham$cabal_voting$Payload$makePayload, _jrootham$cabal_voting$Config$owner, _jrootham$cabal_voting$Config$repository);
+	var url = 'https://api.github.com/graphql';
+	var mime = 'application/json';
+	var headers = {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$http$Http$header,
+			'Authorization',
+			A2(_elm_lang$core$Basics_ops['++'], 'bearer', key)),
+		_1: {ctor: '[]'}
+	};
+	var req = _elm_lang$http$Http$request(
+		{
+			method: 'POST',
+			headers: headers,
+			url: url,
+			body: A2(_elm_lang$http$Http$stringBody, mime, payload),
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+	return A2(_elm_lang$http$Http$send, _jrootham$cabal_voting$Main$FetchResult, req);
+};
+var _jrootham$cabal_voting$Main$init = function (key) {
+	return {
+		ctor: '_Tuple2',
+		_0: A7(
+			_jrootham$cabal_voting$Main$Model,
+			key,
+			'',
+			'',
+			{ctor: '[]'},
+			_jrootham$cabal_voting$Main$Title,
+			'',
+			{ctor: '[]'}),
+		_1: _jrootham$cabal_voting$Main$githubFetch(key)
+	};
+};
+var _jrootham$cabal_voting$Main$ChangeVoter = function (a) {
+	return {ctor: 'ChangeVoter', _0: a};
 };
 var _jrootham$cabal_voting$Main$ChangeOrder = function (a) {
 	return {ctor: 'ChangeOrder', _0: a};
 };
-var _jrootham$cabal_voting$Main$radioBase = F3(
-	function (current, value, order) {
+var _jrootham$cabal_voting$Main$radioBase = F4(
+	function (current, enable, labelText, order) {
 		return A2(
 			_elm_lang$html$Html$label,
 			{ctor: '[]'},
@@ -10013,7 +9910,11 @@ var _jrootham$cabal_voting$Main$radioBase = F3(
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$checked(
 										_elm_lang$core$Native_Utils.eq(current, order)),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(!enable),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -10021,15 +9922,15 @@ var _jrootham$cabal_voting$Main$radioBase = F3(
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(value),
+					_0: _elm_lang$html$Html$text(labelText),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
+var _jrootham$cabal_voting$Main$page = function (model) {
 	var compare = function () {
-		var _p3 = model.order;
-		switch (_p3.ctor) {
+		var _p5 = model.order;
+		switch (_p5.ctor) {
 			case 'Title':
 				return _jrootham$cabal_voting$Main$totalOrder(
 					F2(
@@ -10074,11 +9975,14 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0;
 						}));
+			case 'MyVotes':
+				return _jrootham$cabal_voting$Main$votes(model.name);
 			default:
-				return _jrootham$cabal_voting$Main$myvotes(model.name);
+				return _jrootham$cabal_voting$Main$votes(model.voter);
 		}
 	}();
-	var radio = _jrootham$cabal_voting$Main$radioBase(model.order);
+	var radioSelected = _jrootham$cabal_voting$Main$radioBase(model.order);
+	var radio = radioSelected(true);
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -10111,7 +10015,7 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Order '),
+						_0: _elm_lang$html$Html$text('Order: '),
 						_1: {
 							ctor: '::',
 							_0: A2(radio, ' Title ', _jrootham$cabal_voting$Main$Title),
@@ -10133,7 +10037,43 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 												_1: {
 													ctor: '::',
 													_0: A2(radio, ' My votes ', _jrootham$cabal_voting$Main$MyVotes),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A3(
+															radioSelected,
+															!_elm_lang$core$Native_Utils.eq(model.voter, ''),
+															' Voter ',
+															_jrootham$cabal_voting$Main$Voter),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$select,
+																{ctor: '[]'},
+																A2(
+																	_elm_lang$core$List$map,
+																	function (voter) {
+																		return A2(
+																			_elm_lang$html$Html$option,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$value(voter),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onClick(
+																						_jrootham$cabal_voting$Main$ChangeVoter(voter)),
+																					_1: {ctor: '[]'}
+																				}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text(voter),
+																				_1: {ctor: '[]'}
+																			});
+																	},
+																	model.voters)),
+															_1: {ctor: '[]'}
+														}
+													}
 												}
 											}
 										}
@@ -10224,244 +10164,6 @@ var _jrootham$cabal_voting$Main$loggedinPage = function (model) {
 			}
 		});
 };
-var _jrootham$cabal_voting$Main$Clear = {ctor: 'Clear'};
-var _jrootham$cabal_voting$Main$LoginResult = function (a) {
-	return {ctor: 'LoginResult', _0: a};
-};
-var _jrootham$cabal_voting$Main$githubLogin = F2(
-	function (login, password) {
-		var payload = A2(_jrootham$cabal_voting$Payload$makePayload, _jrootham$cabal_voting$Config$owner, _jrootham$cabal_voting$Config$repository);
-		var url = 'https://api.github.com/graphql';
-		var mime = 'application/json';
-		var header = {
-			ctor: '::',
-			_0: A2(_kallaspriit$elm_basic_auth$BasicAuth$buildAuthorizationHeader, login, password),
-			_1: {ctor: '[]'}
-		};
-		var req = _elm_lang$http$Http$request(
-			{
-				method: 'POST',
-				headers: header,
-				url: url,
-				body: A2(_elm_lang$http$Http$stringBody, mime, payload),
-				expect: _elm_lang$http$Http$expectString,
-				timeout: _elm_lang$core$Maybe$Nothing,
-				withCredentials: false
-			});
-		return A2(_elm_lang$http$Http$send, _jrootham$cabal_voting$Main$LoginResult, req);
-	});
-var _jrootham$cabal_voting$Main$update = F2(
-	function (msg, model) {
-		var _p4 = msg;
-		switch (_p4.ctor) {
-			case 'Name':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{name: _p4._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Password':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{password: _p4._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Login':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_jrootham$cabal_voting$Main$githubLogin, model.name, model.password)
-				};
-			case 'LoginResult':
-				if (_p4._0.ctor === 'Ok') {
-					return A2(_jrootham$cabal_voting$Main$updateModel, model, _p4._0._0);
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								loginError: _jrootham$cabal_voting$Main$formatError(_p4._0._0)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				}
-			case 'Clear':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{loginError: ''}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{order: _p4._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
-	});
-var _jrootham$cabal_voting$Main$Login = {ctor: 'Login'};
-var _jrootham$cabal_voting$Main$Password = function (a) {
-	return {ctor: 'Password', _0: a};
-};
-var _jrootham$cabal_voting$Main$Name = function (a) {
-	return {ctor: 'Name', _0: a};
-};
-var _jrootham$cabal_voting$Main$passwordPage = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h2,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Use github user name and password'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('password-line'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('Name'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_jrootham$cabal_voting$Main$Name),
-									_1: {ctor: '[]'}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('password-line'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('password'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('Password'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_jrootham$cabal_voting$Main$Password),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{ctor: '[]'}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('password-line'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_jrootham$cabal_voting$Main$Login),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Login'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('password-line'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(model.loginError),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('password-line'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_jrootham$cabal_voting$Main$Clear),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Clear error'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		});
-};
 var _jrootham$cabal_voting$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -10489,20 +10191,27 @@ var _jrootham$cabal_voting$Main$view = function (model) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: A2(
+				_0: _elm_lang$core$Native_Utils.eq(model.fetchError, '') ? A2(
 					_elm_lang$html$Html$div,
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: model.loggedin ? _jrootham$cabal_voting$Main$loggedinPage(model) : _jrootham$cabal_voting$Main$passwordPage(model),
+						_0: _jrootham$cabal_voting$Main$page(model),
+						_1: {ctor: '[]'}
+					}) : A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(model.fetchError),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _jrootham$cabal_voting$Main$main = _elm_lang$html$Html$program(
-	{init: _jrootham$cabal_voting$Main$init, view: _jrootham$cabal_voting$Main$view, update: _jrootham$cabal_voting$Main$update, subscriptions: _jrootham$cabal_voting$Main$subscriptions})();
+var _jrootham$cabal_voting$Main$main = _elm_lang$html$Html$programWithFlags(
+	{init: _jrootham$cabal_voting$Main$init, view: _jrootham$cabal_voting$Main$view, update: _jrootham$cabal_voting$Main$update, subscriptions: _jrootham$cabal_voting$Main$subscriptions})(_elm_lang$core$Json_Decode$string);
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
