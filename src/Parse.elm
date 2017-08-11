@@ -28,7 +28,7 @@ type alias Paper =
 
 type alias RawPaper =
     { title : String
-    , body : String
+    , bodyHTML : String
     , createdAt : Date.Date
     , submitter : String
     , votes : List String
@@ -50,7 +50,7 @@ translateNameAndRawPaperList raw =
 
 translateRawPaper : RawPaper-> Paper
 translateRawPaper raw = 
-    Paper raw.title raw.body raw.createdAt raw.submitter raw.votes
+    Paper raw.title raw.bodyHTML raw.createdAt raw.submitter raw.votes
 
 
 decodeRawPaper : Decoder RawPaper
@@ -84,10 +84,13 @@ voteDecoder =
 
 decodeNameAndRawPaperList : Decoder NameAndRawPaperList
 decodeNameAndRawPaperList =
-    decode NameAndPaperList
+    decode NameAndRawPaperList
         |> requiredAt [ "viewer", "login"] string 
         |> requiredAt [ "repository", "issues", "nodes" ] (list decodeRawPaper)
 
+rawParse : String -> Result String NameAndRawPaperList
+rawParse response =
+    decodeString (at [ "data" ] decodeNameAndRawPaperList) response
 
 
 parse : String -> Result String NameAndPaperList
@@ -101,10 +104,5 @@ parse response =
                 Err (Debug.log "err" err)
 
             Ok data ->
-                Ok (Debug.log "data" data)
-
-                --succeed (translateNameAndRawPaperList data)
-rawParse : String -> Result String NameAndRawPaperList
-rawParse response =
-    decodeString (at [ "data" ] decodeNameAndRawPaperList) response
+                Ok (Debug.log "data" (translateNameAndRawPaperList data))
 

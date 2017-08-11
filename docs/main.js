@@ -9403,7 +9403,7 @@ var _jrootham$cabal_voting$Parse$Paper = F5(
 		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
 	});
 var _jrootham$cabal_voting$Parse$translateRawPaper = function (raw) {
-	return A5(_jrootham$cabal_voting$Parse$Paper, raw.title, raw.body, raw.createdAt, raw.submitter, raw.votes);
+	return A5(_jrootham$cabal_voting$Parse$Paper, raw.title, raw.bodyHTML, raw.createdAt, raw.submitter, raw.votes);
 };
 var _jrootham$cabal_voting$Parse$translateNameAndRawPaperList = function (raw) {
 	return A2(
@@ -9413,7 +9413,7 @@ var _jrootham$cabal_voting$Parse$translateNameAndRawPaperList = function (raw) {
 };
 var _jrootham$cabal_voting$Parse$RawPaper = F5(
 	function (a, b, c, d, e) {
-		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
+		return {title: a, bodyHTML: b, createdAt: c, submitter: d, votes: e};
 	});
 var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
@@ -9464,7 +9464,7 @@ var _jrootham$cabal_voting$Parse$decodeNameAndRawPaperList = A3(
 			}
 		},
 		_elm_lang$core$Json_Decode$string,
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndPaperList)));
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndRawPaperList)));
 var _jrootham$cabal_voting$Parse$rawParse = function (response) {
 	return A2(
 		_elm_lang$core$Json_Decode$decodeString,
@@ -9487,7 +9487,10 @@ var _jrootham$cabal_voting$Parse$parse = function (response) {
 			A2(_elm_lang$core$Debug$log, 'err', _p1._0));
 	} else {
 		return _elm_lang$core$Result$Ok(
-			A2(_elm_lang$core$Debug$log, 'data', _p1._0));
+			A2(
+				_elm_lang$core$Debug$log,
+				'data',
+				_jrootham$cabal_voting$Parse$translateNameAndRawPaperList(_p1._0)));
 	}
 };
 var _jrootham$cabal_voting$Parse$Votes = F2(
