@@ -4,6 +4,7 @@ import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 import Result
 import Date
+import Debug
 
 
 type alias NameAndPaperList =
@@ -11,8 +12,21 @@ type alias NameAndPaperList =
      , papers : List Paper
     }
 
+type alias NameAndRawPaperList =
+    {name : String
+     , papers : List RawPaper
+    }
+
 
 type alias Paper =
+    { title : String
+    , body : String
+    , createdAt : Date.Date
+    , submitter : String
+    , votes : List String
+    }
+
+type alias RawPaper =
     { title : String
     , body : String
     , createdAt : Date.Date
@@ -30,12 +44,20 @@ type alias Votes =
     , votes : Int
     }
 
+translateNameAndRawPaperList : NameAndRawPaperList -> NameAndPaperList
+translateNameAndRawPaperList raw = 
+    NameAndPaperList raw.name (List.map translateRawPaper raw.papers)
 
-decodePaper : Decoder Paper
-decodePaper =
-    decode Paper
+translateRawPaper : RawPaper-> Paper
+translateRawPaper raw = 
+    Paper raw.title raw.body raw.createdAt raw.submitter raw.votes
+
+
+decodeRawPaper : Decoder RawPaper
+decodeRawPaper =
+    decode RawPaper
         |> required "title" string
-        |> required "body" string
+        |> required "bodyHTML" string
         |> required "createdAt" dateDecoder
         |> required "author" (field "login" string)
         |> required "reactions" voteDecoder
@@ -60,15 +82,30 @@ voteDecoder =
     at [ "nodes" ] (list (at [ "user", "login" ] string))
 
 
-decodeNameAndPaperList : Decoder NameAndPaperList
-decodeNameAndPaperList =
+decodeNameAndRawPaperList : Decoder NameAndRawPaperList
+decodeNameAndRawPaperList =
     decode NameAndPaperList
         |> requiredAt [ "viewer", "login"] string 
-        |> requiredAt [ "repository", "issues", "nodes" ] (list decodePaper)
+        |> requiredAt [ "repository", "issues", "nodes" ] (list decodeRawPaper)
 
---parse: String -> (Result, Data)
 
+
+rawParse : String -> Result String NameAndRawPaperList
+rawParse response =
+    decodeString (at [ "data" ] decodeNameAndRawPaperList) response
 
 parse : String -> Result String NameAndPaperList
 parse response =
-    decodeString (at [ "data" ] decodeNameAndPaperList) response
+    let
+        translated = rawParse response
+        foo = Debug.log "translated" translated
+    in
+        Debug.crash "Stop"
+
+{-        case translated of
+            Err err ->
+                fail err
+
+            Ok data ->
+                succeed (translateNameAndRawPaperList data)
+-}

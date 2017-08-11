@@ -9394,11 +9394,28 @@ var _jrootham$cabal_voting$Parse$NameAndPaperList = F2(
 	function (a, b) {
 		return {name: a, papers: b};
 	});
+var _jrootham$cabal_voting$Parse$NameAndRawPaperList = F2(
+	function (a, b) {
+		return {name: a, papers: b};
+	});
 var _jrootham$cabal_voting$Parse$Paper = F5(
 	function (a, b, c, d, e) {
 		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
 	});
-var _jrootham$cabal_voting$Parse$decodePaper = A3(
+var _jrootham$cabal_voting$Parse$translateRawPaper = function (raw) {
+	return A5(_jrootham$cabal_voting$Parse$Paper, raw.title, raw.body, raw.createdAt, raw.submitter, raw.votes);
+};
+var _jrootham$cabal_voting$Parse$translateNameAndRawPaperList = function (raw) {
+	return A2(
+		_jrootham$cabal_voting$Parse$NameAndPaperList,
+		raw.name,
+		A2(_elm_lang$core$List$map, _jrootham$cabal_voting$Parse$translateRawPaper, raw.papers));
+};
+var _jrootham$cabal_voting$Parse$RawPaper = F5(
+	function (a, b, c, d, e) {
+		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
+	});
+var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'reactions',
 	_jrootham$cabal_voting$Parse$voteDecoder,
@@ -9412,14 +9429,14 @@ var _jrootham$cabal_voting$Parse$decodePaper = A3(
 			_jrootham$cabal_voting$Parse$dateDecoder,
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'body',
+				'bodyHTML',
 				_elm_lang$core$Json_Decode$string,
 				A3(
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 					'title',
 					_elm_lang$core$Json_Decode$string,
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Paper))))));
-var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$RawPaper))))));
+var _jrootham$cabal_voting$Parse$decodeNameAndRawPaperList = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
 	{
 		ctor: '::',
@@ -9434,7 +9451,7 @@ var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
 			}
 		}
 	},
-	_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodePaper),
+	_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodeRawPaper),
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
 		{
@@ -9448,7 +9465,7 @@ var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
 		},
 		_elm_lang$core$Json_Decode$string,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndPaperList)));
-var _jrootham$cabal_voting$Parse$parse = function (response) {
+var _jrootham$cabal_voting$Parse$rawParse = function (response) {
 	return A2(
 		_elm_lang$core$Json_Decode$decodeString,
 		A2(
@@ -9458,8 +9475,18 @@ var _jrootham$cabal_voting$Parse$parse = function (response) {
 				_0: 'data',
 				_1: {ctor: '[]'}
 			},
-			_jrootham$cabal_voting$Parse$decodeNameAndPaperList),
+			_jrootham$cabal_voting$Parse$decodeNameAndRawPaperList),
 		response);
+};
+var _jrootham$cabal_voting$Parse$parse = function (response) {
+	var translated = _jrootham$cabal_voting$Parse$rawParse(response);
+	var foo = A2(_elm_lang$core$Debug$log, 'translated', translated);
+	return _elm_lang$core$Native_Utils.crash(
+		'Parse',
+		{
+			start: {line: 103, column: 9},
+			end: {line: 103, column: 20}
+		})('Stop');
 };
 var _jrootham$cabal_voting$Parse$Votes = F2(
 	function (a, b) {
