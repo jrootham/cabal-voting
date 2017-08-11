@@ -90,22 +90,21 @@ decodeNameAndRawPaperList =
 
 
 
+parse : String -> Result String NameAndPaperList
+parse response =
+    let
+        raw = rawParse response
+        foo = Debug.log "raw" raw
+    in
+        case raw of
+            Err err ->
+                Err (Debug.log "err" err)
+
+            Ok data ->
+                Ok (Debug.log "data" data)
+
+                --succeed (translateNameAndRawPaperList data)
 rawParse : String -> Result String NameAndRawPaperList
 rawParse response =
     decodeString (at [ "data" ] decodeNameAndRawPaperList) response
 
-parse : String -> Result String NameAndPaperList
-parse response =
-    let
-        translated = rawParse response
-        foo = Debug.log "translated" translated
-    in
-        Debug.crash "Stop"
-
-{-        case translated of
-            Err err ->
-                fail err
-
-            Ok data ->
-                succeed (translateNameAndRawPaperList data)
--}

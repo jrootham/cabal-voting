@@ -9479,14 +9479,16 @@ var _jrootham$cabal_voting$Parse$rawParse = function (response) {
 		response);
 };
 var _jrootham$cabal_voting$Parse$parse = function (response) {
-	var translated = _jrootham$cabal_voting$Parse$rawParse(response);
-	var foo = A2(_elm_lang$core$Debug$log, 'translated', translated);
-	return _elm_lang$core$Native_Utils.crash(
-		'Parse',
-		{
-			start: {line: 103, column: 9},
-			end: {line: 103, column: 20}
-		})('Stop');
+	var raw = _jrootham$cabal_voting$Parse$rawParse(response);
+	var foo = A2(_elm_lang$core$Debug$log, 'raw', raw);
+	var _p1 = raw;
+	if (_p1.ctor === 'Err') {
+		return _elm_lang$core$Result$Err(
+			A2(_elm_lang$core$Debug$log, 'err', _p1._0));
+	} else {
+		return _elm_lang$core$Result$Ok(
+			A2(_elm_lang$core$Debug$log, 'data', _p1._0));
+	}
 };
 var _jrootham$cabal_voting$Parse$Votes = F2(
 	function (a, b) {
