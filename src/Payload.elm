@@ -28,7 +28,7 @@ makePayload owner name =
     issues(first: 100, states: [OPEN]) {
       nodes {
         title
-        body
+        bodyHTML
         createdAt
         author {
           login

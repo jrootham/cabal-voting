@@ -9335,7 +9335,7 @@ var _jrootham$cabal_voting$Payload$makePayload = F2(
 					_1: {ctor: '[]'}
 				}
 			});
-		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        body\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
+		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        bodyHTML\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
 		var ship = A2(
 			_elm_lang$core$String$join,
 			' ',
