@@ -385,7 +385,7 @@ githubFetch : Key -> Cmd Msg
 githubFetch key =
     let
         headers =
-            [ Http.header "Authorization" ("bearer" ++ key) ]
+            [ Http.header "Authorization" ("bearer " ++ key) ]
 
         mime =
             "application/json"

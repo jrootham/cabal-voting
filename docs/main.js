@@ -9851,7 +9851,7 @@ var _jrootham$cabal_voting$Main$githubFetch = function (key) {
 		_0: A2(
 			_elm_lang$http$Http$header,
 			'Authorization',
-			A2(_elm_lang$core$Basics_ops['++'], 'bearer', key)),
+			A2(_elm_lang$core$Basics_ops['++'], 'bearer ', key)),
 		_1: {ctor: '[]'}
 	};
 	var req = _elm_lang$http$Http$request(
