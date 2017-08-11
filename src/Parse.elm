@@ -1,4 +1,4 @@
-module Parse exposing (parse, NameAndPaperList, Paper)
+module Parse exposing (parse, NameAndPaperList, Paper, Link)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
@@ -20,7 +20,9 @@ type alias NameAndRawPaperList =
 
 type alias Paper =
     { title : String
-    , body : String
+    , paper : Link
+    , comments : String
+    , references : List Link
     , createdAt : Date.Date
     , submitter : String
     , votes : List String
@@ -34,7 +36,10 @@ type alias RawPaper =
     , votes : List String
     }
 
-
+type alias Link =
+    { text: String
+    , link: String
+    }   
 
 -- Hang onto this because voting may change
 
@@ -50,7 +55,13 @@ translateNameAndRawPaperList raw =
 
 translateRawPaper : RawPaper-> Paper
 translateRawPaper raw = 
-    Paper raw.title raw.bodyHTML raw.createdAt raw.submitter raw.votes
+    Paper raw.title 
+            (Link "Paper" "https://xkcd.com/1875/") 
+            raw.bodyHTML 
+            [] 
+            raw.createdAt 
+            raw.submitter 
+            raw.votes
 
 
 decodeRawPaper : Decoder RawPaper

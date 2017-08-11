@@ -1,6 +1,7 @@
 module Main exposing (main)
 
-import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, select, option)
+import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, 
+    select, option, a)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, on)
 import Http
@@ -8,7 +9,7 @@ import Date
 import Set
 import Config
 import Payload exposing (..)
-import Parse exposing (parse, Paper)
+import Parse exposing (parse, NameAndPaperList, Paper, Link)
 
 
 main =
@@ -171,6 +172,9 @@ setEnabled enabled =
     else
         class "flat-disabled"
 
+makeLink: Link -> Html msg
+makeLink link =
+    a [href link.link] [text link.text]
 
 displayPaper : Model -> Bool -> Paper -> Html Msg
 displayPaper model votable paper =
@@ -183,6 +187,7 @@ displayPaper model votable paper =
 
         belongsTo =
             model.name == paper.submitter
+        
     in
         tr [ class "entry" ]
             [ td []
@@ -192,9 +197,10 @@ displayPaper model votable paper =
                     ]
                 ]
             , td []
-                [ (div [] [ h5 [] [ text paper.title ] ])
-                , (div [ class "contents" ] [ text paper.body ])
-                ]
+                ([ (div [] [ h5 [] [ text paper.title ] ])
+                , (div [] [makeLink paper.paper])
+                , (div [ class "contents" ] [ text paper.comments ])
+                ] ++ (List.map (\ ref-> div [] [makeLink ref]) paper.references))
             , td [ class "vote" ]
                 [ label []
                     [ input
