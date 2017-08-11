@@ -9181,8 +9181,8 @@ var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
 var _jrootham$cabal_voting$Config$maxVotes = 5;
 var _jrootham$cabal_voting$Config$maxPapers = 5;
-var _jrootham$cabal_voting$Config$repository = 'SMRTYPRTY';
-var _jrootham$cabal_voting$Config$owner = 'CompSciCabal';
+var _jrootham$cabal_voting$Config$repository = 'cabal-voting';
+var _jrootham$cabal_voting$Config$owner = 'jrootham';
 
 var _truqu$elm_base64$BitList$partition = F2(
 	function (size, list) {
@@ -9681,8 +9681,8 @@ var _jrootham$cabal_voting$Main$myvotes = function (name) {
 			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'Main',
 				{
-					start: {line: 273, column: 17},
-					end: {line: 273, column: 28}
+					start: {line: 274, column: 17},
+					end: {line: 274, column: 28}
 				})('This should be impossible'))));
 		});
 };
@@ -9717,7 +9717,18 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(paper.submitter),
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('submitter'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(paper.submitter),
+										_1: {ctor: '[]'}
+									}),
 								_1: {
 									ctor: '::',
 									_0: A2(
@@ -9736,26 +9747,7 @@ var _jrootham$cabal_voting$Main$displayPaper = F3(
 											_0: _elm_lang$html$Html$text('Edit'),
 											_1: {ctor: '[]'}
 										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('flat-button'),
-												_1: {
-													ctor: '::',
-													_0: _jrootham$cabal_voting$Main$setEnabled(belongsTo),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Close'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							}),
 						_1: {ctor: '[]'}
@@ -9877,6 +9869,14 @@ var _jrootham$cabal_voting$Main$voteLimit = function (model) {
 		_jrootham$cabal_voting$Main$countVotes(model)) > -1;
 };
 var _jrootham$cabal_voting$Main$userLine = function (model) {
+	var totalString = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'out of ',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(
+				_elm_lang$core$List$length(model.papers)),
+			' total.'));
 	var maxVoteString = _elm_lang$core$Basics$toString(_jrootham$cabal_voting$Config$maxVotes);
 	var voteString = _elm_lang$core$Basics$toString(
 		_jrootham$cabal_voting$Main$countVotes(model));
@@ -9889,7 +9889,7 @@ var _jrootham$cabal_voting$Main$userLine = function (model) {
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				' of ',
-				A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible papers.'))));
+				A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible, '))));
 	var maxPaperString = _elm_lang$core$Basics$toString(_jrootham$cabal_voting$Config$maxPapers);
 	var paperCount = _elm_lang$core$List$length(
 		A2(
@@ -9908,14 +9908,17 @@ var _jrootham$cabal_voting$Main$userLine = function (model) {
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				' of ',
-				A2(_elm_lang$core$Basics_ops['++'], maxPaperString, ' possible papers, '))));
+				A2(_elm_lang$core$Basics_ops['++'], maxPaperString, ' possible, '))));
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'User: ',
 		A2(
 			_elm_lang$core$Basics_ops['++'],
 			model.name,
-			A2(_elm_lang$core$Basics_ops['++'], submitString, votingString)));
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				submitString,
+				A2(_elm_lang$core$Basics_ops['++'], votingString, totalString))));
 };
 var _jrootham$cabal_voting$Main$formatError = function (error) {
 	var _p0 = error;

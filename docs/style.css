@@ -8,6 +8,11 @@ h1
     text-align: center;
 }
 
+h5
+{
+	margin: 0px;
+}
+
 .outer
 {
 	margin: 20px;
@@ -39,6 +44,11 @@ h1
 .entry
 {
 	margin-top: 20px;
+}
+
+.submitter
+{
+	margin-bottom: 7px;
 }
 
 .flat-button

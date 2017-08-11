@@ -1,10 +1,12 @@
-module Main exposing (..)
+module Main exposing (main)
 
-import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label)
+import Html exposing 
+    (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, select, option)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onClick)
+import Html.Events exposing (onInput, onClick, on)
 import Http
 import Date
+import Set
 import BasicAuth exposing (buildAuthorizationHeader)
 import Config
 import Payload exposing (..)
@@ -33,7 +35,7 @@ type alias Password =
 -- Types
 
 type PaperOrder 
-    = Title | Earliest | Latest | LeastVotes | MostVotes | Submitter | MyVotes
+    = Title | Earliest | Latest | LeastVotes | MostVotes | Submitter | MyVotes | Voter
 
 -- MODEL
 
@@ -45,12 +47,14 @@ type alias Model =
     , loginError : String
     , papers : List Paper
     , order : PaperOrder
+    , voter : String
+    , voters : List String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( (Model False "" "" "" [] Title), Cmd.none )
+    ( (Model False "" "" "" [] Title "" []), Cmd.none )
 
 
 
@@ -73,6 +77,7 @@ type Msg
     | LoginResult (Result Http.Error String)
     | Clear
     | ChangeOrder PaperOrder
+    | ChangeVoter String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -99,6 +104,9 @@ update msg model =
         ChangeOrder newOrder ->
             ( { model | order = newOrder}, Cmd.none )
 
+        ChangeVoter newVoter ->
+            ( { model | voter = newVoter }, Cmd.none)
+
 
 updateModel : Model -> ResponseString -> ( Model, Cmd Msg )
 updateModel model response =
@@ -108,7 +116,13 @@ updateModel model response =
     in
         case result of
             Ok papers ->
-                ( { model | loggedin = True, papers = papers }, Cmd.none )
+                let
+                    raw = List.foldr (\ paper voterList -> List.append voterList paper.votes) [""] papers
+                    voters = List.sort (Set.toList (Set.fromList raw)) 
+                
+                in
+                        
+                    ( { model | loggedin = True, papers = papers, voters = voters }, Cmd.none )
 
             Err error ->
                 ( { model | loginError = error }, Cmd.none )
@@ -185,9 +199,8 @@ displayPaper model votable paper =
         tr [class "entry"]
             [ td [] [div [] 
                 [
-                    text paper.submitter
+                    div [class "submitter"] [text paper.submitter]
                     , div [class "flat-button", setEnabled belongsTo ] [text "Edit"]
-                    , div [class "flat-button", setEnabled belongsTo] [text "Close"]
                 ]]
             , td []
                 [ (div [] [ h5 [] [text paper.title] ])
@@ -244,19 +257,21 @@ userLine model =
             toString Config.maxVotes
 
         submitString =
-            " submitted " ++ paperString ++ " of " ++ maxPaperString ++ " possible papers, "
+            " submitted " ++ paperString ++ " of " ++ maxPaperString ++ " possible, "
 
         votingString =
-            " voted for  " ++ voteString ++ " of " ++ maxVoteString ++ " possible papers."
+            " voted for  " ++ voteString ++ " of " ++ maxVoteString ++ " possible, "
+
+        totalString = "out of " ++ (toString (List.length model.papers)) ++ " total."
     in
-        "User: " ++ model.name ++ submitString ++ votingString
+        "User: " ++ model.name ++ submitString ++ votingString ++ totalString
 
 nameIn: String -> Paper -> Bool
 nameIn name paper = 
     List.member name paper.votes
 
-myvotes: String -> (Paper -> Paper -> Order)
-myvotes name = 
+votes: String -> (Paper -> Paper -> Order)
+votes name = 
     let
         voterIn = nameIn name
     in
@@ -285,7 +300,8 @@ totalOrder lessThan left right =
 loggedinPage : Model -> Html Msg
 loggedinPage model =
     let
-        radio = radioBase model.order
+        radioSelected = radioBase model.order
+        radio = radioSelected True
         compare = 
             case model.order of
                 Title ->
@@ -301,13 +317,16 @@ loggedinPage model =
                 Submitter ->
                     totalOrder (\ left right -> left.submitter < right.submitter)
                 MyVotes ->
-                    myvotes model.name  
+                    votes model.name
+                Voter ->
+                    votes model.voter
+
 
     in        
         div []
             [ (div [] [ h3 [] [text (userLine model)] ])
             ,div [class "order"]
-                [text "Order "
+                [text "Order: "
                 , radio " Title " Title
                 , radio " Earliest " Earliest
                 , radio " Latest " Latest
@@ -315,6 +334,11 @@ loggedinPage model =
                 , radio " Least votes " LeastVotes
                 , radio " Submitter " Submitter
                 , radio " My votes " MyVotes
+                , radioSelected (not (model.voter == "")) " Voter " Voter
+                , select [] 
+                    (List.map 
+                        (\ voter -> option [value voter, onClick (ChangeVoter voter)] [text voter] ) 
+                        model.voters)
                 ]   
             , (div [] 
                 [ 
@@ -330,17 +354,18 @@ loggedinPage model =
                 ])
         ]
 
-radioBase : PaperOrder -> String -> PaperOrder -> Html Msg
-radioBase current value order =
+radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
+radioBase current enable labelText order =
   label [] 
     [ input 
         [ type_ "radio"
         , name "change-order"
         , onClick (ChangeOrder order)
         , checked (current == order) 
+        , disabled (not enable)
         ] 
         []
-    , text value
+    , text labelText
     ]
 
 
