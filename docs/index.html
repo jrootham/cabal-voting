@@ -11,10 +11,13 @@
 <body>
 A string to show
 <script>
+	console.log("key", key);
 	OAuth.initialize(key);
+	console.log("After initialize");
 
 	OAuth.popup('github')
 	.done(function(result) {
+		console.log(result);
 		Elm.ReadOnly.fullscreen(result.access_token);
 	})
 	.fail(function (err) {
