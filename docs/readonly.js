@@ -9350,19 +9350,11 @@ var _jrootham$cabal_voting$Parse$NameAndPaperList = F2(
 	function (a, b) {
 		return {name: a, papers: b};
 	});
-var _jrootham$cabal_voting$Parse$NameAndRawPaperList = F2(
-	function (a, b) {
-		return {name: a, papers: b};
+var _jrootham$cabal_voting$Parse$Paper = F4(
+	function (a, b, c, d) {
+		return {title: a, createdAt: b, submitter: c, votes: d};
 	});
-var _jrootham$cabal_voting$Parse$Paper = F7(
-	function (a, b, c, d, e, f, g) {
-		return {title: a, paper: b, comments: c, references: d, createdAt: e, submitter: f, votes: g};
-	});
-var _jrootham$cabal_voting$Parse$RawPaper = F5(
-	function (a, b, c, d, e) {
-		return {title: a, body: b, createdAt: c, submitter: d, votes: e};
-	});
-var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
+var _jrootham$cabal_voting$Parse$decodePaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'reactions',
 	_jrootham$cabal_voting$Parse$voteDecoder,
@@ -9376,14 +9368,10 @@ var _jrootham$cabal_voting$Parse$decodeRawPaper = A3(
 			_jrootham$cabal_voting$Parse$dateDecoder,
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'body',
+				'title',
 				_elm_lang$core$Json_Decode$string,
-				A3(
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-					'title',
-					_elm_lang$core$Json_Decode$string,
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$RawPaper))))));
-var _jrootham$cabal_voting$Parse$decodeNameAndRawPaperList = A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Paper)))));
+var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
 	{
 		ctor: '::',
@@ -9398,7 +9386,7 @@ var _jrootham$cabal_voting$Parse$decodeNameAndRawPaperList = A3(
 			}
 		}
 	},
-	_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodeRawPaper),
+	_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$decodePaper),
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
 		{
@@ -9411,8 +9399,8 @@ var _jrootham$cabal_voting$Parse$decodeNameAndRawPaperList = A3(
 			}
 		},
 		_elm_lang$core$Json_Decode$string,
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndRawPaperList)));
-var _jrootham$cabal_voting$Parse$rawParse = function (response) {
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndPaperList)));
+var _jrootham$cabal_voting$Parse$parse = function (response) {
 	return A2(
 		_elm_lang$core$Json_Decode$decodeString,
 		A2(
@@ -9422,57 +9410,9 @@ var _jrootham$cabal_voting$Parse$rawParse = function (response) {
 				_0: 'data',
 				_1: {ctor: '[]'}
 			},
-			_jrootham$cabal_voting$Parse$decodeNameAndRawPaperList),
+			_jrootham$cabal_voting$Parse$decodeNameAndPaperList),
 		response);
 };
-var _jrootham$cabal_voting$Parse$Link = F2(
-	function (a, b) {
-		return {text: a, link: b};
-	});
-var _jrootham$cabal_voting$Parse$translateRawPaper = function (raw) {
-	return A7(
-		_jrootham$cabal_voting$Parse$Paper,
-		raw.title,
-		A2(_jrootham$cabal_voting$Parse$Link, 'Paper', 'https://xkcd.com/1875/'),
-		raw.body,
-		{
-			ctor: '::',
-			_0: A2(_jrootham$cabal_voting$Parse$Link, 'Reference 1', 'https://xkcd.com/1052/'),
-			_1: {
-				ctor: '::',
-				_0: A2(_jrootham$cabal_voting$Parse$Link, 'Reference 2', 'https://xkcd.com/1271/'),
-				_1: {ctor: '[]'}
-			}
-		},
-		raw.createdAt,
-		raw.submitter,
-		raw.votes);
-};
-var _jrootham$cabal_voting$Parse$translateNameAndRawPaperList = function (raw) {
-	return A2(
-		_jrootham$cabal_voting$Parse$NameAndPaperList,
-		raw.name,
-		A2(_elm_lang$core$List$map, _jrootham$cabal_voting$Parse$translateRawPaper, raw.papers));
-};
-var _jrootham$cabal_voting$Parse$parse = function (response) {
-	var raw = _jrootham$cabal_voting$Parse$rawParse(response);
-	var foo = A2(_elm_lang$core$Debug$log, 'raw', raw);
-	var _p1 = raw;
-	if (_p1.ctor === 'Err') {
-		return _elm_lang$core$Result$Err(
-			A2(_elm_lang$core$Debug$log, 'err', _p1._0));
-	} else {
-		return _elm_lang$core$Result$Ok(
-			A2(
-				_elm_lang$core$Debug$log,
-				'data',
-				_jrootham$cabal_voting$Parse$translateNameAndRawPaperList(_p1._0)));
-	}
-};
-var _jrootham$cabal_voting$Parse$Votes = F2(
-	function (a, b) {
-		return {user: a, votes: b};
-	});
 
 var _jrootham$cabal_voting$Payload$makePayload = F2(
 	function (owner, name) {
@@ -9494,7 +9434,7 @@ var _jrootham$cabal_voting$Payload$makePayload = F2(
 					_1: {ctor: '[]'}
 				}
 			});
-		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        body\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
+		var fromGraphQLi = '\n  query repo($owner: String!, $name: String!) {\n    viewer {\n    login\n  }\n  repository(owner: $owner, name: $name) {\n    issues(first: 100, states: [OPEN]) {\n      nodes {\n        title\n        createdAt\n        author {\n          login\n        }\n        reactions(first: 100, content: THUMBS_UP) {\n          nodes {\n            user {\n              login\n            }\n          }\n        }\n      }\n    }\n  }\n}\n';
 		var ship = A2(
 			_elm_lang$core$String$join,
 			' ',
@@ -9533,176 +9473,14 @@ var _jrootham$cabal_voting$ReadOnly$votes = function (name) {
 			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'ReadOnly',
 				{
-					start: {line: 273, column: 17},
-					end: {line: 273, column: 28}
+					start: {line: 246, column: 17},
+					end: {line: 246, column: 28}
 				})('This should be impossible'))));
 		});
-};
-var _jrootham$cabal_voting$ReadOnly$makeLink = function (link) {
-	return A2(
-		_elm_lang$html$Html$a,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$href(link.link),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$target('_blank'),
-				_1: {ctor: '[]'}
-			}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(link.text),
-			_1: {ctor: '[]'}
-		});
-};
-var _jrootham$cabal_voting$ReadOnly$setEnabled = function (enabled) {
-	return enabled ? _elm_lang$html$Html_Attributes$class('flat-enabled') : _elm_lang$html$Html_Attributes$class('flat-disabled');
 };
 var _jrootham$cabal_voting$ReadOnly$checkVote = F2(
 	function (login, vote) {
 		return _elm_lang$core$Native_Utils.eq(login, vote);
-	});
-var _jrootham$cabal_voting$ReadOnly$displayPaper = F3(
-	function (model, votable, paper) {
-		var belongsTo = _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
-		var testVote = _jrootham$cabal_voting$ReadOnly$checkVote(model.name);
-		var on = A2(_elm_lang$core$List$any, testVote, paper.votes);
-		return A2(
-			_elm_lang$html$Html$tr,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('entry'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$td,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('submitter'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text(paper.submitter),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$h5,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(paper.title),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$div,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _jrootham$cabal_voting$ReadOnly$makeLink(paper.paper),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('contents'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(paper.comments),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							A2(
-								_elm_lang$core$List$map,
-								function (ref) {
-									return A2(
-										_elm_lang$html$Html$div,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _jrootham$cabal_voting$ReadOnly$makeLink(ref),
-											_1: {ctor: '[]'}
-										});
-								},
-								paper.references))),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$td,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(
-										_elm_lang$core$List$length(paper.votes))),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$td,
-								{ctor: '[]'},
-								A2(
-									_elm_lang$core$List$map,
-									function (login) {
-										return A2(
-											_elm_lang$html$Html$div,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(login),
-												_1: {ctor: '[]'}
-											});
-									},
-									paper.votes)),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			});
 	});
 var _jrootham$cabal_voting$ReadOnly$countVotes = function (model) {
 	var testVote = _jrootham$cabal_voting$ReadOnly$checkVote(model.name);
@@ -9769,6 +9547,103 @@ var _jrootham$cabal_voting$ReadOnly$userLine = function (model) {
 				submitString,
 				A2(_elm_lang$core$Basics_ops['++'], votingString, totalString))));
 };
+var _jrootham$cabal_voting$ReadOnly$displayPaper = F3(
+	function (model, votable, paper) {
+		return A2(
+			_elm_lang$html$Html$tr,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('entry'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('submitter'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(paper.submitter),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h5,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(paper.title),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_elm_lang$core$Basics$toString(
+										_elm_lang$core$List$length(paper.votes))),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								A2(
+									_elm_lang$core$List$map,
+									function (login) {
+										return A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(login),
+												_1: {ctor: '[]'}
+											});
+									},
+									paper.votes)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+	});
 var _jrootham$cabal_voting$ReadOnly$formatError = function (error) {
 	var _p0 = error;
 	switch (_p0.ctor) {
@@ -10168,7 +10043,7 @@ var _jrootham$cabal_voting$ReadOnly$page = function (model) {
 															{ctor: '[]'},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('Contents'),
+																_0: _elm_lang$html$Html$text('Title'),
 																_1: {ctor: '[]'}
 															}),
 														_1: {

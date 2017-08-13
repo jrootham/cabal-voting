@@ -9,7 +9,7 @@ import Date
 import Set
 import Config
 import Payload exposing (..)
-import Parse exposing (parse, NameAndPaperList, Paper, Link)
+import Parse exposing (parse, NameAndPaperList, Paper)
 
 
 main =
@@ -160,46 +160,19 @@ view model =
         ]
 
 
+displayPaper : Model -> Bool -> Paper -> Html Msg
+displayPaper model votable paper =
+    tr [ class "entry" ]
+        [ td [] [ div [][ div [ class "submitter" ] [ text paper.submitter ]]]
+        , td [] [ div [] [ h5 [] [ text paper.title ] ]]
+        , td [] [text (toString (List.length paper.votes))]
+        , td [] (List.map (\login -> div [] [ text login ]) paper.votes)
+        ]
+
+
 checkVote : String -> String -> Bool
 checkVote login vote =
     login == vote
-
-
-setEnabled : Bool -> Html.Attribute msg
-setEnabled enabled =
-    if enabled then
-        class "flat-enabled"
-    else
-        class "flat-disabled"
-
-makeLink: Link -> Html msg
-makeLink link =
-    a [(href link.link), (target "_blank")] [text link.text]
-
-displayPaper : Model -> Bool -> Paper -> Html Msg
-displayPaper model votable paper =
-    let
-        testVote =
-            checkVote model.name
-
-        on =
-            List.any testVote paper.votes
-
-        belongsTo =
-            model.name == paper.submitter
-
-    in
-        tr [ class "entry" ]
-            [ td []
-                [ div [][ div [ class "submitter" ] [ text paper.submitter ]]]
-            , td []
-                ([ (div [] [ h5 [] [ text paper.title ] ])
-                , (div [] [makeLink paper.paper])
-                , (div [ class "contents" ] [ text paper.comments ])
-                ] ++ (List.map (\ ref-> div [] [makeLink ref]) paper.references))
-            , td [] [text (toString (List.length paper.votes))]
-            , td [] (List.map (\login -> div [] [ text login ]) paper.votes)
-            ]
 
 
 countVotes : Model -> Int
@@ -341,7 +314,7 @@ page model =
                     ((thead []
                         [ tr []
                             [ th [] [ text "Submitter" ]
-                            , th [] [ text "Contents" ]
+                            , th [] [ text "Title" ]
                             , th [] [ text "Votes" ]
                             , th [] [ text "Voters" ]
                             ]

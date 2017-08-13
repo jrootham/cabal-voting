@@ -9,11 +9,9 @@
 	<script src="readonly.js"></script>
 </head>
 <body>
-A string to show
+<div>A string to show</div>
 <script>
-	console.log("key", key);
 	OAuth.initialize(key);
-	console.log("After initialize");
 
 	OAuth.popup('github')
 	.done(function(result) {

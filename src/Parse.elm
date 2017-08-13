@@ -1,4 +1,4 @@
-module Parse exposing (parse, NameAndPaperList, Paper, Link)
+module Parse exposing (parse, NameAndPaperList, Paper)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
@@ -12,63 +12,17 @@ type alias NameAndPaperList =
      , papers : List Paper
     }
 
-type alias NameAndRawPaperList =
-    {name : String
-     , papers : List RawPaper
-    }
-
-
 type alias Paper =
     { title : String
-    , paper : Link
-    , comments : String
-    , references : List Link
     , createdAt : Date.Date
     , submitter : String
     , votes : List String
     }
 
-type alias RawPaper =
-    { title : String
-    , body : String
-    , createdAt : Date.Date
-    , submitter : String
-    , votes : List String
-    }
-
-type alias Link =
-    { text: String
-    , link: String
-    }   
-
--- Hang onto this because voting may change
-
-
-type alias Votes =
-    { user : String
-    , votes : Int
-    }
-
-translateNameAndRawPaperList : NameAndRawPaperList -> NameAndPaperList
-translateNameAndRawPaperList raw = 
-    NameAndPaperList raw.name (List.map translateRawPaper raw.papers)
-
-translateRawPaper : RawPaper-> Paper
-translateRawPaper raw = 
-    Paper raw.title 
-            (Link "Paper" "https://xkcd.com/1875/") 
-            raw.body 
-            [(Link "Reference 1" "https://xkcd.com/1052/"), (Link "Reference 2" "https://xkcd.com/1271/")] 
-            raw.createdAt 
-            raw.submitter 
-            raw.votes
-
-
-decodeRawPaper : Decoder RawPaper
-decodeRawPaper =
-    decode RawPaper
+decodePaper : Decoder Paper
+decodePaper =
+    decode Paper
         |> required "title" string
-        |> required "body" string
         |> required "createdAt" dateDecoder
         |> required "author" (field "login" string)
         |> required "reactions" voteDecoder
@@ -93,27 +47,13 @@ voteDecoder =
     at [ "nodes" ] (list (at [ "user", "login" ] string))
 
 
-decodeNameAndRawPaperList : Decoder NameAndRawPaperList
-decodeNameAndRawPaperList =
-    decode NameAndRawPaperList
+decodeNameAndPaperList : Decoder NameAndPaperList
+decodeNameAndPaperList =
+    decode NameAndPaperList
         |> requiredAt [ "viewer", "login"] string 
-        |> requiredAt [ "repository", "issues", "nodes" ] (list decodeRawPaper)
-
-rawParse : String -> Result String NameAndRawPaperList
-rawParse response =
-    decodeString (at [ "data" ] decodeNameAndRawPaperList) response
-
+        |> requiredAt [ "repository", "issues", "nodes" ] (list decodePaper)
 
 parse : String -> Result String NameAndPaperList
 parse response =
-    let
-        raw = rawParse response
-        foo = Debug.log "raw" raw
-    in
-        case raw of
-            Err err ->
-                Err (Debug.log "err" err)
-
-            Ok data ->
-                Ok (Debug.log "data" (translateNameAndRawPaperList data))
+    decodeString (at [ "data" ] decodeNameAndPaperList) response
 
