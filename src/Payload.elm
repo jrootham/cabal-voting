@@ -18,7 +18,7 @@ type alias Send =
 makePayload : Owner -> Name -> Send
 makePayload owner name =
     let
-        fromGraphQLi =
+        fromGraphQLi = Debug.log "Payload"
             """
   query repo($owner: String!, $name: String!) {
     viewer {
