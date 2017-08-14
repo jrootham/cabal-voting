@@ -55,5 +55,10 @@ decodeNameAndPaperList =
 
 parse : String -> Result String NameAndPaperList
 parse response =
+    let
+        foo = Debug.log "response" response
+            
+    in
+            
     decodeString (at [ "data" ] decodeNameAndPaperList) response
 

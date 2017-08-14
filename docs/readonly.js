@@ -9401,6 +9401,7 @@ var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
 		_elm_lang$core$Json_Decode$string,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$NameAndPaperList)));
 var _jrootham$cabal_voting$Parse$parse = function (response) {
+	var foo = A2(_elm_lang$core$Debug$log, 'response', response);
 	return A2(
 		_elm_lang$core$Json_Decode$decodeString,
 		A2(
