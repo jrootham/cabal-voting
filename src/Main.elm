@@ -1,21 +1,19 @@
 module Main exposing (main)
 
 import Html exposing (Html, div, input, button, text, h1, h2, h3, h5, table, thead, tr, th, td, label, 
-    select, option, a)
+    select, option, a, textarea)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onClick, on)
+import Html.Events exposing (onInput, onClick)
 import Http
 import Date
 import Set
 import Config
-import Payload exposing (..)
-import Parse exposing (parse, NameAndPaperList, Paper, Link)
+import Parse exposing (Paper, Link)
 
+import Demo exposing(..)
 
 main =
-    Html.programWithFlags { init = init, view = view, update = update, subscriptions = subscriptions }
-
-
+    Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 -- Aliases
 
@@ -26,8 +24,6 @@ type alias ResponseString =
 
 type alias Key =
     String
-
-
 
 -- Types
 
@@ -43,24 +39,27 @@ type PaperOrder
     | Voter
 
 
+type Page = Login | List | Edit
 
 -- MODEL
 
 
 type alias Model =
-    { key : String
+    { page : Page
     , name : String
+    , loginError : String
     , fetchError : String
     , papers : List Paper
     , order : PaperOrder
     , voter : String
     , voters : List String
+    , edit : Maybe Paper
     }
 
 
-init : String -> ( Model, Cmd Msg )
-init key =
-    ( (Model key "" "" [] Title "" []), githubFetch key )
+init : ( Model, Cmd Msg )
+init =
+    ( (Model Login "" "" "" [] Title "" [] Nothing), Cmd.none )
 
 
 
@@ -77,22 +76,40 @@ subscriptions model =
 
 
 type Msg
-    = ChangeOrder PaperOrder
+    = Name String
+    | DoLogin
+    | ClearLogin
+    | ChangeOrder PaperOrder
     | ChangeVoter String
     | FetchResult (Result Http.Error ResponseString)
-    | Clear
-
+    | ClearFetch
+    | Add
+    | DoEdit Int
+    | Close Int
+    | Cancel
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Name newName ->
+            ( { model | name = newName}, Cmd.none)
+
+        DoLogin ->
+            if isUser model.name then
+                ({model | page = List, papers = getPaperList}, Cmd.none)
+            else
+                ({model | loginError = "Not a valid user"}, Cmd.none)
+
+        ClearLogin ->
+            ( { model | loginError = "" }, Cmd.none )
+
         FetchResult (Ok response) ->
             updateModel model response
 
         FetchResult (Err error) ->
             ( { model | fetchError = formatError error }, Cmd.none )
 
-        Clear ->
+        ClearFetch ->
             ( { model | fetchError = "" }, Cmd.none )
 
         ChangeOrder newOrder ->
@@ -101,34 +118,45 @@ update msg model =
         ChangeVoter newVoter ->
             ( { model | voter = newVoter }, Cmd.none )
 
+        Add ->
+            ({model | page = Edit, edit = Just (newPaper model.name)}, Cmd.none)
+
+        DoEdit id ->
+            ({model | page = Edit, edit = getPaper model.papers id}, Cmd.none)
+
+        Close id ->
+            ({model | papers = delete model.papers id}, Cmd.none)
+
+        Cancel ->
+            ({model | page = List}, Cmd.none)
+
 
 
 updateModel : Model -> ResponseString -> ( Model, Cmd Msg )
 updateModel model response =
-    let
+    (model, Cmd.none)
+
+{-    let
         result =
             parse response
     in
         case result of
             Ok data ->
                 let
-                    name =
-                        data.name
-
                     papers =
                         data.papers
 
                     raw =
-                        List.foldr (\paper voterList -> List.append voterList paper.votes) [ "" ] papers
+                        List.foldl (\paper voterList -> List.append voterList paper.votes) [ "" ] papers
 
                     voters =
                         List.sort (Set.toList (Set.fromList raw))
                 in
-                    ( { model | name = name, papers = papers, voters = voters }, Cmd.none )
+                    ( { model | papers = papers, voters = voters }, Cmd.none )
 
             Err error ->
                 ( { model | fetchError = error }, Cmd.none )
-
+-}
 
 formatError : Http.Error -> String
 formatError error =
@@ -153,11 +181,68 @@ view : Model -> Html Msg
 view model =
     div [ class "outer" ]
         [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
-        , if model.fetchError == "" then
-            div [] [ page model ]
-        else
-            div [] [text model.fetchError]
+        , case model.page of
+            Login ->
+                loginPage model
+
+            List ->
+                if model.fetchError == "" then
+                    div [] [ page model ]
+                else
+                    div [] [text model.fetchError]
+
+            Edit ->
+                editPage model
         ]
+
+editPage : Model -> Html Msg
+editPage model = 
+    case model.edit of
+        Just paper ->            
+            div [] 
+            [
+                div [] [text "Title:", input [value paper.title] []]
+                ,div [] [text "Paper:", editLink paper.paper]
+                ,div [] [text "Comment:", textarea [] [text paper.comment]]
+                ,div [] [text "References:", editReferences paper.references]
+                ,div [] 
+                [
+                    div [class "flat-button", setEnabled True] [text "Save"]
+                    ,div [class "flat-button", setEnabled True, onClick Cancel] [text "Cancel"]
+                ]
+            ]
+
+        Nothing ->
+            div [] [text "Paper not found.  Should not occur."]
+
+editReferences : List Link -> Html Msg
+editReferences references = 
+    div [] 
+    [
+        div [] [div [class "flat-button", setEnabled True] [text "Add reference"]]
+        ,div [] [div [] (List.map editLink references)]
+    ]
+
+
+editLink : Link -> Html Msg
+editLink link =
+    div []
+    [
+        div [] [text "Link text", input [value link.text] []]
+        , div [] [text "Link:", input[type_ "url", value link.link] []]
+    ]
+
+
+loginPage : Model -> Html Msg
+loginPage model =
+    div [] 
+    
+    [ div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
+    , div [class "password-line"] [ div [class "flat-button", setEnabled True, onClick DoLogin ] [ text "Login" ] ]
+    , div [class "password-line"] [ text model.loginError ]        
+    , div [class "password-line"] [ div [class "flat-button", setEnabled True, onClick ClearLogin ] [ text "Clear error" ] ]
+    ]
+    
 
 
 checkVote : String -> String -> Bool
@@ -193,13 +278,14 @@ displayPaper model votable paper =
             [ td []
                 [ div []
                     [ div [ class "submitter" ] [ text paper.submitter ]
-                    , div [ class "flat-button", setEnabled belongsTo ] [ text "Edit" ]
+                    , div [ class "flat-button", setEnabled belongsTo, onClick (DoEdit paper.id)  ] [ text "Edit" ]
+                    , div [ class "flat-button", setEnabled belongsTo, onClick (Close paper.id) ] [ text "Close" ]
                     ]
                 ]
             , td []
                 ([ (div [] [ h5 [] [ text paper.title ] ])
                 , (div [] [makeLink paper.paper])
-                , (div [ class "contents" ] [ text paper.comments ])
+                , (div [ class "contents" ] [ text paper.comment ])
                 ] ++ (List.map (\ ref-> div [] [makeLink ref]) paper.references))
             , td [ class "vote" ]
                 [ label []
@@ -350,6 +436,7 @@ page model =
                         model.voters
                     )
                 ]
+            , div [] [div [class "flat-button", setEnabled True, onClick Add] [text "Add"]]
             , (div []
                 [ table []
                     ((thead []
@@ -387,25 +474,21 @@ radioBase current enable labelText order =
 -- Commands
 
 
-githubFetch : Key -> Cmd Msg
-githubFetch key =
+fetch : String -> Cmd Msg
+fetch name =
     let
-        headers =
-            [ Http.header "Authorization" ("bearer " ++ key) ]
-
         mime =
             "application/json"
 
         url =
             "https://api.github.com/graphql"
 
-        payload =
-            makePayload Config.owner Config.repository
+        payload = "{}"
 
         req =
             Http.request
                 { method = "POST"
-                , headers = headers
+                , headers = []
                 , url = url
                 , body = Http.stringBody mime payload
                 , expect = Http.expectString

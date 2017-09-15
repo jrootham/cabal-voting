@@ -9350,10 +9350,23 @@ var _jrootham$cabal_voting$Parse$NameAndPaperList = F2(
 	function (a, b) {
 		return {name: a, papers: b};
 	});
-var _jrootham$cabal_voting$Parse$Paper = F4(
-	function (a, b, c, d) {
-		return {title: a, createdAt: b, submitter: c, votes: d};
+var _jrootham$cabal_voting$Parse$Paper = F7(
+	function (a, b, c, d, e, f, g) {
+		return {title: a, paper: b, comment: c, references: d, createdAt: e, submitter: f, votes: g};
 	});
+var _jrootham$cabal_voting$Parse$Link = F2(
+	function (a, b) {
+		return {text: a, link: b};
+	});
+var _jrootham$cabal_voting$Parse$linkDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'link',
+	_elm_lang$core$Json_Decode$string,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'text',
+		_elm_lang$core$Json_Decode$string,
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Link)));
 var _jrootham$cabal_voting$Parse$decodePaper = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'reactions',
@@ -9368,9 +9381,21 @@ var _jrootham$cabal_voting$Parse$decodePaper = A3(
 			_jrootham$cabal_voting$Parse$dateDecoder,
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'title',
-				_elm_lang$core$Json_Decode$string,
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Paper)))));
+				'references',
+				_elm_lang$core$Json_Decode$list(_jrootham$cabal_voting$Parse$linkDecoder),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'comment',
+					_elm_lang$core$Json_Decode$string,
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'paper',
+						_jrootham$cabal_voting$Parse$linkDecoder,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'title',
+							_elm_lang$core$Json_Decode$string,
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Paper))))))));
 var _jrootham$cabal_voting$Parse$decodeNameAndPaperList = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt,
 	{
