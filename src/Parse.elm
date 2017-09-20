@@ -1,4 +1,4 @@
-module Parse exposing (Paper, Link)
+module Parse exposing (Paper, Link, Vote, parse)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
@@ -13,13 +13,27 @@ type alias Paper =
     , references : List Link
     , createdAt : Date.Date
     , submitter : String
-    , votes : List String
+    , votes : List Vote
     }
 
 type alias Link =
-    { text: String
+    { index : Int
+    , text: String
     , link: String
     }   
+
+type alias Vote =
+    {
+        name: String
+        , votes : Int
+    }
+
+parse : String -> Result String (List Paper)
+parse responseString =
+    if False then
+        Ok []
+    else
+        Err "Not implemented"
 
 decodePaper : Decoder Paper
 decodePaper =
@@ -30,13 +44,14 @@ decodePaper =
         |> required "comment" string
         |> required "references" (list linkDecoder)
         |> required "createdAt" dateDecoder
-        |> required "author" (field "login" string)
-        |> required "reactions" voteDecoder
+        |> required "submitter" (field "login" string)
+        |> required "votes" (list voteDecoder)
 
 
 linkDecoder : Decoder Link
 linkDecoder =
     decode Link
+        |> required "index" int
         |> required "text" string
         |> required "link" string
 
@@ -54,8 +69,8 @@ dateDecoder =
             )
 
 
-voteDecoder : Decoder (List String)
+voteDecoder : Decoder Vote
 voteDecoder =
-    at [ "nodes" ] (list (at [ "user", "login" ] string))
-
-
+    decode Vote
+        |> required "name" string
+        |> required "votes" int

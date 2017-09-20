@@ -8,7 +8,7 @@ import Http
 import Date
 import Set
 import Config
-import Parse exposing (Paper, Link)
+import Parse exposing (Paper, Link, Vote, parse)
 
 import Demo exposing(..)
 
@@ -47,7 +47,6 @@ type Page = Login | List | Edit
 type alias Model =
     { page : Page
     , name : String
-    , loginError : String
     , fetchError : String
     , papers : List Paper
     , order : PaperOrder
@@ -59,7 +58,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( (Model Login "" "" "" [] Title "" [] Nothing), Cmd.none )
+    ( (Model Login "" "" [] Title "" [] Nothing), Cmd.none )
 
 
 
@@ -74,34 +73,41 @@ subscriptions model =
 
 -- UPDATE
 
-
 type Msg
     = Name String
-    | DoLogin
-    | ClearLogin
+    | StartLogin
+    | Add
     | ChangeOrder PaperOrder
     | ChangeVoter String
+    | DecrementVote Int
+    | IncrementVote Int
     | FetchResult (Result Http.Error ResponseString)
     | ClearFetch
-    | Add
     | DoEdit Int
     | Close Int
+    | InputTitle String
+    | InputPaperText String
+    | InputPaperLink String
+    | InputComment String
+    | AddReference
+    | DeleteReference Int
+    | InputReferenceText Int String
+    | InputReferenceLink Int String
+    | Save
     | Cancel
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+--  Login page updates
+
         Name newName ->
             ( { model | name = newName}, Cmd.none)
 
-        DoLogin ->
-            if isUser model.name then
-                ({model | page = List, papers = getPaperList}, Cmd.none)
-            else
-                ({model | loginError = "Not a valid user"}, Cmd.none)
+        StartLogin ->
+            (model, startLogin model.name)
 
-        ClearLogin ->
-            ( { model | loginError = "" }, Cmd.none )
+-- fetch 
 
         FetchResult (Ok response) ->
             updateModel model response
@@ -112,14 +118,16 @@ update msg model =
         ClearFetch ->
             ( { model | fetchError = "" }, Cmd.none )
 
+--  List page updates
+
+        Add ->
+            ({model | page = Edit, edit = Just (newPaper model.name)}, Cmd.none)
+
         ChangeOrder newOrder ->
             ( { model | order = newOrder }, Cmd.none )
 
         ChangeVoter newVoter ->
             ( { model | voter = newVoter }, Cmd.none )
-
-        Add ->
-            ({model | page = Edit, edit = Just (newPaper model.name)}, Cmd.none)
 
         DoEdit id ->
             ({model | page = Edit, edit = getPaper model.papers id}, Cmd.none)
@@ -127,36 +135,74 @@ update msg model =
         Close id ->
             ({model | papers = delete model.papers id}, Cmd.none)
 
-        Cancel ->
-            ({model | page = List}, Cmd.none)
+        IncrementVote id ->
+            (model, Cmd.none)
 
+        DecrementVote id ->
+            (model, Cmd.none)
+
+--  Edit page updates
+
+        InputTitle newTitle ->
+            ({model | edit = makeNewTitle model.edit newTitle}, Cmd.none)
+        
+        InputPaperText newText ->
+            ({model | edit = makeNewPaperText model.edit newText}, Cmd.none)
+        
+        InputPaperLink newLink ->
+            ({model | edit = makeNewPaperLink model.edit newLink}, Cmd.none)
+        
+        InputComment newComment ->
+            ({model | edit = makeNewComment model.edit newComment}, Cmd.none)
+        
+        AddReference ->
+            ({model | edit = addReference model.edit}, Cmd.none)
+        
+        DeleteReference referenceIndex ->
+            ({model | edit = deleteReference model.edit referenceIndex}, Cmd.none)
+        
+        InputReferenceText referenceIndex newText ->
+            ({model | edit = makeNewReferenceText model.edit referenceIndex newText}, Cmd.none)
+        
+        InputReferenceLink referenceIndex newLink ->
+            ({model | edit = makeNewReferenceLink model.edit referenceIndex newLink}, Cmd.none)
+        
+        Save ->
+            (model, Cmd.none)
+
+        Cancel ->
+            ({model | page = List, edit = Nothing}, Cmd.none)
+
+
+startLogin : String -> Cmd Msg
+startLogin name =
+    fetch name
+
+getVoters : List Paper -> List String
+getVoters paperList = 
+    let
+        insert : Vote -> (Set.Set String) -> Set.Set String
+        insert = \ vote nameSet -> Set.insert vote.name nameSet
+        inner:  (List Vote) -> (Set.Set String) -> Set.Set String
+        inner = \ voteList nameSet-> List.foldl insert nameSet voteList
+        nameSet = List.foldl (\ paper nameSet-> inner paper.votes nameSet) (Set.fromList [""]) paperList 
+    in
+        Set.toList nameSet
 
 
 updateModel : Model -> ResponseString -> ( Model, Cmd Msg )
 updateModel model response =
-    (model, Cmd.none)
-
-{-    let
+    let
         result =
             parse response
     in
         case result of
-            Ok data ->
-                let
-                    papers =
-                        data.papers
-
-                    raw =
-                        List.foldl (\paper voterList -> List.append voterList paper.votes) [ "" ] papers
-
-                    voters =
-                        List.sort (Set.toList (Set.fromList raw))
-                in
-                    ( { model | papers = papers, voters = voters }, Cmd.none )
+            Ok papers ->
+                ( { model | papers = papers, voters = getVoters papers}, Cmd.none )
 
             Err error ->
                 ( { model | fetchError = error }, Cmd.none )
--}
+
 
 formatError : Http.Error -> String
 formatError error =
@@ -201,122 +247,271 @@ editPage model =
         Just paper ->            
             div [] 
             [
-                div [] [text "Title:", input [value paper.title] []]
-                ,div [] [text "Paper:", editLink paper.paper]
-                ,div [] [text "Comment:", textarea [] [text paper.comment]]
-                ,div [] [text "References:", editReferences paper.references]
+                div [] [inputDiv "Title: " paper.title InputTitle]
+                ,div [] [editPaperLink paper]
+                ,div [] [div [class "label"] 
+                    [text "Comment: "]
+                    , textarea [cols 80, onInput InputComment] [text paper.comment]
+                    ]
+                ,div [] [div [class "label"] [text "References: "], (editReferences paper.id paper.references)]
                 ,div [] 
                 [
-                    div [class "flat-button", setEnabled True] [text "Save"]
-                    ,div [class "flat-button", setEnabled True, onClick Cancel] [text "Cancel"]
+                    normalFlatButton True Save "Save"
+                    ,normalFlatButton True Cancel "Cancel"
                 ]
             ]
 
         Nothing ->
             div [] [text "Paper not found.  Should not occur."]
 
-editReferences : List Link -> Html Msg
-editReferences references = 
+editReferences : Int -> List Link -> Html Msg
+editReferences paperId references = 
     div [] 
     [
-        div [] [div [class "flat-button", setEnabled True] [text "Add reference"]]
-        ,div [] [div [] (List.map editLink references)]
+        div [] [div [] [wideFlatButton True AddReference "Add reference"]]
+        ,div [] [div [] (List.map editLink (List.sortBy .index references))]
     ]
 
 
-editLink : Link -> Html Msg
-editLink link =
+editLinkBase : (String -> Msg) -> (String -> Msg) -> Link -> Html Msg
+editLinkBase makeMessageText makeMessageLink link =
     div []
     [
-        div [] [text "Link text", input [value link.text] []]
-        , div [] [text "Link:", input[type_ "url", value link.link] []]
+        inputDiv "Link text: " link.text makeMessageText,
+        urlDiv "Link: " link.link makeMessageLink
     ]
 
+editLink : Link -> Html Msg
+editLink link = 
+    div [] 
+    [wideFlatButton True (DeleteReference link.index) "Delete reference"
+      , editLinkBase (InputReferenceText link.index) (InputReferenceLink link.index) link
+    ]
+
+editPaperLink : Paper -> Html Msg
+editPaperLink paper = editLinkBase InputPaperText InputPaperLink paper.paper
+
+inputDivBase : String -> String -> String -> (String -> Msg) -> Html Msg
+inputDivBase typeName label currentValue makeMessage =
+    div [] [div [class "label"] [text label], input[type_ typeName, value currentValue, onInput makeMessage] []]
+
+inputDiv = inputDivBase "text"
+urlDiv = inputDivBase "url"
+
+makeNewTitle : (Maybe Paper) -> String -> Maybe Paper
+makeNewTitle maybePaper newTitle =
+    case maybePaper of
+        Just paper  ->
+            Just {paper | title = newTitle}
+
+        Nothing ->
+            Nothing
+            
+makeNewComment : (Maybe Paper) -> String -> Maybe Paper
+makeNewComment maybePaper newComment =
+    case maybePaper of
+        Just paper  ->
+            Just {paper | comment = newComment}
+
+        Nothing ->
+            Nothing
+            
+makeNewPaperText: (Maybe Paper) -> String -> Maybe Paper
+makeNewPaperText maybePaper newText =
+    case maybePaper of
+        Just paper  ->
+            let
+                oldPaper = paper.paper
+                newPaper = {oldPaper | text = newText}
+            in
+                    
+            Just {paper | paper = newPaper}
+
+        Nothing ->
+            Nothing
+             
+makeNewPaperLink: (Maybe Paper) -> String -> Maybe Paper
+makeNewPaperLink maybePaper newLink =
+    case maybePaper of
+        Just paper  ->
+            let
+                oldPaper = paper.paper
+                newPaper = {oldPaper | link = newLink}
+            in
+                    
+            Just {paper | paper = newPaper}
+
+        Nothing ->
+            Nothing
+
+addReference : (Maybe Paper) -> Maybe Paper
+addReference maybePaper = 
+    case maybePaper of
+        Just paper  ->
+            let
+                maybeMax = List.maximum (List.map (\ reference -> reference.index) paper.references)
+                newMax = case maybeMax of
+                    Just max ->
+                        max + 1
+                    Nothing ->
+                        1
+                
+                newReference = Link newMax "" ""
+            in
+            Just {paper | references = newReference :: paper.references}
+
+        Nothing ->
+            Nothing   
+
+deleteReference : (Maybe Paper) -> Int -> Maybe Paper
+deleteReference maybePaper referenceIndex = 
+    case maybePaper of
+        Just paper  ->
+            let
+                trim = \ reference -> reference.index /= referenceIndex
+                trimmedReferences = List.filter trim  paper.references
+                setIndex = \ listIndex reference -> {reference | index = listIndex + 1}
+                newReferences = List.indexedMap setIndex trimmedReferences
+            in
+            Just {paper | references = newReferences}
+
+        Nothing ->
+            Nothing   
+             
+makeNewReferenceText: (Maybe Paper) -> Int -> String -> Maybe Paper
+makeNewReferenceText maybePaper referenceIndex newText =
+    case maybePaper of
+        Just paper  ->
+            let
+                setText = \ link -> 
+                    if link.index == referenceIndex then
+                        {link | text = newText}
+                    else
+                        link
+
+                newReferences = List.map setText paper.references
+            in
+                    
+            Just {paper | references = newReferences}
+
+        Nothing ->
+            Nothing
+
+makeNewReferenceLink: (Maybe Paper) -> Int -> String -> Maybe Paper
+makeNewReferenceLink maybePaper referenceIndex newLink =
+    case maybePaper of
+        Just paper  ->
+            let
+                setText = \ link -> 
+                    if link.index == referenceIndex then
+                        {link | link = newLink}
+                    else
+                        link
+ 
+                newReferences = List.map setText paper.references
+            in
+                    
+            Just {paper | references = newReferences}
+
+        Nothing ->
+            Nothing
+
+
+
+
+--  ----------------------   Login stuff
 
 loginPage : Model -> Html Msg
 loginPage model =
     div [] 
     
     [ div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
-    , div [class "password-line"] [ div [class "flat-button", setEnabled True, onClick DoLogin ] [ text "Login" ] ]
-    , div [class "password-line"] [ text model.loginError ]        
-    , div [class "password-line"] [ div [class "flat-button", setEnabled True, onClick ClearLogin ] [ text "Clear error" ] ]
+    , div [class "password-line"] [ normalFlatButton True StartLogin "Login"]
+    , div [class "password-line"] [ text model.fetchError ]        
+    , div [class "password-line"] [ wideFlatButton True ClearFetch "Clear error" ]
     ]
     
+flatButton : String -> Bool -> Msg -> String -> Html Msg
+flatButton otherClass enabled click label =
+    let
+        enableClass = if enabled then
+            class "flat-enabled"
+        else
+            class "flat-disabled"
+    in
+            
+    div [class "flat-button", class otherClass, enableClass, onClick click ] [text label]
 
-
-checkVote : String -> String -> Bool
-checkVote login vote =
-    login == vote
-
-
-setEnabled : Bool -> Html.Attribute msg
-setEnabled enabled =
-    if enabled then
-        class "flat-enabled"
-    else
-        class "flat-disabled"
+normalFlatButton = flatButton "normal"
+wideFlatButton = flatButton "wide"
+thinFlatButton = flatButton "thin"
 
 makeLink: Link -> Html msg
 makeLink link =
     a [(href link.link), (target "_blank")] [text link.text]
 
-displayPaper : Model -> Bool -> Paper -> Html Msg
-displayPaper model votable paper =
+displayPaper : Model -> Paper -> Html Msg
+displayPaper model paper =
     let
-        testVote =
-            checkVote model.name
+        testVote = \ vote -> vote.name == model.name
 
-        on =
-            List.any testVote paper.votes
+        thisVoterCount = 
+            let
+                possible =  List.head (List.filter testVote paper.votes)
+            in
+                case possible of
+                    Just vote ->
+                        vote.votes
+                    Nothing ->
+                        0
 
-        belongsTo =
-            model.name == paper.submitter
+        belongsTo = model.name == paper.submitter
 
+        displayVotes = \ vote -> div [] [ text (vote.name ++ " "), text (toString vote.votes)]
     in
         tr [ class "entry" ]
             [ td []
                 [ div []
                     [ div [ class "submitter" ] [ text paper.submitter ]
-                    , div [ class "flat-button", setEnabled belongsTo, onClick (DoEdit paper.id)  ] [ text "Edit" ]
-                    , div [ class "flat-button", setEnabled belongsTo, onClick (Close paper.id) ] [ text "Close" ]
+                    , normalFlatButton belongsTo (DoEdit paper.id) "Edit"
+                    , normalFlatButton belongsTo (Close paper.id) "Close" 
                     ]
                 ]
             , td []
                 ([ (div [] [ h5 [] [ text paper.title ] ])
                 , (div [] [makeLink paper.paper])
                 , (div [ class "contents" ] [ text paper.comment ])
-                ] ++ (List.map (\ ref-> div [] [makeLink ref]) paper.references))
+                ] ++ (List.map (\ ref-> div [] [makeLink ref]) (List.sortBy .index paper.references)))
             , td [ class "vote" ]
-                [ label []
-                    [ input
-                        [ type_ "checkbox"
-                        , checked on
-                        , disabled (not (on || votable))
-                        ]
-                        []
-                    , text "Vote"
-                    ]
+                [ 
+                    thinFlatButton (thisVoterCount > 0) (DecrementVote paper.id) " -"
+                    , text " "
+                    , text (toString thisVoterCount)
+                    , text " "
+                    , thinFlatButton (voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
                 ]
-            , td [] (List.map (\login -> div [] [ text login ]) paper.votes)
+            , td [] (List.map displayVotes paper.votes)
             ]
 
 
 countVotes : Model -> Int
 countVotes model =
     let
-        testVote =
-            checkVote model.name
-
-        pickVote =
-            \issue -> List.any testVote issue.votes
+        inner: Vote -> Int -> Int
+        inner = \ vote count -> count + vote.votes
+        filter : Vote -> Bool
+        filter = \ vote -> vote.name == model.name
+        outer: Paper -> Int -> Int
+        outer = \ paper count -> List.foldl inner count (List.filter filter paper.votes)
     in
-        List.length (List.filter pickVote model.papers)
+        List.foldl outer 0 model.papers
 
-
-voteLimit : Model -> Bool
-voteLimit model =
-    Config.maxVotes >= countVotes model
+voteLimit : Model -> Int-> Bool
+voteLimit model thisVoterCount =
+    let
+        available = Config.maxVotes - (countVotes model)
+    in
+        (available > 0) && (Config.maxPerPaper > thisVoterCount)
 
 
 userLine : Model -> String
@@ -351,7 +546,7 @@ userLine model =
 
 nameIn : String -> Paper -> Bool
 nameIn name paper =
-    List.member name paper.votes
+    List.member name (List.map (\ vote -> vote.name) paper.votes)
 
 
 votes : String -> (Paper -> Paper -> Order)
@@ -436,7 +631,7 @@ page model =
                         model.voters
                     )
                 ]
-            , div [] [div [class "flat-button", setEnabled True, onClick Add] [text "Add"]]
+            , div [] [(normalFlatButton True Add "Add")
             , (div []
                 [ table []
                     ((thead []
@@ -448,11 +643,12 @@ page model =
                             ]
                         ]
                      )
-                        :: (List.map (displayPaper model (voteLimit model)) (List.sortWith compare model.papers))
+                        :: (List.map (displayPaper model) (List.sortWith compare model.papers))
                     )
                 ]
               )
             ]
+        ]
 
 
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
@@ -481,11 +677,11 @@ fetch name =
             "application/json"
 
         url =
-            "https://api.github.com/graphql"
+            "https://127.0.0.1:8040"
 
         payload = "{}"
 
-        req =
+        req = 
             Http.request
                 { method = "POST"
                 , headers = []

@@ -51,12 +51,33 @@ h5
 	margin-bottom: 7px;
 }
 
+.label
+{
+	display: inline-block;
+	width: 6em;
+}
+
 .flat-button
 {
+	display: inline-block;
 	background-color: blue;
 	padding: 2px;
 	margin: 2px;
+}
+
+.normal
+{
 	width: 4em;
+}
+
+.wide
+{
+	width: 8em;
+}
+
+.thin
+{
+	width: 1em;
 }
 
 .flat-enabled

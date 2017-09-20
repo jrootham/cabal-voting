@@ -1,1 +1,8 @@
+echo " "
+echo " "
+echo " "
+echo " "
+echo " "
+echo " "
+
 elm-make src/Main.elm --output docs/main.js

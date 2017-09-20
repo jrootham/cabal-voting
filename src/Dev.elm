@@ -12,6 +12,8 @@ repository =
 maxPapers =
     5
 
-
-maxVotes =
+maxPerPaper =
     5
+    
+maxVotes =
+    15
