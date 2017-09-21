@@ -677,7 +677,7 @@ fetch name =
             "application/json"
 
         url =
-            "https://127.0.0.1:8040"
+            "http://127.0.0.1:8040"
 
         payload = "{}"
 

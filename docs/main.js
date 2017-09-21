@@ -10209,7 +10209,7 @@ var _jrootham$cabal_voting$Main$FetchResult = function (a) {
 };
 var _jrootham$cabal_voting$Main$fetch = function (name) {
 	var payload = '{}';
-	var url = 'https://127.0.0.1:8040';
+	var url = 'http://127.0.0.1:8040';
 	var mime = 'application/json';
 	var req = _elm_lang$http$Http$request(
 		{
