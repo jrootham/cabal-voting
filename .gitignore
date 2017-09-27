@@ -4,3 +4,7 @@ elm-stuff
 repl-temp-*
 src/Config.elm
 index.html
+server/voting/.hgignore
+server/voting/.lein-failures
+server/voting/.lein-repl-history
+server/voting/target/
