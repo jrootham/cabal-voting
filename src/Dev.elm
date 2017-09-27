@@ -1,13 +1,7 @@
 module Config exposing (..)
 
 
-owner =
-    "jrootham"
-
-
-repository =
-    "cabal-voting"
-
+backend = "http://127.0.0.1:8040"
 
 maxPapers =
     5

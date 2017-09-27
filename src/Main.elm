@@ -8,22 +8,13 @@ import Http
 import Date
 import Set
 import Config
-import Parse exposing (Paper, Link, Vote, parse)
+import Parse exposing (Paper, Reference, Link, Vote, parse)
+import Payload exposing (loginPayload, paperPayload, votePayload,closePayload)
 
 import Demo exposing(..)
 
 main =
     Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
-
--- Aliases
-
-
-type alias ResponseString =
-    String
-
-
-type alias Key =
-    String
 
 -- Types
 
@@ -47,18 +38,19 @@ type Page = Login | List | Edit
 type alias Model =
     { page : Page
     , name : String
-    , fetchError : String
+    , errorMessage : String
     , papers : List Paper
     , order : PaperOrder
     , voter : String
     , voters : List String
     , edit : Maybe Paper
+    , debounce : Bool
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( (Model Login "" "" [] Title "" [] Nothing), Cmd.none )
+    ( (Model Login "" "" [] Title "" [] Nothing True), Cmd.none )
 
 
 
@@ -81,7 +73,7 @@ type Msg
     | ChangeVoter String
     | DecrementVote Int
     | IncrementVote Int
-    | FetchResult (Result Http.Error ResponseString)
+    | FetchResult (Result Http.Error String)
     | ClearFetch
     | DoEdit Int
     | Close Int
@@ -105,18 +97,18 @@ update msg model =
             ( { model | name = newName}, Cmd.none)
 
         StartLogin ->
-            (model, startLogin model.name)
+            ({model | debounce = False}, fetch (loginPayload model.name))
 
 -- fetch 
 
         FetchResult (Ok response) ->
-            updateModel model response
+            (debounce (updateModel model response), Cmd.none)
 
         FetchResult (Err error) ->
-            ( { model | fetchError = formatError error }, Cmd.none )
+            ( { model | errorMessage = formatError error, debounce = True }, Cmd.none )
 
         ClearFetch ->
-            ( { model | fetchError = "" }, Cmd.none )
+            ( { model | errorMessage = "" }, Cmd.none )
 
 --  List page updates
 
@@ -133,13 +125,13 @@ update msg model =
             ({model | page = Edit, edit = getPaper model.papers id}, Cmd.none)
 
         Close id ->
-            ({model | papers = delete model.papers id}, Cmd.none)
+            ({model | debounce = False}, fetch (closePayload model.name id))
 
         IncrementVote id ->
-            (model, Cmd.none)
+            ({model | debounce = False}, fetch (votePayload model.name id 1))
 
         DecrementVote id ->
-            (model, Cmd.none)
+            ({model | debounce = False}, fetch (votePayload model.name id -1))
 
 --  Edit page updates
 
@@ -168,15 +160,16 @@ update msg model =
             ({model | edit = makeNewReferenceLink model.edit referenceIndex newLink}, Cmd.none)
         
         Save ->
-            (model, Cmd.none)
+            case model.edit of
+                Just paper ->
+                    ({model | debounce = False}, fetch (paperPayload model.name paper))
+                Nothing ->
+                    ({model | errorMessage = "No paper.  Should not happen"}, Cmd.none)
 
         Cancel ->
             ({model | page = List, edit = Nothing}, Cmd.none)
 
 
-startLogin : String -> Cmd Msg
-startLogin name =
-    fetch name
 
 getVoters : List Paper -> List String
 getVoters paperList = 
@@ -190,18 +183,25 @@ getVoters paperList =
         Set.toList nameSet
 
 
-updateModel : Model -> ResponseString -> ( Model, Cmd Msg )
-updateModel model response =
-    let
-        result =
-            parse response
-    in
-        case result of
-            Ok papers ->
-                ( { model | papers = papers, voters = getVoters papers}, Cmd.none )
+debounce : Model -> Model
+debounce model = 
+    {model | debounce = True}
 
-            Err error ->
-                ( { model | fetchError = error }, Cmd.none )
+updateModel : Model -> String -> Model
+updateModel model response =
+    case parse response of
+        Ok errorAndPapers ->
+            let
+                error = errorAndPapers.error
+                papers = errorAndPapers.paperList
+            in
+                if error == "" then
+                    { model | errorMessage = "", page = List, papers = papers, voters = getVoters papers}
+                else
+                    {model | errorMessage = error}
+
+        Err error ->
+            { model | errorMessage = error }
 
 
 formatError : Http.Error -> String
@@ -232,10 +232,10 @@ view model =
                 loginPage model
 
             List ->
-                if model.fetchError == "" then
+                if model.errorMessage == "" then
                     div [] [ page model ]
                 else
-                    div [] [text model.fetchError]
+                    div [] [text model.errorMessage]
 
             Edit ->
                 editPage model
@@ -256,7 +256,7 @@ editPage model =
                 ,div [] [div [class "label"] [text "References: "], (editReferences paper.id paper.references)]
                 ,div [] 
                 [
-                    normalFlatButton True Save "Save"
+                    normalFlatButton model.debounce Save "Save"
                     ,normalFlatButton True Cancel "Cancel"
                 ]
             ]
@@ -264,32 +264,32 @@ editPage model =
         Nothing ->
             div [] [text "Paper not found.  Should not occur."]
 
-editReferences : Int -> List Link -> Html Msg
+editReferences : Int -> List Reference -> Html Msg
 editReferences paperId references = 
     div [] 
     [
         div [] [div [] [wideFlatButton True AddReference "Add reference"]]
-        ,div [] [div [] (List.map editLink (List.sortBy .index references))]
+        ,div [] [div [] (List.map editReference (List.sortBy .index references))]
     ]
 
 
-editLinkBase : (String -> Msg) -> (String -> Msg) -> Link -> Html Msg
-editLinkBase makeMessageText makeMessageLink link =
+editLink : (String -> Msg) -> (String -> Msg) -> Link -> Html Msg
+editLink makeMessageText makeMessageLink link =
     div []
     [
         inputDiv "Link text: " link.text makeMessageText,
         urlDiv "Link: " link.link makeMessageLink
     ]
 
-editLink : Link -> Html Msg
-editLink link = 
+editReference : Reference -> Html Msg
+editReference reference = 
     div [] 
-    [wideFlatButton True (DeleteReference link.index) "Delete reference"
-      , editLinkBase (InputReferenceText link.index) (InputReferenceLink link.index) link
+    [widerFlatButton True (DeleteReference reference.index) "Delete reference"
+      , editLink (InputReferenceText reference.index) (InputReferenceLink reference.index) reference.link
     ]
 
 editPaperLink : Paper -> Html Msg
-editPaperLink paper = editLinkBase InputPaperText InputPaperLink paper.paper
+editPaperLink paper = editLink InputPaperText InputPaperLink paper.paper
 
 inputDivBase : String -> String -> String -> (String -> Msg) -> Html Msg
 inputDivBase typeName label currentValue makeMessage =
@@ -350,15 +350,15 @@ addReference maybePaper =
         Just paper  ->
             let
                 maybeMax = List.maximum (List.map (\ reference -> reference.index) paper.references)
-                newMax = case maybeMax of
+                newIndex = case maybeMax of
                     Just max ->
                         max + 1
                     Nothing ->
                         1
                 
-                newReference = Link newMax "" ""
+                newReference = Reference newIndex (Link "" "")
             in
-            Just {paper | references = newReference :: paper.references}
+                Just {paper | references = newReference :: paper.references}
 
         Nothing ->
             Nothing   
@@ -378,18 +378,18 @@ deleteReference maybePaper referenceIndex =
         Nothing ->
             Nothing   
              
-makeNewReferenceText: (Maybe Paper) -> Int -> String -> Maybe Paper
-makeNewReferenceText maybePaper referenceIndex newText =
+makeNewReference: (Link -> String -> Link) -> (Maybe Paper) -> Int -> String -> Maybe Paper
+makeNewReference setFunction maybePaper referenceIndex newText =
     case maybePaper of
         Just paper  ->
             let
-                setText = \ link -> 
-                    if link.index == referenceIndex then
-                        {link | text = newText}
+                setLink = \ reference -> 
+                    if reference.index == referenceIndex then
+                        {reference | link = setFunction reference.link newText}
                     else
-                        link
+                        reference
 
-                newReferences = List.map setText paper.references
+                newReferences = List.map setLink paper.references
             in
                     
             Just {paper | references = newReferences}
@@ -397,25 +397,16 @@ makeNewReferenceText maybePaper referenceIndex newText =
         Nothing ->
             Nothing
 
-makeNewReferenceLink: (Maybe Paper) -> Int -> String -> Maybe Paper
-makeNewReferenceLink maybePaper referenceIndex newLink =
-    case maybePaper of
-        Just paper  ->
-            let
-                setText = \ link -> 
-                    if link.index == referenceIndex then
-                        {link | link = newLink}
-                    else
-                        link
- 
-                newReferences = List.map setText paper.references
-            in
-                    
-            Just {paper | references = newReferences}
+setLinkText : Link -> String -> Link
+setLinkText link text =
+    {link | text = text}
 
-        Nothing ->
-            Nothing
-
+setLinkLink : Link -> String -> Link
+setLinkLink link text =
+    {link | link = text}
+    
+makeNewReferenceLink = makeNewReference setLinkLink
+makeNewReferenceText = makeNewReference setLinkText
 
 
 
@@ -426,29 +417,34 @@ loginPage model =
     div [] 
     
     [ div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
-    , div [class "password-line"] [ normalFlatButton True StartLogin "Login"]
-    , div [class "password-line"] [ text model.fetchError ]        
+    , div [class "password-line"] [ normalFlatButton model.debounce StartLogin "Login"]
+    , div [class "password-line"] [ text model.errorMessage ]        
     , div [class "password-line"] [ wideFlatButton True ClearFetch "Clear error" ]
     ]
     
 flatButton : String -> Bool -> Msg -> String -> Html Msg
 flatButton otherClass enabled click label =
     let
-        enableClass = if enabled then
-            class "flat-enabled"
-        else
-            class "flat-disabled"
+        others = 
+            if enabled then
+                [class "flat-enabled", onClick click ]        
+            else
+                [class "flat-disabled"]
     in
             
-    div [class "flat-button", class otherClass, enableClass, onClick click ] [text label]
+    div (List.append [class "flat-button", class otherClass] others) [text label]
 
 normalFlatButton = flatButton "normal"
 wideFlatButton = flatButton "wide"
+widerFlatButton = flatButton "wider"
 thinFlatButton = flatButton "thin"
 
 makeLink: Link -> Html msg
 makeLink link =
     a [(href link.link), (target "_blank")] [text link.text]
+
+
+--------------------------------------
 
 displayPaper : Model -> Paper -> Html Msg
 displayPaper model paper =
@@ -474,21 +470,21 @@ displayPaper model paper =
                 [ div []
                     [ div [ class "submitter" ] [ text paper.submitter ]
                     , normalFlatButton belongsTo (DoEdit paper.id) "Edit"
-                    , normalFlatButton belongsTo (Close paper.id) "Close" 
+                    , normalFlatButton (model.debounce && belongsTo) (Close paper.id) "Close" 
                     ]
                 ]
             , td []
                 ([ (div [] [ h5 [] [ text paper.title ] ])
                 , (div [] [makeLink paper.paper])
                 , (div [ class "contents" ] [ text paper.comment ])
-                ] ++ (List.map (\ ref-> div [] [makeLink ref]) (List.sortBy .index paper.references)))
+                ] ++ (List.map (\ ref-> div [] [makeLink ref.link]) (List.sortBy .index paper.references)))
             , td [ class "vote" ]
                 [ 
-                    thinFlatButton (thisVoterCount > 0) (DecrementVote paper.id) " -"
+                    thinFlatButton (model.debounce && thisVoterCount > 0) (DecrementVote paper.id) " -"
                     , text " "
                     , text (toString thisVoterCount)
                     , text " "
-                    , thinFlatButton (voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
+                    , thinFlatButton (model.debounce && voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
                 ]
             , td [] (List.map displayVotes paper.votes)
             ]
@@ -513,6 +509,9 @@ voteLimit model thisVoterCount =
     in
         (available > 0) && (Config.maxPerPaper > thisVoterCount)
 
+validateAdd : Model -> Bool
+validateAdd model =
+    Config.maxPapers > (List.length (List.filter (\ paper -> model.name == paper.submitter) model.papers))            
 
 userLine : Model -> String
 userLine model =
@@ -587,6 +586,8 @@ page model =
         radio =
             radioSelected True
 
+        sumVotes = \ voteList -> List.sum (List.map .votes voteList)
+
         compare =
             case model.order of
                 Title ->
@@ -599,10 +600,10 @@ page model =
                     totalOrder (\left right -> (Date.toTime right.createdAt) < (Date.toTime left.createdAt))
 
                 MostVotes ->
-                    totalOrder (\left right -> (List.length right.votes) < (List.length left.votes))
+                    totalOrder (\left right -> (sumVotes right.votes) < (sumVotes left.votes))
 
                 LeastVotes ->
-                    totalOrder (\left right -> (List.length left.votes) < (List.length right.votes))
+                    totalOrder (\left right -> (sumVotes left.votes) < (sumVotes right.votes))
 
                 Submitter ->
                     totalOrder (\left right -> left.submitter < right.submitter)
@@ -631,7 +632,7 @@ page model =
                         model.voters
                     )
                 ]
-            , div [] [(normalFlatButton True Add "Add")
+            , div [] [(normalFlatButton (model.debounce && validateAdd model) Add "Add")
             , (div []
                 [ table []
                     ((thead []
@@ -666,20 +667,16 @@ radioBase current enable labelText order =
         ]
 
 
-
 -- Commands
 
 
 fetch : String -> Cmd Msg
-fetch name =
+fetch payload =
     let
         mime =
             "application/json"
 
-        url =
-            "http://127.0.0.1:8040"
-
-        payload = "{}"
+        url = Config.backend
 
         req = 
             Http.request

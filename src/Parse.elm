@@ -1,57 +1,71 @@
-module Parse exposing (Paper, Link, Vote, parse)
+module Parse exposing (Paper, Reference, Link, Vote, ErrorAndPaperList, parse)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 import Result
 import Date
 
+type alias ErrorAndPaperList =
+    { error: String
+      , paperList : List Paper
+    }
+
 type alias Paper =
     { id : Int
     , title : String
     , paper : Link
     , comment : String
-    , references : List Link
+    , references : List Reference
     , createdAt : Date.Date
     , submitter : String
     , votes : List Vote
     }
 
-type alias Link =
+type alias Reference =
     { index : Int
-    , text: String
+      , link : Link
+    }
+type alias Link =
+    { text: String
     , link: String
     }   
 
 type alias Vote =
-    {
-        name: String
-        , votes : Int
+    { name: String
+      , votes : Int
     }
 
-parse : String -> Result String (List Paper)
+parse : String -> Result String ErrorAndPaperList
 parse responseString =
-    if False then
-        Ok []
-    else
-        Err "Not implemented"
+    decodeString decodeErrorAndPaperList responseString
+
+decodeErrorAndPaperList : Decoder ErrorAndPaperList
+decodeErrorAndPaperList =
+    decode ErrorAndPaperList
+        |> required "error" string
+        |> required "paper_list" (list decodePaper)
 
 decodePaper : Decoder Paper
 decodePaper =
     decode Paper
-        |> required "id" int
+        |> required "paper_id" int
         |> required "title" string
         |> required "paper" linkDecoder
-        |> required "comment" string
-        |> required "references" (list linkDecoder)
-        |> required "createdAt" dateDecoder
-        |> required "submitter" (field "login" string)
+        |> required "paper_comment" string
+        |> required "references" (list referenceDecoder)
+        |> required "created_at" dateDecoder
+        |> required "submitter" string
         |> required "votes" (list voteDecoder)
 
+referenceDecoder : Decoder Reference
+referenceDecoder =
+  decode Reference
+    |> required "reference_index" int
+    |> required "link" linkDecoder
 
 linkDecoder : Decoder Link
 linkDecoder =
     decode Link
-        |> required "index" int
         |> required "text" string
         |> required "link" string
 
