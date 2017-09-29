@@ -8,9 +8,9 @@
   					[ring-cors "0.1.11"]
   					[ring/ring-json "0.4.0"]
   					[org.clojure/clojure "1.8.0"]
-					[org.xerial/sqlite-jdbc "3.20.0"]
-					[org.clojure/java.jdbc "0.7.1"]
-					[org.clojure/data.json "0.2.6"]
+  					[org.xerial/sqlite-jdbc "3.20.0"]
+  					[org.clojure/java.jdbc "0.7.1"]
+  					[org.clojure/data.json "0.2.6"]
                  ]
   :main ^:skip-aot voting.core
   :aot [voting.core]

@@ -1,0 +1,1 @@
+  query repo($owner: String!, $name: String!) {repository(owner: $owner, name: $name) {    issues(first: 100, states: [OPEN]) {      nodes {        title        createdAt        body author {          login        }        reactions(first: 100, content: THUMBS_UP) {          nodes {            user {              login            }          }        }      }    }  }}
