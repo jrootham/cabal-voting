@@ -250,12 +250,16 @@
 )
 
 (defn -main
-  "Cabal voting server"
-  [& args]
-  (let 	[
-  			port (Integer/parseInt (first args)) 
-  			db-file (second args)
-  		]
-		(run-jetty (make-handler db-file) {:port port})  	
-  	)
+  	"Cabal voting server"
+  	[& args]
+  	(if (= 2 (count args))
+	  	(let 
+	  		[
+	  			port (Integer/parseInt (first args)) 
+	  			db-file (second args)
+	  		]
+			(run-jetty (make-handler db-file) {:port port})  	
+	  	)
+	  (println "Usage: java -jar uberjar port dbfile")
+	)
  )

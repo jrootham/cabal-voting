@@ -13,6 +13,7 @@ CREATE TABLE "users" (
     "name" TEXT NOT NULL,
     "valid" INTEGER NOT NULL DEFAULT (1),
     "user_admin" INTEGER NOT NULL DEFAULT (0),
+    "rules_admin" INTEGER NOT NULL DEFAULT (0),
     "paper_admin" INTEGER NOT NULL DEFAULT (0)
 );
 CREATE TABLE "links" (

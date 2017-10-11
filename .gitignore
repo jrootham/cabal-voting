@@ -8,7 +8,7 @@ server/voting/.hgignore
 server/voting/.lein-failures
 server/voting/.lein-repl-history
 server/voting/target/
-parser/voting/.hgignore
-parser/voting/.lein-failures
-parser/voting/.lein-repl-history
-parser/voting/target/
+parser/.hgignore
+parser/.lein-failures
+parser/.lein-repl-history
+parser/target/

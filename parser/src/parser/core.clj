@@ -5,11 +5,12 @@
 	(:require [clojure.java.io :as io])
 	(:require [org.httpkit.client :as http])
 	(:require [clojure.data.json :as json])
+	(:require [clojure.string :as str])
 )
 
 
 
-(def url-regex #"http([0-9a-zA-Z;/?:@=&$-_.+!*'(),]*)")
+(def url-regex #"http([0-9a-zA-Z;/?:@=&$-_.+!*',~]*)")
 
 (defn get-link[body]
 	(first (re-find url-regex body))
@@ -32,12 +33,46 @@
 	(get-new-id (insert! db :links {:text text, :link link}))
 )
 
-(defn save-paper [db paper link]
+(defn get-references [reference-index reference-list body]
+	(let [link (get-link body)]
+		(if (str/blank? link)
+			[reference-list, body]
+			(let 
+				[
+					reference-name (str "Reference " reference-index)
+					new-index (+ 1 reference-index)
+					new-list (cons [reference-index reference-name link] reference-list)
+					new-body (str/replace-first body link reference-name)
+				]
+				(get-references new-index new-list new-body)
+			)
+		)
+	)
+)
+
+(defn make-references [db paper-id]
+	(fn [reference]
+		(let 
+			[
+				[reference-index reference-name link] reference
+				link-id (make-link db reference-name link)
+				record 
+					{
+						:paper_id paper-id
+						:reference_index reference-index
+						:link_id link-id
+					}
+			]
+			(insert! db :comment_references record)
+		)
+	)
+)
+
+(defn save-paper [db paper link body]
 	(let
 		[
 			title (get paper "title")
 			created-at (get paper "createdAt")
-			body (get paper "body")
 			submitter-name (get-in paper ["author" "login"])
 			submitter (get-name-id db submitter-name)
 			record 
@@ -61,19 +96,29 @@
 	)
 )
 
-(defn cast-votes [db paper link]
-	(let [
-		paper-id (save-paper db paper link)
-		raw-votes (get-in paper ["reactions" "nodes"])
+(defn cast-votes [db paper link body]
+	(let 
+		[
+			reference-result (get-references 1 [] body)
+			reference-list (first reference-result)
+			new-body (second reference-result)
+			paper-id (save-paper db paper link new-body)
+			raw-votes (get-in paper ["reactions" "nodes"])
 		]
-		(doall(map (make-cast db paper-id) raw-votes))
+		(doall (map (make-references db paper-id) reference-list))
+		(doall (map (make-cast db paper-id) raw-votes))
 	)
 )
 
 (defn make-save[db]
 	(fn [paper]
-		(let [link (get-link (get paper "body"))]
-			(if link (cast-votes db paper link))
+		(let [
+				body (get paper "body")
+				link (get-link body)
+			]
+			(if link 
+				(cast-votes db paper link (str/replace-first body link ""))
+			)
 		)
 	)
 )
