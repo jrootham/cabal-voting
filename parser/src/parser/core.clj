@@ -123,6 +123,11 @@
 	)
 )
 
+(defn fill-data [db]
+	(update! db :users {:user_admin 1} ["name=?" "jrootham"])
+	(insert! db :config {:max_papers 5, :max_votes 15, :max_votes_per_paper 5})
+)
+
 (defn update-db [db-file body]
 	(with-db-connection [db {:dbtype "sqlite" :dbname db-file}]
 		(let 
@@ -131,6 +136,7 @@
 				paper-list (get-in parsed ["data" "repository" "issues" "nodes"])
 			]
 			(doall (map (make-save db) paper-list))
+			(fill-data db)
 			(println "Done")
 		)
 	)
