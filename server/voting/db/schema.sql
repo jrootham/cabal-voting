@@ -1,44 +1,47 @@
-CREATE TABLE "papers" (
-    "paper_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
-    "link_id" INTEGER NOT NULL,
-    "paper_comment" TEXT NOT NULL,
-    "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "open_paper" INTEGER NOT NULL DEFAULT 1
+CREATE TABLE config (
+    config_id INTEGER PRIMARY KEY DEFAULT 1,
+    max_papers INTEGER NOT NULL,
+    max_votes INTEGER NOT NULL,
+    max_votes_per_paper INTEGER NOT NULL
 );
 
-CREATE TABLE "users" (
-    "user_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "name" TEXT NOT NULL,
-    "valid" INTEGER NOT NULL DEFAULT (1),
-    "user_admin" INTEGER NOT NULL DEFAULT (0),
-    "rules_admin" INTEGER NOT NULL DEFAULT (0),
-    "paper_admin" INTEGER NOT NULL DEFAULT (0)
-);
-CREATE TABLE "links" (
-    "link_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "text" TEXT NOT NULL,
-    "link" TEXT NOT NULL
-);
-CREATE TABLE "comment_references" (
-    "comment_reference_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "paper_id" INTEGER NOT NULL,
-    "reference_index" INTEGER NOT NULL,
-    "link_id" INTEGER NOT NULL
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    valid BOOLEAN NOT NULL DEFAULT TRUE,
+    user_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    rules_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    paper_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE "votes" (
-    "vote_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    "paper_id" INTEGER NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "votes" INTEGER NOT NULL
+CREATE TABLE links (
+    link_id SERIAL PRIMARY KEY,
+    link_text TEXT NOT NULL,
+    link TEXT NOT NULL
 );
 
-CREATE TABLE "config" (
-    "config_id" INTEGER PRIMARY KEY NOT NULL DEFAULT(1),
-    "max_papers" INTEGER NOT NULL,
-    "max_votes" INTEGER NOT NULL,
-    "max_votes_per_paper" INTEGER NOT NULL
+CREATE TABLE papers (
+    paper_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users,
+    title TEXT NOT NULL,
+    link_id INTEGER NOT NULL REFERENCES links,
+    paper_comment TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    open_paper BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+CREATE TABLE comment_references (
+    comment_reference_id SERIAL PRIMARY KEY,
+    paper_id INTEGER NOT NULL REFERENCES papers,
+    reference_index INTEGER NOT NULL,
+    link_id INTEGER NOT NULL REFERENCES links
+);
+
+CREATE TABLE votes (
+    vote_id SERIAL PRIMARY KEY,
+    paper_id INTEGER NOT NULL REFERENCES papers,
+    user_id INTEGER NOT NULL REFERENCES users,
+    votes INTEGER NOT NULL CHECK (votes >= 0)
+);
+
 

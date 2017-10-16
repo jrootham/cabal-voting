@@ -6,9 +6,8 @@
 	(:require [org.httpkit.client :as http])
 	(:require [clojure.data.json :as json])
 	(:require [clojure.string :as str])
+	(:require [clj-time [format :as timef] [coerce :as timec]])
 )
-
-
 
 (def url-regex #"http([0-9a-zA-Z;/?:@=&$-_.+!*',~]*)")
 
@@ -30,7 +29,7 @@
 )
 
 (defn make-link [db text link]
-	(get-new-id (insert! db :links {:text text, :link link}))
+	(get-new-id (insert! db :links {:link_text text, :link link}))
 )
 
 (defn get-references [reference-index reference-list body]
@@ -68,11 +67,15 @@
 	)
 )
 
+(defn format-timestamp [raw]
+	(timec/to-timestamp (timef/parse (timef/formatter :date-time-no-ms) raw))
+)
+
 (defn save-paper [db paper link body]
 	(let
 		[
 			title (get paper "title")
-			created-at (get paper "createdAt")
+			created-at (format-timestamp(get paper "createdAt"))
 			submitter-name (get-in paper ["author" "login"])
 			submitter (get-name-id db submitter-name)
 			record 
@@ -124,12 +127,12 @@
 )
 
 (defn fill-data [db]
-	(update! db :users {:user_admin 1} ["name=?" "jrootham"])
+	(update! db :users {:user_admin true} ["name=?" "jrootham"])
 	(insert! db :config {:max_papers 5, :max_votes 15, :max_votes_per_paper 5})
 )
 
-(defn update-db [db-file body]
-	(with-db-connection [db {:dbtype "sqlite" :dbname db-file}]
+(defn update-db [db-name password body]
+	(with-db-connection [db {:dbtype "postgresql" :dbname db-name :name "jrootham" :password password}]
 		(let 
 			[
 				parsed (json/read-str body)
@@ -142,12 +145,12 @@
 	)
 )
 
-(defn update-data [db-file user password query-string]
+(defn update-data [db-name user github-password postgres-password query-string]
 	(let [
 			payload {:query query-string :variables {:owner "CompSciCabal" :name "SMRTYPRTY"}}
 			options 
 				{
-	              :basic-auth [user password]
+	              :basic-auth [user github-password]
 	              :user-agent "Cabal Voting System"
 	              :body (json/write-str payload)
               	}
@@ -158,7 +161,7 @@
           	(fn [{:keys [status headers body error]}] ;; asynchronous response handling
             	(if error
               		(println "Failed, exception is " error)
-              		(update-db db-file body)
+              		(update-db db-name postgres-password body)
     			)
     		)
     	)
@@ -171,16 +174,18 @@
   (if (== 1 (count args))
 	  (let 
 	  	[
-	  		db-file (first args)
+	  		db-name (first args)
 	  		graphql-query (slurp(io/input-stream "graphql.query"))
 	  		_ (println "User name:")
 	  		user (read-line)
-	 		_ (println "password:")
-	  		password (read-line)
+	 		_ (println "github password:")
+	  		github-password (read-line)
+	 		_ (println "postgresql password:")
+	  		postgres-password (read-line)
 	   	]
-	   	(update-data db-file user password graphql-query)
+	   	(update-data db-name user github-password postgres-password graphql-query)
 	   	(read-line)
 	  )
-	  (println "Usage: lein run db-file")
+	  (println "Usage: lein run db-name")
 	)
 )

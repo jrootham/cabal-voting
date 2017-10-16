@@ -17,7 +17,7 @@
 		body (get request :body)		
 		db (get request :connection)
 		nameValue (get body "user")
-		result (query db ["SELECT user_id FROM users WHERE name =?" nameValue])
+		result (query db ["SELECT user_id FROM users WHERE name =? AND valid" nameValue])
 		]
 
 		(if (= 1 (count result))
@@ -28,7 +28,7 @@
 )
 
 (defn get-link [db link-id]
-	(first (query db ["SELECT text, link FROM links WHERE link_id=?;" link-id]))
+	(first (query db ["SELECT link_text, link FROM links WHERE link_id=?;" link-id]))
 )
 
 (defn get-reference-mapper [db]
@@ -85,7 +85,7 @@
 		db (get request :connection)
 		columns "paper_id, title, link_id, paper_comment, created_at, users.name AS submitter"
 		from " FROM papers JOIN users ON papers.user_id = users.user_id"
-		query-string (str "SELECT " columns from " WHERE open_paper = 1;")
+		query-string (str "SELECT " columns from " WHERE open_paper	;")
 		result (query db [query-string])
 		map-fn (make-paper-apply db)
 		]
@@ -229,10 +229,10 @@
 	(output (close (vote (paper (login request)))))
 )
 
-(defn make-wrap-db [db-file]
+(defn make-wrap-db [db-name]
 	(fn [handler]  
 		(fn [req]    
-			(with-db-connection [db {:dbtype "sqlite" :dbname db-file}]      
+			(with-db-connection [db {:dbtype "pg" :dbname db-name}]      
 				(handler (assoc req :connection db))
 			)
 		)
@@ -243,8 +243,8 @@
   (wrap-cors handler :access-control-allow-origin [#".*"]
                      :access-control-allow-methods [:post]))
 
-(defn make-handler [db-file] 
-	(let [wrap-db (make-wrap-db db-file)] 
+(defn make-handler [db-name] 
+	(let [wrap-db (make-wrap-db db-name)] 
 		(cors (wrap-json-response (wrap-json-body (wrap-db pipeline))))
 	)
 )
@@ -256,10 +256,10 @@
 	  	(let 
 	  		[
 	  			port (Integer/parseInt (first args)) 
-	  			db-file (second args)
+	  			db-name (second args)
 	  		]
-			(run-jetty (make-handler db-file) {:port port})  	
+			(run-jetty (make-handler db-name) {:port port})  	
 	  	)
-	  (println "Usage: java -jar uberjar port dbfile")
+	  (println "Usage: java -jar uberjar port dbname")
 	)
  )
