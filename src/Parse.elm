@@ -66,7 +66,7 @@ referenceDecoder =
 linkDecoder : Decoder Link
 linkDecoder =
     decode Link
-        |> required "text" string
+        |> required "link_text" string
         |> required "link" string
 
 dateDecoder : Decoder Date.Date

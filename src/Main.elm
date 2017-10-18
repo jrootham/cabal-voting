@@ -26,7 +26,7 @@ type PaperOrder
     | LeastVotes
     | MostVotes
     | Submitter
-    | MyVotes
+    | Mine
     | Voter
 
 
@@ -69,6 +69,7 @@ type Msg
     = Name String
     | StartLogin
     | Add
+    | Reload
     | ChangeOrder PaperOrder
     | ChangeVoter String
     | DecrementVote Int
@@ -114,6 +115,9 @@ update msg model =
 
         Add ->
             ({model | page = Edit, edit = Just (newPaper model.name)}, Cmd.none)
+
+        Reload ->
+            ({model | debounce = False}, fetch (loginPayload model.name))
 
         ChangeOrder newOrder ->
             ( { model | order = newOrder }, Cmd.none )
@@ -463,7 +467,9 @@ displayPaper model paper =
 
         belongsTo = model.name == paper.submitter
 
-        displayVotes = \ vote -> div [] [ text (vote.name ++ " "), text (toString vote.votes)]
+        rawDisplayVotes = \ name votes -> div [] [ text (name ++ " "), text (toString votes)]
+        displayVotes = \ vote -> rawDisplayVotes vote.name vote.votes
+        totalVotes = \ votes -> rawDisplayVotes "Total" (List.sum (List.map .votes votes))
     in
         tr [ class "entry" ]
             [ td []
@@ -486,7 +492,7 @@ displayPaper model paper =
                     , text " "
                     , thinFlatButton (model.debounce && voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
                 ]
-            , td [] (List.map displayVotes paper.votes)
+            , td [] ((totalVotes paper.votes) :: (List.map displayVotes paper.votes))
             ]
 
 
@@ -535,7 +541,7 @@ userLine model =
             " submitted " ++ paperString ++ " of " ++ maxPaperString ++ " possible, "
 
         votingString =
-            " voted for  " ++ voteString ++ " of " ++ maxVoteString ++ " possible, "
+            " cast  " ++ voteString ++ " of " ++ maxVoteString ++ " possible votes, "
 
         totalString =
             "out of " ++ (toString (List.length model.papers)) ++ " total."
@@ -564,7 +570,7 @@ votes name =
             else if (not (voterIn left)) && (not (voterIn right)) then
                 EQ
             else
-                Debug.crash "This should be impossible"
+                Debug.crash "votes: This should be impossible"
 
 
 totalOrder : (a -> a -> Bool) -> a -> a -> Order
@@ -576,6 +582,23 @@ totalOrder lessThan left right =
     else
         EQ
 
+mineOrder: String -> (Paper -> Paper -> Order)
+mineOrder name =
+    \left right ->
+        if (left.submitter == name) && (right.submitter == name) then
+            EQ
+        else if (left.submitter == name) && (right.submitter /= name) then
+            LT
+        else if (left.submitter /= name) && (right.submitter == name) then
+            GT
+        else if (left.submitter == right.submitter) then
+            EQ
+        else if (left.submitter < right.submitter) then
+            LT
+        else if (left.submitter > right.submitter) then
+            GT
+        else
+            Debug.crash "mineOrder Cannot happen"
 
 page : Model -> Html Msg
 page model =
@@ -608,8 +631,8 @@ page model =
                 Submitter ->
                     totalOrder (\left right -> left.submitter < right.submitter)
 
-                MyVotes ->
-                    votes model.name
+                Mine ->
+                    mineOrder model.name
 
                 Voter ->
                     votes model.voter
@@ -624,7 +647,7 @@ page model =
                 , radio " Most votes " MostVotes
                 , radio " Least votes " LeastVotes
                 , radio " Submitter " Submitter
-                , radio " My votes " MyVotes
+                , radio " Mine " Mine
                 , radioSelected (not (model.voter == "")) " Voter " Voter
                 , select []
                     (List.map
@@ -632,7 +655,12 @@ page model =
                         model.voters
                     )
                 ]
-            , div [] [(normalFlatButton (model.debounce && validateAdd model) Add "Add")
+            , (div []
+                    [
+                        (normalFlatButton (model.debounce && validateAdd model) Add "Add")
+                        ,(normalFlatButton model.debounce Reload "Reload")
+                    ]
+                )
             , (div []
                 [ table []
                     ((thead []
@@ -649,7 +677,6 @@ page model =
                 ]
               )
             ]
-        ]
 
 
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg

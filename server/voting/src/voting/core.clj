@@ -6,6 +6,7 @@
          [ring.util.response :refer [response]])
 	(:require [clojure.java.jdbc :refer :all :as jdbc])
 	(:use clojure.java.jdbc)
+	(:require [clojure.string :as str])
 )
 
 (defn make-empty [text]
@@ -229,11 +230,26 @@
 	(output (close (vote (paper (login request)))))
 )
 
+(defn get-uri [db-name]
+	(let
+		[
+	 		_ (println "user:")
+	  		user (read-line)
+	 		_ (println "database password:")
+	  		password (read-line)
+	  		db-password (str/replace password " " "+")
+		]
+		(str "jdbc:postgresql://localhost:5432/" db-name "?user=" user "&password=" db-password)
+	)
+)
+
 (defn make-wrap-db [db-name]
-	(fn [handler]  
-		(fn [req]    
-			(with-db-connection [db {:dbtype "pg" :dbname db-name}]      
-				(handler (assoc req :connection db))
+	(let [uri (get-uri db-name)]
+		(fn [handler]  
+			(fn [req]    
+				(with-db-connection [db {:connection-uri uri}]      
+					(handler (assoc req :connection db))
+				)
 			)
 		)
 	)

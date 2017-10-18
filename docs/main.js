@@ -9348,7 +9348,7 @@ var _jrootham$cabal_voting$Parse$linkDecoder = A3(
 	_elm_lang$core$Json_Decode$string,
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'text',
+		'link_text',
 		_elm_lang$core$Json_Decode$string,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_jrootham$cabal_voting$Parse$Link)));
 var _jrootham$cabal_voting$Parse$referenceDecoder = A3(
@@ -9726,6 +9726,15 @@ var _jrootham$cabal_voting$Payload$closePayload = F2(
 			});
 	});
 
+var _jrootham$cabal_voting$Main$mineOrder = F3(
+	function (name, left, right) {
+		return (_elm_lang$core$Native_Utils.eq(left.submitter, name) && _elm_lang$core$Native_Utils.eq(right.submitter, name)) ? _elm_lang$core$Basics$EQ : ((_elm_lang$core$Native_Utils.eq(left.submitter, name) && (!_elm_lang$core$Native_Utils.eq(right.submitter, name))) ? _elm_lang$core$Basics$LT : (((!_elm_lang$core$Native_Utils.eq(left.submitter, name)) && _elm_lang$core$Native_Utils.eq(right.submitter, name)) ? _elm_lang$core$Basics$GT : (_elm_lang$core$Native_Utils.eq(left.submitter, right.submitter) ? _elm_lang$core$Basics$EQ : ((_elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0) ? _elm_lang$core$Basics$LT : ((_elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) > 0) ? _elm_lang$core$Basics$GT : _elm_lang$core$Native_Utils.crash(
+			'Main',
+			{
+				start: {line: 601, column: 13},
+				end: {line: 601, column: 24}
+			})('mineOrder Cannot happen'))))));
+	});
 var _jrootham$cabal_voting$Main$totalOrder = F3(
 	function (lessThan, left, right) {
 		return A2(lessThan, left, right) ? _elm_lang$core$Basics$LT : (A2(lessThan, right, left) ? _elm_lang$core$Basics$GT : _elm_lang$core$Basics$EQ);
@@ -9749,9 +9758,9 @@ var _jrootham$cabal_voting$Main$votes = function (name) {
 			return (voterIn(left) && voterIn(right)) ? _elm_lang$core$Basics$EQ : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'Main',
 				{
-					start: {line: 567, column: 17},
-					end: {line: 567, column: 28}
-				})('This should be impossible'))));
+					start: {line: 573, column: 17},
+					end: {line: 573, column: 28}
+				})('votes: This should be impossible'))));
 		});
 };
 var _jrootham$cabal_voting$Main$validateAdd = function (model) {
@@ -9802,14 +9811,14 @@ var _jrootham$cabal_voting$Main$userLine = function (model) {
 		_jrootham$cabal_voting$Main$countVotes(model));
 	var votingString = A2(
 		_elm_lang$core$Basics_ops['++'],
-		' voted for  ',
+		' cast  ',
 		A2(
 			_elm_lang$core$Basics_ops['++'],
 			voteString,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				' of ',
-				A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible, '))));
+				A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible votes, '))));
 	var maxPaperString = _elm_lang$core$Basics$toString(_jrootham$cabal_voting$Config$maxPapers);
 	var paperCount = _elm_lang$core$List$length(
 		A2(
@@ -10161,7 +10170,7 @@ var _jrootham$cabal_voting$Main$Model = F9(
 		return {page: a, name: b, errorMessage: c, papers: d, order: e, voter: f, voters: g, edit: h, debounce: i};
 	});
 var _jrootham$cabal_voting$Main$Voter = {ctor: 'Voter'};
-var _jrootham$cabal_voting$Main$MyVotes = {ctor: 'MyVotes'};
+var _jrootham$cabal_voting$Main$Mine = {ctor: 'Mine'};
 var _jrootham$cabal_voting$Main$Submitter = {ctor: 'Submitter'};
 var _jrootham$cabal_voting$Main$MostVotes = {ctor: 'MostVotes'};
 var _jrootham$cabal_voting$Main$LeastVotes = {ctor: 'LeastVotes'};
@@ -10516,6 +10525,15 @@ var _jrootham$cabal_voting$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'Reload':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{debounce: false}),
+					_1: _jrootham$cabal_voting$Main$fetch(
+						_jrootham$cabal_voting$Payload$loginPayload(model.name))
+				};
 			case 'ChangeOrder':
 				return {
 					ctor: '_Tuple2',
@@ -10688,21 +10706,37 @@ var _jrootham$cabal_voting$Main$DecrementVote = function (a) {
 };
 var _jrootham$cabal_voting$Main$displayPaper = F2(
 	function (model, paper) {
-		var displayVotes = function (vote) {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						A2(_elm_lang$core$Basics_ops['++'], vote.name, ' ')),
-					_1: {
+		var rawDisplayVotes = F2(
+			function (name, votes) {
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(vote.votes)),
-						_1: {ctor: '[]'}
-					}
-				});
+							A2(_elm_lang$core$Basics_ops['++'], name, ' ')),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(votes)),
+							_1: {ctor: '[]'}
+						}
+					});
+			});
+		var displayVotes = function (vote) {
+			return A2(rawDisplayVotes, vote.name, vote.votes);
+		};
+		var totalVotes = function (votes) {
+			return A2(
+				rawDisplayVotes,
+				'Total',
+				_elm_lang$core$List$sum(
+					A2(
+						_elm_lang$core$List$map,
+						function (_) {
+							return _.votes;
+						},
+						votes)));
 		};
 		var belongsTo = _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
 		var testVote = function (vote) {
@@ -10883,7 +10917,11 @@ var _jrootham$cabal_voting$Main$displayPaper = F2(
 							_0: A2(
 								_elm_lang$html$Html$td,
 								{ctor: '[]'},
-								A2(_elm_lang$core$List$map, displayVotes, paper.votes)),
+								{
+									ctor: '::',
+									_0: totalVotes(paper.votes),
+									_1: A2(_elm_lang$core$List$map, displayVotes, paper.votes)
+								}),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -10936,6 +10974,7 @@ var _jrootham$cabal_voting$Main$radioBase = F4(
 				}
 			});
 	});
+var _jrootham$cabal_voting$Main$Reload = {ctor: 'Reload'};
 var _jrootham$cabal_voting$Main$Add = {ctor: 'Add'};
 var _jrootham$cabal_voting$Main$page = function (model) {
 	var sumVotes = function (voteList) {
@@ -10994,8 +11033,8 @@ var _jrootham$cabal_voting$Main$page = function (model) {
 						function (left, right) {
 							return _elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0;
 						}));
-			case 'MyVotes':
-				return _jrootham$cabal_voting$Main$votes(model.name);
+			case 'Mine':
+				return _jrootham$cabal_voting$Main$mineOrder(model.name);
 			default:
 				return _jrootham$cabal_voting$Main$votes(model.voter);
 		}
@@ -11055,7 +11094,7 @@ var _jrootham$cabal_voting$Main$page = function (model) {
 												_0: A2(radio, ' Submitter ', _jrootham$cabal_voting$Main$Submitter),
 												_1: {
 													ctor: '::',
-													_0: A2(radio, ' My votes ', _jrootham$cabal_voting$Main$MyVotes),
+													_0: A2(radio, ' Mine ', _jrootham$cabal_voting$Main$Mine),
 													_1: {
 														ctor: '::',
 														_0: A3(
@@ -11115,32 +11154,58 @@ var _jrootham$cabal_voting$Main$page = function (model) {
 								'Add'),
 							_1: {
 								ctor: '::',
+								_0: A3(_jrootham$cabal_voting$Main$normalFlatButton, model.debounce, _jrootham$cabal_voting$Main$Reload, 'Reload'),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$div,
+									_elm_lang$html$Html$table,
 									{ctor: '[]'},
 									{
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$table,
+											_elm_lang$html$Html$thead,
 											{ctor: '[]'},
 											{
 												ctor: '::',
 												_0: A2(
-													_elm_lang$html$Html$thead,
+													_elm_lang$html$Html$tr,
 													{ctor: '[]'},
 													{
 														ctor: '::',
 														_0: A2(
-															_elm_lang$html$Html$tr,
+															_elm_lang$html$Html$th,
 															{ctor: '[]'},
 															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Submitter'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$th,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Contents'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
 																ctor: '::',
 																_0: A2(
 																	_elm_lang$html$Html$th,
 																	{ctor: '[]'},
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Submitter'),
+																		_0: _elm_lang$html$Html$text('Vote'),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {
@@ -11150,47 +11215,25 @@ var _jrootham$cabal_voting$Main$page = function (model) {
 																		{ctor: '[]'},
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Contents'),
+																			_0: _elm_lang$html$Html$text('Voters'),
 																			_1: {ctor: '[]'}
 																		}),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$th,
-																			{ctor: '[]'},
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html$text('Vote'),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$th,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Voters'),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		}
-																	}
+																	_1: {ctor: '[]'}
 																}
-															}),
-														_1: {ctor: '[]'}
+															}
+														}
 													}),
-												_1: A2(
-													_elm_lang$core$List$map,
-													_jrootham$cabal_voting$Main$displayPaper(model),
-													A2(_elm_lang$core$List$sortWith, compare, model.papers))
+												_1: {ctor: '[]'}
 											}),
-										_1: {ctor: '[]'}
+										_1: A2(
+											_elm_lang$core$List$map,
+											_jrootham$cabal_voting$Main$displayPaper(model),
+											A2(_elm_lang$core$List$sortWith, compare, model.papers))
 									}),
 								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});

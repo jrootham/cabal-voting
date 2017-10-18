@@ -131,8 +131,8 @@
 	(insert! db :config {:max_papers 5, :max_votes 15, :max_votes_per_paper 5})
 )
 
-(defn update-db [db-name password body]
-	(with-db-connection [db {:dbtype "postgresql" :dbname db-name :name "jrootham" :password password}]
+(defn update-db [db-uri body]
+	(with-db-connection [db {:connection-uri db-uri}]
 		(let 
 			[
 				parsed (json/read-str body)
@@ -145,7 +145,7 @@
 	)
 )
 
-(defn update-data [db-name user github-password postgres-password query-string]
+(defn update-data [db-spec user github-password query-string]
 	(let [
 			payload {:query query-string :variables {:owner "CompSciCabal" :name "SMRTYPRTY"}}
 			options 
@@ -161,10 +161,21 @@
           	(fn [{:keys [status headers body error]}] ;; asynchronous response handling
             	(if error
               		(println "Failed, exception is " error)
-              		(update-db db-name postgres-password body)
+              		(update-db db-spec body)
     			)
     		)
     	)
+	)
+)
+
+(defn get-uri [user db-name]
+	(let
+		[
+	 		_ (println "database password:")
+	  		password (read-line)
+	  		db-password (str/replace password " " "+")
+		]
+		(str "jdbc:postgresql://localhost:5432/" db-name "?user=" user "&password=" db-password)
 	)
 )
 
@@ -175,15 +186,14 @@
 	  (let 
 	  	[
 	  		db-name (first args)
+	  		db-password (second args)
 	  		graphql-query (slurp(io/input-stream "graphql.query"))
 	  		_ (println "User name:")
 	  		user (read-line)
 	 		_ (println "github password:")
 	  		github-password (read-line)
-	 		_ (println "postgresql password:")
-	  		postgres-password (read-line)
 	   	]
-	   	(update-data db-name user github-password postgres-password graphql-query)
+	   	(update-data (get-uri user db-name) user github-password graphql-query)
 	   	(read-line)
 	  )
 	  (println "Usage: lein run db-name")
