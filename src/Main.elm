@@ -230,7 +230,7 @@ formatError error =
 view : Model -> Html Msg
 view model =
     div [ class "outer" ]
-        [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
+        [ div [] [ h1 [] [ text "Test Cabal Voting System" ] ]
         , case model.page of
             Login ->
                 loginPage model
@@ -380,7 +380,7 @@ deleteReference maybePaper referenceIndex =
             Just {paper | references = newReferences}
 
         Nothing ->
-            Nothing   
+            Debug.crash "Paper needs to be present" 
              
 makeNewReference: (Link -> String -> Link) -> (Maybe Paper) -> Int -> String -> Maybe Paper
 makeNewReference setFunction maybePaper referenceIndex newText =
@@ -399,7 +399,7 @@ makeNewReference setFunction maybePaper referenceIndex newText =
             Just {paper | references = newReferences}
 
         Nothing ->
-            Nothing
+            Debug.crash "Paper needs to be present" 
 
 setLinkText : Link -> String -> Link
 setLinkText link text =
@@ -436,7 +436,7 @@ flatButton otherClass enabled click label =
                 [class "flat-disabled"]
     in
             
-    div (List.append [class "flat-button", class otherClass] others) [text label]
+    button (List.append [class "flat-button", class otherClass] others) [text label]
 
 normalFlatButton = flatButton "normal"
 wideFlatButton = flatButton "wide"
@@ -449,6 +449,16 @@ makeLink link =
 
 
 --------------------------------------
+
+voteTable: List Vote -> List (Html Msg)
+voteTable votes =
+    let
+        rawDisplayVotes = \ name votes -> tr [] [ td [] [text name], td [] [text (toString votes)]]
+        displayVotes = \ vote -> rawDisplayVotes vote.name vote.votes
+        totalVotes = \ votes -> rawDisplayVotes "Total" (List.sum (List.map .votes votes))
+    in
+        
+    [table [] ((totalVotes votes) :: (List.map displayVotes votes))]
 
 displayPaper : Model -> Paper -> Html Msg
 displayPaper model paper =
@@ -467,32 +477,31 @@ displayPaper model paper =
 
         belongsTo = model.name == paper.submitter
 
-        rawDisplayVotes = \ name votes -> div [] [ text (name ++ " "), text (toString votes)]
-        displayVotes = \ vote -> rawDisplayVotes vote.name vote.votes
-        totalVotes = \ votes -> rawDisplayVotes "Total" (List.sum (List.map .votes votes))
     in
         tr [ class "entry" ]
-            [ td []
+            [ td [class "column"]
                 [ div []
                     [ div [ class "submitter" ] [ text paper.submitter ]
                     , normalFlatButton belongsTo (DoEdit paper.id) "Edit"
                     , normalFlatButton (model.debounce && belongsTo) (Close paper.id) "Close" 
                     ]
                 ]
-            , td []
+            , td [class "column"]
                 ([ (div [] [ h5 [] [ text paper.title ] ])
                 , (div [] [makeLink paper.paper])
                 , (div [ class "contents" ] [ text paper.comment ])
                 ] ++ (List.map (\ ref-> div [] [makeLink ref.link]) (List.sortBy .index paper.references)))
-            , td [ class "vote" ]
-                [ 
-                    thinFlatButton (model.debounce && thisVoterCount > 0) (DecrementVote paper.id) " -"
-                    , text " "
-                    , text (toString thisVoterCount)
-                    , text " "
-                    , thinFlatButton (model.debounce && voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
+            , td [class "column", class "vote" ]
+                [ div [class "group"]
+                    [
+                        thinFlatButton (model.debounce && thisVoterCount > 0) (DecrementVote paper.id) "-"
+                        , text " "
+                        , text (toString thisVoterCount)
+                        , text " "
+                        , thinFlatButton (model.debounce && voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
+                    ]
                 ]
-            , td [] ((totalVotes paper.votes) :: (List.map displayVotes paper.votes))
+            , td [class "column"](voteTable paper.votes)
             ]
 
 
@@ -648,12 +657,15 @@ page model =
                 , radio " Least votes " LeastVotes
                 , radio " Submitter " Submitter
                 , radio " Mine " Mine
-                , radioSelected (not (model.voter == "")) " Voter " Voter
-                , select []
-                    (List.map
-                        (\voter -> option [ value voter, onClick (ChangeVoter voter) ] [ text voter ])
-                        model.voters
-                    )
+                , div [class "group"] 
+                    [   
+                        radioSelected (not (model.voter == "")) " Voter " Voter
+                        , select []
+                            (List.map
+                                (\voter -> option [ value voter, onClick (ChangeVoter voter) ] [ text voter ])
+                                model.voters
+                            )
+                    ]
                 ]
             , (div []
                     [
@@ -681,7 +693,7 @@ page model =
 
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
 radioBase current enable labelText order =
-    label []
+    label [class "group"]
         [ input
             [ type_ "radio"
             , name "change-order"
