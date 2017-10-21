@@ -105,4 +105,10 @@ h5
 .column
 {
 	vertical-align: top;
+	padding-top: 20px;
+}
+
+.vote-name
+{
+	min-width: 10em;
 }

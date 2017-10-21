@@ -453,7 +453,7 @@ makeLink link =
 voteTable: List Vote -> List (Html Msg)
 voteTable votes =
     let
-        rawDisplayVotes = \ name votes -> tr [] [ td [] [text name], td [] [text (toString votes)]]
+        rawDisplayVotes = \ name votes -> tr [] [ td [class "vote-name"] [text name], td [] [text (toString votes)]]
         displayVotes = \ vote -> rawDisplayVotes vote.name vote.votes
         totalVotes = \ votes -> rawDisplayVotes "Total" (List.sum (List.map .votes votes))
     in
