@@ -9313,7 +9313,7 @@ var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 var _jrootham$cabal_voting$Config$maxVotes = 15;
 var _jrootham$cabal_voting$Config$maxPerPaper = 5;
 var _jrootham$cabal_voting$Config$maxPapers = 5;
-var _jrootham$cabal_voting$Config$backend = 'http://127.0.0.1:8040';
+var _jrootham$cabal_voting$Config$backend = 'https://test-voting-server.herokuapp.com/';
 
 var _jrootham$cabal_voting$Parse$dateDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
