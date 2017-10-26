@@ -9547,7 +9547,7 @@ var _jrootham$cabal_voting$Payload$linkContents = function (link) {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'text',
+				_0: 'link_text',
 				_1: _elm_lang$core$Json_Encode$string(link.text)
 			},
 			_1: {

@@ -37,7 +37,7 @@ paperContents paper =
 
 linkContents : Link -> Value
 linkContents link = 
-  object[("text", string link.text), ("link", string link.link)]
+  object[("link_text", string link.text), ("link", string link.link)]
 
 referenceContents : Reference -> Value
 referenceContents reference =
