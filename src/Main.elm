@@ -359,13 +359,21 @@ addReference maybePaper =
                         max + 1
                     Nothing ->
                         1
-                
+
                 newReference = Reference newIndex (Link "" "")
             in
                 Just {paper | references = newReference :: paper.references}
 
         Nothing ->
-            Nothing   
+            Debug.crash "Paper needs to be present" 
+
+makeSetIndex: Int -> (Reference -> Reference)
+makeSetIndex referenceIndex =
+    \ reference ->
+        if (reference.index > referenceIndex) then
+            {reference | index = reference.index - 1}
+        else
+            reference
 
 deleteReference : (Maybe Paper) -> Int -> Maybe Paper
 deleteReference maybePaper referenceIndex = 
@@ -374,8 +382,8 @@ deleteReference maybePaper referenceIndex =
             let
                 trim = \ reference -> reference.index /= referenceIndex
                 trimmedReferences = List.filter trim  paper.references
-                setIndex = \ listIndex reference -> {reference | index = listIndex + 1}
-                newReferences = List.indexedMap setIndex trimmedReferences
+                setIndex = makeSetIndex referenceIndex
+                newReferences = List.map setIndex trimmedReferences
             in
             Just {paper | references = newReferences}
 
