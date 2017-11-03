@@ -182,7 +182,7 @@ getVoters paperList =
         insert = \ vote nameSet -> Set.insert vote.name nameSet
         inner:  (List Vote) -> (Set.Set String) -> Set.Set String
         inner = \ voteList nameSet-> List.foldl insert nameSet voteList
-        nameSet = List.foldl (\ paper nameSet-> inner paper.votes nameSet) (Set.fromList [""]) paperList 
+        nameSet = List.foldl (\ paper nameSet-> inner paper.votes nameSet) (Set.fromList []) paperList 
     in
         Set.toList nameSet
 
@@ -200,7 +200,20 @@ updateModel model response =
                 papers = errorAndPapers.paperList
             in
                 if error == "" then
-                    { model | errorMessage = "", page = List, papers = papers, voters = getVoters papers}
+                    let
+                        sortVoter = 
+                            if model.voter == "" then
+                                model.name
+                            else
+                                model.voter
+                    in
+                            
+                    { model | errorMessage = ""
+                        , page = List
+                        , papers = papers
+                        , voters = getVoters papers
+                        , voter = sortVoter
+                    }
                 else
                     {model | errorMessage = error}
 
@@ -570,6 +583,28 @@ nameIn : String -> Paper -> Bool
 nameIn name paper =
     List.member name (List.map (\ vote -> vote.name) paper.votes)
 
+getVotes : String -> List Vote -> Int
+getVotes name voteList =
+    let
+        entry = List.head (List.filter (\vote -> vote.name == name) voteList)
+    in
+    case entry of
+        Just vote ->
+            vote.votes
+        
+        Nothing ->
+            Debug.crash "Should have votes"
+
+
+compareVotes : String -> List Vote -> List Vote -> Order
+compareVotes name left right =
+    if getVotes name left == getVotes name right then
+        EQ
+    else if getVotes name left < getVotes name right then
+        GT
+    else
+        LT
+
 
 votes : String -> (Paper -> Paper -> Order)
 votes name =
@@ -579,7 +614,8 @@ votes name =
     in
         \left right ->
             if (voterIn left) && (voterIn right) then
-                EQ
+                compareVotes name left.votes right.votes
+
             else if (not (voterIn left)) && (voterIn right) then
                 GT
             else if (voterIn left) && (not (voterIn right)) then
@@ -664,10 +700,10 @@ page model =
                 , radio " Most votes " MostVotes
                 , radio " Least votes " LeastVotes
                 , radio " Submitter " Submitter
-                , radio " Mine " Mine
+                , radio " My Papers " Mine
                 , div [class "group"] 
                     [   
-                        radioSelected (not (model.voter == "")) " Voter " Voter
+                        radioSelected True " Voter " Voter
                         , select []
                             (List.map
                                 (\voter -> option [ value voter, onClick (ChangeVoter voter) ] [ text voter ])
