@@ -11233,7 +11233,12 @@ var _jrootham$cabal_voting$Main$page = function (model) {
 																							ctor: '::',
 																							_0: _elm_lang$html$Html_Events$onClick(
 																								_jrootham$cabal_voting$Main$ChangeVoter(voter)),
-																							_1: {ctor: '[]'}
+																							_1: {
+																								ctor: '::',
+																								_0: _elm_lang$html$Html_Attributes$selected(
+																									_elm_lang$core$Native_Utils.eq(voter, model.voter)),
+																								_1: {ctor: '[]'}
+																							}
 																						}
 																					},
 																					{

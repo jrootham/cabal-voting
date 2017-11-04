@@ -706,7 +706,12 @@ page model =
                         radioSelected True " Voter " Voter
                         , select []
                             (List.map
-                                (\voter -> option [ value voter, onClick (ChangeVoter voter) ] [ text voter ])
+                                (\voter -> option 
+                                    [ value voter
+                                    , onClick (ChangeVoter voter) 
+                                    , selected (voter == model.voter)
+                                    ] 
+                                    [ text voter ])
                                 model.voters
                             )
                     ]
