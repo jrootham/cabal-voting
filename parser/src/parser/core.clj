@@ -186,7 +186,6 @@
 	  (let 
 	  	[
 	  		db-name (first args)
-	  		db-password (second args)
 	  		graphql-query (slurp(io/input-stream "graphql.query"))
 	  		_ (println "User name:")
 	  		user (read-line)

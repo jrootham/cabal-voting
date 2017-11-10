@@ -243,7 +243,7 @@ formatError error =
 view : Model -> Html Msg
 view model =
     div [ class "outer" ]
-        [ div [] [ h1 [] [ text "Test Cabal Voting System" ] ]
+        [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
         , case model.page of
             Login ->
                 loginPage model
