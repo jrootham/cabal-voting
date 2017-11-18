@@ -9310,7 +9310,7 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _jrootham$cabal_voting$Config$maxVotes = 5;
+var _jrootham$cabal_voting$Config$maxVotes = 15;
 var _jrootham$cabal_voting$Config$maxPerPaper = 5;
 var _jrootham$cabal_voting$Config$maxPapers = 5;
 var _jrootham$cabal_voting$Config$backend = 'https://voting-server.herokuapp.com/';

@@ -10,4 +10,4 @@ maxPerPaper =
     5
     
 maxVotes =
-    5
+    15
