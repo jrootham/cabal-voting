@@ -2,8 +2,7 @@
 elm-stuff
 # elm-repl generated files
 repl-temp-*
-src/Config.elm
-index.html
+./index.html
 server/voting/.hgignore
 server/voting/.lein-failures
 server/voting/.lein-repl-history
@@ -12,3 +11,6 @@ parser/.hgignore
 parser/.lein-failures
 parser/.lein-repl-history
 parser/target/
+docs/main.js
+docs/test/main.js
+docs/dev/main.js

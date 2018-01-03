@@ -1,39 +1,27 @@
 module Payload exposing (loginPayload, paperPayload, votePayload, closePayload)
 
-import Parse exposing(Paper, Reference, Link)
-import Json.Encode exposing (..)
+import Json.Encode exposing (Value, object, string, int, list)
+import Http exposing (Body, jsonBody)
 
-type alias PayloadElement = (String, Value)
+import Types exposing(..)
 
-makePayload : (List PayloadElement) -> String
-makePayload payloadList =      
-  encode 0 (object payloadList)
-
-userElement : String -> PayloadElement
-userElement user =      
-  ("user", string user)
-
-loginPayload : String -> String
+loginPayload : String -> Body
 loginPayload user = 
-  makePayload [userElement user]   
+  jsonBody (object [("user", (string user))])
 
-paperPayload : String -> Paper -> String
-paperPayload user paper =
-  makePayload [userElement user, paperElement paper]
-
-paperElement : Paper -> PayloadElement
-paperElement paper =
-  ("paper", paperContents paper)
+paperPayload : Paper -> Body
+paperPayload paper =
+  jsonBody (object [("paper", paperContents paper)])
 
 paperContents : Paper -> Value
 paperContents paper = 
-  object 
-  [ ("paper_id", int paper.id)
-  , ("title", string paper.title)
-  , ("paper", linkContents paper.paper)
-  , ("comment", string paper.comment)
-  , ("references", (referenceListContents paper.references))
-  ] 
+  object
+    [ ("paper_id", int paper.id)
+    , ("title", string paper.title)
+    , ("paper", linkContents paper.paper)
+    , ("comment", string paper.comment)
+    , ("references", (referenceListContents paper.references))
+    ]
 
 linkContents : Link -> Value
 linkContents link = 
@@ -47,13 +35,13 @@ referenceListContents : (List Reference) -> Value
 referenceListContents references =
   list (List.map (\ reference -> referenceContents reference) references)
 
-votePayload : String -> Int -> Int-> String
-votePayload name paperId increment = 
-  makePayload  [userElement name, ("paper_id", int paperId), ("increment", int increment)]
+votePayload : Int -> Body
+votePayload paperId = 
+  jsonBody (object [("paper_id", int paperId)])
 
-closePayload : String -> Int -> String
-closePayload name paperId = 
-  makePayload  [userElement name, ("close", bool True), ("paper_id", int paperId)]
+closePayload : Int -> Body
+closePayload paperId = 
+  jsonBody (object [("paper_id", int paperId)])
 
 
 

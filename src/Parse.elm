@@ -1,48 +1,40 @@
-module Parse exposing (Paper, Reference, Link, Vote, ErrorAndPaperList, parse)
+module Parse exposing (parsePaperList, parseRules, parseLogin)
 
-import Json.Decode exposing (..)
-import Json.Decode.Pipeline exposing (..)
+import Json.Decode exposing (Decoder, decodeString, int, string, bool, list, succeed, fail, andThen)
+import Json.Decode.Pipeline exposing (decode, required)
+import Http exposing (Response)
 import Result
 import Date
 
-type alias ErrorAndPaperList =
-    { error: String
-      , paperList : List Paper
-    }
+import Types exposing (..)
 
-type alias Paper =
-    { id : Int
-    , title : String
-    , paper : Link
-    , comment : String
-    , references : List Reference
-    , createdAt : Date.Date
-    , submitter : String
-    , votes : List Vote
-    }
+parseRules : String -> Result String Rules
+parseRules responseString =
+    decodeString decodeRules responseString
 
-type alias Reference =
-    { index : Int
-      , link : Link
-    }
-type alias Link =
-    { text: String
-    , link: String
-    }   
+decodeRules: Decoder Rules
+decodeRules =
+    decode Rules
+        |> required "max_papers" int
+        |> required "max_votes" int
+        |> required "max_votes_per_paper" int
 
-type alias Vote =
-    { name: String
-      , votes : Int
-    }
+parseLogin : String -> Result String Admin
+parseLogin responseString =
+    decodeString decodeAdmin responseString
 
-parse : String -> Result String ErrorAndPaperList
-parse responseString =
-    decodeString decodeErrorAndPaperList responseString
+decodeAdmin : Decoder Admin
+decodeAdmin = 
+    decode Admin
+        |> required "admin" bool
 
-decodeErrorAndPaperList : Decoder ErrorAndPaperList
-decodeErrorAndPaperList =
-    decode ErrorAndPaperList
-        |> required "error" string
+parsePaperList : String -> Result String PaperList
+parsePaperList responseString =
+    decodeString decodePaperList responseString
+
+decodePaperList : Decoder PaperList
+decodePaperList =
+    decode PaperList
         |> required "paper_list" (list decodePaper)
 
 decodePaper : Decoder Paper
