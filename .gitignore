@@ -11,6 +11,3 @@ parser/.hgignore
 parser/.lein-failures
 parser/.lein-repl-history
 parser/target/
-docs/main.js
-docs/test/main.js
-docs/dev/main.js
