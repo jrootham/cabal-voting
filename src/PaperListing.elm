@@ -12,7 +12,7 @@ paperListPage : Model -> Html Msg
 paperListPage model =
     let
         radioSelected =
-            radioBase model.order
+            radioBase (getPaperOrder model)
 
         radio =
             radioSelected True
@@ -20,7 +20,7 @@ paperListPage model =
         sumVotes = \ voteList -> List.sum (List.map .votes voteList)
 
         compare =
-            case model.order of
+            case getPaperOrder model of
                 Title ->
                     totalOrder (\left right -> left.title < right.title)
 
@@ -43,7 +43,7 @@ paperListPage model =
                     mineOrder model.name
 
                 Voter ->
-                    votes model.voter
+                    votes (getVoter model)
     in
         div []
             [ (div [] [ h3 [] [ text (userLine model) ] ])
@@ -65,10 +65,10 @@ paperListPage model =
                                 (\voter -> option 
                                     [ value voter
                                     , onClick (ChangeVoter voter) 
-                                    , selected (voter == model.voter)
+                                    , selected (voter == (getVoter model))
                                     ] 
                                     [ text voter ])
-                                model.voters
+                                (getVoters model)
                             )
                     ]
                 ]
@@ -89,7 +89,7 @@ paperListPage model =
                             ]
                         ]
                      )
-                        :: (List.map (displayPaper model) (List.sortWith compare model.papers))
+                        :: (List.map (displayPaper model) (List.sortWith compare (getPapers model)))
                     )
                 ]
               )
@@ -98,10 +98,14 @@ paperListPage model =
 displayAdmin : Model -> Html Msg
 displayAdmin model =
     if model.admin then
-        div [] [text "Admin"]
+        div [] 
+        [
+              div [class "group"]  [text "Admin"]
+            , div [class "group"]  [normalFlatButton model.debounce LoadUsers "Users"]
+        ]
     else
         div [] []
-        
+
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
 radioBase current enable labelText order =
     label [class "group"]
@@ -181,7 +185,7 @@ countVotes model =
         outer: Paper -> Int -> Int
         outer = \ paper count -> List.foldl inner count (List.filter filter paper.votes)
     in
-        List.foldl outer 0 model.papers
+        List.foldl outer 0 (getPapers model)
 
 voteLimit : Model -> Int-> Bool
 voteLimit model thisVoterCount =
@@ -192,13 +196,18 @@ voteLimit model thisVoterCount =
 
 validateAdd : Model -> Bool
 validateAdd model =
-    (getMaxPapers model) > (List.length (List.filter (\ paper -> model.name == paper.submitter) model.papers))            
+    let
+        submitterFilter = \ paper -> model.name == paper.submitter
+        paperCount = (List.length (List.filter submitterFilter (getPapers model)))
+    in
+            
+    (getMaxPapers model) > paperCount
 
 userLine : Model -> String
 userLine model =
     let
         paperCount =
-            List.length (List.filter (\paper -> model.name == paper.submitter) model.papers)
+            List.length (List.filter (\paper -> model.name == paper.submitter) (getPapers model))
 
         paperString =
             toString paperCount
@@ -219,7 +228,7 @@ userLine model =
             " cast  " ++ voteString ++ " of " ++ maxVoteString ++ " possible votes, "
 
         totalString =
-            "out of " ++ (toString (List.length model.papers)) ++ " total."
+            "out of " ++ (toString (List.length (getPapers model))) ++ " total."
     in
         "User: " ++ model.name ++ submitString ++ votingString ++ totalString
 

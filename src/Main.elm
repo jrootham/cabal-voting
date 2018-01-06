@@ -8,12 +8,13 @@ import Date
 import Set
 
 import Types exposing (..)
-import Parse exposing (parsePaperList, parseRules, parseLogin)
-import Payload exposing (loginPayload, paperPayload, votePayload, closePayload)
+import Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList)
+import Payload exposing (loginPayload, paperPayload, votePayload, closePayload, userPayload)
 import Wait exposing (waitPage)
 import Login exposing (loginPage)
 import PaperListing exposing (paperListPage)
 import Edit exposing (editPage)
+import User exposing (userPage, editUser)
 
 main =
     Html.programWithFlags { init = init, view = view, update = update, subscriptions = subscriptions }
@@ -21,12 +22,9 @@ main =
 init: String -> ( Model, Cmd Msg )
 init target =
     let
-        rules = Rules 5 15 5
-        model = Model target rules Wait False totalCount "" "" [] Title "" [] Nothing True
+        model = initialModel target     
     in
-            
-    ( model, fetchRules model)
-
+        (model, fetchRules model)
 
 
 -- Subscriptions
@@ -47,20 +45,36 @@ view model =
         [ div [] [ h1 [] [ text "Cabal Voting System" ] ]
         , case model.page of
             Wait ->
-                waitPage model
+                ifError waitPage model
                 
             Login ->
                 loginPage model
 
             List ->
-                if model.errorMessage == "" then
-                    div [] [ paperListPage model ]
-                else
-                    div [] [text model.errorMessage]
+                ifError paperListPage model
 
             Edit ->
-                editPage model
+                ifError editPage model
+
+            Users ->
+                ifError userPage model
+
+            UserPage ->
+                ifError editUser model
         ]
+
+
+ifError : (Model -> Html Msg) -> Model -> Html Msg
+ifError page model =
+    if model.errorMessage == "" then
+        let
+            _ = Debug.log "page" page
+                
+        in
+                
+        div [] [ page model ]
+    else
+        div [] [text model.errorMessage]
 
 
 -- UPDATE
@@ -106,19 +120,26 @@ update msg model =
 --  List page updates
 
         Add ->
-            ({model | page = Edit, edit = Just (newPaper model.name)}, Cmd.none)
+            let
+                temp = setEdit (Just (newPaper model.name)) model
+            in
+                    
+            ({temp | page = Edit}, Cmd.none)
 
         Reload ->
             (bounce model, fetchReload model)
 
         ChangeOrder newOrder ->
-            ( { model | order = newOrder }, Cmd.none )
+            (setPaperOrder newOrder model, Cmd.none )
 
         ChangeVoter newVoter ->
-            ( { model | voter = newVoter }, Cmd.none )
+            (setVoter newVoter model, Cmd.none )
 
         DoEdit id ->
-            ({model | page = Edit, edit = getPaper model.papers id}, Cmd.none)
+            let
+                temp = setEdit (getPaper (getPapers model) id) model
+            in
+                ({temp | page = Edit}, Cmd.none)
 
         Close id ->
             (bounce model, fetchClose (closePayload id) model)
@@ -132,38 +153,108 @@ update msg model =
 --  Edit page updates
 
         InputTitle newTitle ->
-            ({model | edit = makeNewTitle model.edit newTitle}, Cmd.none)
+            (setEdit (makeNewTitle (getEdit model) newTitle) model, Cmd.none)
         
         InputPaperText newText ->
-            ({model | edit = makeNewPaperText model.edit newText}, Cmd.none)
+            (setEdit (makeNewPaperText (getEdit model) newText) model, Cmd.none)
         
         InputPaperLink newLink ->
-            ({model | edit = makeNewPaperLink model.edit newLink}, Cmd.none)
+            (setEdit (makeNewPaperLink (getEdit model) newLink) model, Cmd.none)
         
         InputComment newComment ->
-            ({model | edit = makeNewComment model.edit newComment}, Cmd.none)
+            (setEdit (makeNewComment (getEdit model) newComment) model, Cmd.none)
         
         AddReference ->
-            ({model | edit = addReference model.edit}, Cmd.none)
+            (setEdit (addReference (getEdit model)) model, Cmd.none)
         
         DeleteReference referenceIndex ->
-            ({model | edit = deleteReference model.edit referenceIndex}, Cmd.none)
+            (setEdit (deleteReference (getEdit model) referenceIndex) model, Cmd.none)
         
         InputReferenceText referenceIndex newText ->
-            ({model | edit = makeNewReferenceText model.edit referenceIndex newText}, Cmd.none)
+            (setEdit (makeNewReferenceText (getEdit model) referenceIndex newText) model, Cmd.none)
         
         InputReferenceLink referenceIndex newLink ->
-            ({model | edit = makeNewReferenceLink model.edit referenceIndex newLink}, Cmd.none)
+            (setEdit (makeNewReferenceLink (getEdit model) referenceIndex newLink) model, Cmd.none)
         
         Save ->
-            case model.edit of
+            case getEdit model of
                 Just paper ->
                     (bounce model, fetchSave (paperPayload paper) model)
                 Nothing ->
                     ({model | errorMessage = "No paper.  Should not happen"}, Cmd.none)
 
         Cancel ->
-            ({model | page = List, edit = Nothing}, Cmd.none)
+            (setEdit Nothing {model | page = List}, Cmd.none)
+
+        LoadUsers ->
+            (bounce model, fetchUsers model)
+
+        ListUsers (Ok response) ->
+            (debounce (setUser Nothing (putUserList model response)), Cmd.none)
+
+        ListUsers (Err error) ->
+            (debounce { model | errorMessage = formatError error}, Cmd.none )
+
+        EditUser user ->
+            (setUser (Just user) {model | page = UserPage}, Cmd.none)   
+
+        UserName name ->
+            (updateUserField updateUserName model name, Cmd.none)
+
+        UserAdmin admin ->
+            (updateUserField updateUserAdmin model admin, Cmd.none)
+
+        UserValid valid ->
+            (updateUserField updateUserValid model valid, Cmd.none)
+
+        UpdateUser ->
+            case getUser model of
+                Just user ->
+                    (bounce model, fetchUpdateUser (userPayload user) model)
+
+                Nothing ->
+                    ({model | errorMessage = "No user.  Should not happen"}, Cmd.none)
+
+        CloseUser ->
+            (setUser Nothing {model | page = Users}, Cmd.none)
+
+        ShutUserList ->
+            (setUserList Nothing {model | page = List}, Cmd.none)            
+
+updateUserField : (Model -> User -> a -> Model) -> Model -> a -> Model
+updateUserField update model value =
+    case getUser model of
+        Just user ->
+            update model user value
+
+        Nothing ->
+            {model | errorMessage = "No user.  Should not happen"}
+
+updateUserName : Model -> User -> String -> Model
+updateUserName model user name =
+    setUser (Just {user | name = name}) model
+
+updateUserAdmin : Model -> User -> Bool -> Model
+updateUserAdmin model user admin =
+    setUser (Just {user | admin = admin}) model
+    
+updateUserValid : Model -> User -> Bool -> Model
+updateUserValid model user valid =
+    setUser (Just {user | valid = valid}) model
+    
+
+putUserList : Model -> String -> Model
+putUserList model response =
+    case parseUserList response of
+        Ok userList ->
+            let
+                temp = setUserList (Just userList.userList) model 
+            in
+                    
+            {temp | page = Users}
+
+        Err error ->
+            {model | errorMessage = error}
 
 newPaper : String -> Paper
 newPaper submitter = 
@@ -173,7 +264,7 @@ getPaper : List Paper -> Int -> Maybe Paper
 getPaper paperList id =
     List.head (List.filter (\ paper -> id == paper.id) paperList)            
 
-makeNewTitle : (Maybe Paper) -> String -> Maybe Paper
+makeNewTitle : Maybe Paper -> String -> Maybe Paper
 makeNewTitle maybePaper newTitle =
     case maybePaper of
         Just paper  ->
@@ -337,18 +428,15 @@ updateModel model response =
                 papers = paperList.papers
 
                 sortVoter = 
-                    if model.voter == "" then
+                    if (getVoter model) == "" then
                         model.name
                     else
-                        model.voter
+                        getVoter model
+
+                temp = setVoters (getVoters papers) (setVoter sortVoter (setPapers papers model))
             in
                     
-            { model | errorMessage = ""
-                , page = List
-                , papers = papers
-                , voters = getVoters papers
-                , voter = sortVoter
-            }
+            {temp | errorMessage = "", page = List}
 
         Err error ->
             { model | errorMessage = error }
@@ -386,6 +474,10 @@ fetchVote = fetch "POST" "vote" True FetchResult
 fetchUnvote = fetch "POST" "unvote" True FetchResult
 
 fetchSave = fetch "POST" "save" True FetchResult
+
+fetchUsers = fetch "POST" "userList" True ListUsers emptyBody
+
+fetchUpdateUser = fetch "POST" "updateUser" True ListUsers
 
 fetch : String -> String -> Bool -> (Result Error String -> Msg) -> Body -> Model -> Cmd Msg
 fetch method route credential action body model =

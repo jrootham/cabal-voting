@@ -1,4 +1,4 @@
-module Parse exposing (parsePaperList, parseRules, parseLogin)
+module Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList)
 
 import Json.Decode exposing (Decoder, decodeString, int, string, bool, list, succeed, fail, andThen)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -7,6 +7,23 @@ import Result
 import Date
 
 import Types exposing (..)
+
+parseUserList : String -> Result String UserList 
+parseUserList responseString =
+    decodeString decodeUserList responseString
+
+decodeUserList : Decoder UserList
+decodeUserList =
+    decode UserList
+        |> required "user_list" (list decodeUser)
+
+decodeUser : Decoder User
+decodeUser =
+    decode User
+        |> required "user_id" int
+        |> required "name" string
+        |> required "valid" bool
+        |> required "admin" bool
 
 parseRules : String -> Result String Rules
 parseRules responseString =

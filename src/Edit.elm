@@ -9,8 +9,8 @@ import Common exposing (normalFlatButton, wideFlatButton, widerFlatButton)
 
 editPage : Model -> Html Msg
 editPage model = 
-    case model.edit of
-        Just paper ->            
+    case getEdit model of
+        Just paper ->
             div [] 
             [
                 div [] [inputDiv "Title: " paper.title InputTitle]

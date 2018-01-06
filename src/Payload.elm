@@ -1,9 +1,22 @@
-module Payload exposing (loginPayload, paperPayload, votePayload, closePayload)
+module Payload exposing (loginPayload, paperPayload, votePayload, closePayload, userPayload)
 
-import Json.Encode exposing (Value, object, string, int, list)
+import Json.Encode exposing (Value, object, string, int, bool, list)
 import Http exposing (Body, jsonBody)
 
 import Types exposing(..)
+
+userPayload : User -> Body
+userPayload user = 
+  jsonBody (object [("user", userContents user)])
+
+userContents : User -> Value
+userContents user =
+  object
+    [ ("user_id", int user.id)
+    , ("name", string user.name)
+    , ("valid", bool user.valid)
+    , ("admin", bool user.admin)
+    ]
 
 loginPayload : String -> Body
 loginPayload user = 
