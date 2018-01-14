@@ -9,11 +9,15 @@ import Common exposing (normalFlatButton, wideFlatButton)
 
 loginPage : Model -> Html Msg
 loginPage model =
-    div [] 
-    
-    [ div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
-    , div [class "password-line"] [ normalFlatButton model.debounce StartLogin "Login"]
-    , div [class "password-line"] [ text model.errorMessage ]        
-    , div [class "password-line"] [ wideFlatButton True ClearFetch "Clear error" ]
-    ]
+    let
+        canLogin = (model.currentUser /= Nothing) && model.debounce
+    in
+            
+        div [] 
+            [ div [class "password-line"] [ input [ placeholder "Name", onInput Name ] [] ]
+            , div [class "password-line"] [ normalFlatButton canLogin StartLogin "Login"]
+            , div [class "password-line"] [ normalFlatButton model.debounce Guest "Guest"]
+            , div [class "password-line"] [ text model.errorMessage ]        
+            , div [class "password-line"] [ wideFlatButton True ClearError "Clear error" ]
+            ]
     

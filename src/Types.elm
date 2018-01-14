@@ -6,10 +6,10 @@ import Http
 totalCount = 30 * 60
 
 type alias PaperModel =
-    { papers : List Paper
+    { paperList : List Paper
     , order : PaperOrder
     , voter : String
-    , voters : List String
+    , voterList : List String
     , edit : Maybe Paper
     } 
 
@@ -22,24 +22,31 @@ type alias Model =
     { target : String
     , rules : Rules
     , page : Page
-    , admin : Bool
     , countDown : Int
-    , name : String
+    , currentUser : Maybe User
     , errorMessage : String
     , debounce : Bool
     , paperModel : PaperModel
     , userModel : UserModel
     }
 
-getPapers : Model -> List Paper
-getPapers model =
-    model.paperModel.papers
+initialModel target =
+    let
+        rules = Rules 5 15 5
+        paperModel = PaperModel [] Title "" [] Nothing
+        userModel = UserModel Nothing Nothing
+    in
+    Model target rules Wait totalCount Nothing "" True paperModel userModel
+ 
+getPaperList : Model -> List Paper
+getPaperList model =
+    model.paperModel.paperList
 
-setPapers : List Paper -> Model -> Model
-setPapers papers model =
+setPaperList : List Paper -> Model -> Model
+setPaperList paperList model =
     let
         temp = model.paperModel
-        paperModel = {temp | papers = papers}
+        paperModel = {temp | paperList = paperList}
     in
     {model | paperModel = paperModel}
 
@@ -67,17 +74,17 @@ setVoter voter model =
     in
     {model | paperModel = paperModel}
 
-getVoters : Model -> List String
-getVoters model =
-    model.paperModel.voters
+getVoterList : Model -> List String
+getVoterList model =
+    model.paperModel.voterList
 
-setVoters : List String -> Model -> Model
-setVoters voters model =
+setVoterList : List String -> Model -> Model
+setVoterList voterList model =
     let
         temp = model.paperModel
-        paperModel = {temp | voters = voters}
+        paperModel = {temp | voterList = voterList}
     in
-    {model | paperModel = paperModel}
+        {model | paperModel = paperModel}
 
 getEdit : Model -> Maybe Paper
 getEdit model =
@@ -103,12 +110,12 @@ setUserList userList model =
     in
     {model | userModel = userModel}
 
-getUser : Model -> Maybe User
-getUser model =
+getEditUser : Model -> Maybe User
+getEditUser model =
     model.userModel.user
 
-setUser : Maybe User -> Model -> Model
-setUser user model =
+setEditUser : Maybe User -> Model -> Model
+setEditUser user model =
     let
         temp = model.userModel
         userModel = {temp | user = user}
@@ -116,14 +123,6 @@ setUser user model =
     {model | userModel = userModel}
 
 
-initialModel target =
-    let
-        rules = Rules 5 15 5
-        paperModel = PaperModel [] Title "" [] Nothing
-        userModel = UserModel Nothing Nothing
-    in
-    Model target rules Wait False totalCount "" "" True paperModel userModel
- 
 type alias Rules =
     { maxPapers: Int
     , maxVotes: Int
@@ -159,6 +158,7 @@ type Msg
     | RulesResult (Result Http.Error String)
     | Name String
     | StartLogin
+    | Guest
     | UpdateLogin (Result Http.Error String)
     | Add
     | Reload
@@ -167,7 +167,7 @@ type Msg
     | DecrementVote Int
     | IncrementVote Int
     | FetchResult (Result Http.Error String)
-    | ClearFetch
+    | ClearError
     | DoEdit Int
     | Close Int
     | InputTitle String
@@ -189,8 +189,11 @@ type Msg
     | UpdateUser
     | CloseUser
     | ShutUserList
+    | CloseList
+    | OpenList
+    | UpdateRules
 
-type alias PaperList = {papers: List Paper}
+type alias PaperList = {paperList: List Paper}
 
 type alias Paper =
     { id : Int
@@ -219,10 +222,7 @@ type alias Vote =
 
 type alias Admin = {admin: Bool}
 
-type alias LoginData = 
-    { cookie: String
-    , admin: Bool
-    }
+type alias LoginData = {admin: Bool}
 
 type alias User =
     { id : Int
@@ -233,5 +233,9 @@ type alias User =
 
 newUser : User
 newUser = User 0 "" True False
+
+newCurrentUser : String -> User
+newCurrentUser name =
+    User 0 name True False
 
 type alias UserList = {userList : List User}

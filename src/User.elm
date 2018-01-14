@@ -51,7 +51,7 @@ displayUser model user =
 
 editUser : Model -> Html Msg
 editUser model =
-    case getUser model of
+    case getEditUser model of
         Just user ->
             userForm model user
 
@@ -78,7 +78,7 @@ userValues user =
 
 canSave : Model -> Bool
 canSave model =
-    case getUser model of
+    case getEditUser model of
         Just user ->
             model.debounce && (user.name /= "")
 

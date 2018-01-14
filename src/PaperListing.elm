@@ -11,6 +11,8 @@ import Common exposing (normalFlatButton, thinFlatButton, makeLink)
 paperListPage : Model -> Html Msg
 paperListPage model =
     let
+        _ = Debug.log "listing papers" model.paperModel.voterList
+
         radioSelected =
             radioBase (getPaperOrder model)
 
@@ -40,7 +42,12 @@ paperListPage model =
                     totalOrder (\left right -> left.submitter < right.submitter)
 
                 Mine ->
-                    mineOrder model.name
+                    case model.currentUser of
+                        Just user ->
+                            mineOrder user.name
+
+                        Nothing ->
+                            totalOrder (\left right -> left.submitter < right.submitter)
 
                 Voter ->
                     votes (getVoter model)
@@ -56,7 +63,10 @@ paperListPage model =
                 , radio " Most votes " MostVotes
                 , radio " Least votes " LeastVotes
                 , radio " Submitter " Submitter
-                , radio " My Papers " Mine
+                , if model.currentUser /= Nothing then
+                    radio " My Papers " Mine
+                  else
+                    div [class "group"] []
                 , div [class "group"] 
                     [   
                         radioSelected True " Voter " Voter
@@ -68,7 +78,7 @@ paperListPage model =
                                     , selected (voter == (getVoter model))
                                     ] 
                                     [ text voter ])
-                                (getVoters model)
+                                (getVoterList model)
                             )
                     ]
                 ]
@@ -89,7 +99,7 @@ paperListPage model =
                             ]
                         ]
                      )
-                        :: (List.map (displayPaper model) (List.sortWith compare (getPapers model)))
+                        :: (List.map (displayPaper model) (List.sortWith compare (getPaperList model)))
                     )
                 ]
               )
@@ -97,14 +107,23 @@ paperListPage model =
 
 displayAdmin : Model -> Html Msg
 displayAdmin model =
-    if model.admin then
-        div [] 
-        [
-              div [class "group"]  [text "Admin"]
-            , div [class "group"]  [normalFlatButton model.debounce LoadUsers "Users"]
-        ]
-    else
-        div [] []
+    case model.currentUser of
+        Just user ->
+            if user.admin then
+                div [] 
+                [
+                      div [class "group"]  [text "Admin"]
+                    , div [class "group"]  [normalFlatButton model.debounce LoadUsers "Users"]
+                    , div [class "group"]  [normalFlatButton model.debounce CloseList "Close"]
+                    , div [class "group"]  [normalFlatButton model.debounce OpenList "Open"]
+                    , div [class "group"]  [normalFlatButton model.debounce UpdateRules "Rules"]
+                ]
+            else
+                div [] []
+
+        Nothing ->
+            div [] []
+
 
 radioBase : PaperOrder -> Bool -> String -> PaperOrder -> Html Msg
 radioBase current enable labelText order =
@@ -133,7 +152,13 @@ voteTable votes =
 displayPaper : Model -> Paper -> Html Msg
 displayPaper model paper =
     let
-        testVote = \ vote -> vote.name == model.name
+        testVote =
+            case model.currentUser of
+                Just user -> 
+                    \ vote -> vote.name == user.name
+
+                Nothing ->
+                    \ vote -> False
 
         thisVoterCount = 
             let
@@ -145,7 +170,13 @@ displayPaper model paper =
                     Nothing ->
                         0
 
-        belongsTo = model.name == paper.submitter
+        belongsTo = 
+            case model.currentUser of
+                Just user ->
+                    user.name == paper.submitter
+
+                Nothing ->
+                    False
 
     in
         tr [ class "entry" ]
@@ -164,15 +195,23 @@ displayPaper model paper =
             , td [class "column", class "vote" ]
                 [ div [class "group"]
                     [
-                        thinFlatButton (model.debounce && thisVoterCount > 0) (DecrementVote paper.id) "-"
+                        thinFlatButton (canDecrement thisVoterCount model) (DecrementVote paper.id) "-"
                         , text " "
                         , text (toString thisVoterCount)
                         , text " "
-                        , thinFlatButton (model.debounce && voteLimit model thisVoterCount) (IncrementVote paper.id) "+"
+                        , thinFlatButton (canIncrement thisVoterCount model) (IncrementVote paper.id) "+"
                     ]
                 ]
             , td [class "column"](voteTable paper.votes)
             ]
+
+canDecrement : Int -> Model -> Bool
+canDecrement votes model =
+    (model.currentUser /= Nothing) && model.debounce &&  votes > 0
+
+canIncrement : Int -> Model -> Bool
+canIncrement votes model =
+    (model.currentUser /= Nothing) && model.debounce && voteLimit model votes 
 
 
 countVotes : Model -> Int
@@ -180,12 +219,20 @@ countVotes model =
     let
         inner: Vote -> Int -> Int
         inner = \ vote count -> count + vote.votes
+        
         filter : Vote -> Bool
-        filter = \ vote -> vote.name == model.name
+        filter = 
+            case model.currentUser of
+                Just user ->
+                    \ vote -> vote.name == user.name
+
+                Nothing ->
+                    \ vote -> False
+
         outer: Paper -> Int -> Int
         outer = \ paper count -> List.foldl inner count (List.filter filter paper.votes)
     in
-        List.foldl outer 0 (getPapers model)
+        List.foldl outer 0 (getPaperList model)
 
 voteLimit : Model -> Int-> Bool
 voteLimit model thisVoterCount =
@@ -196,41 +243,50 @@ voteLimit model thisVoterCount =
 
 validateAdd : Model -> Bool
 validateAdd model =
-    let
-        submitterFilter = \ paper -> model.name == paper.submitter
-        paperCount = (List.length (List.filter submitterFilter (getPapers model)))
-    in
-            
-    (getMaxPapers model) > paperCount
+    case model.currentUser of
+        Just user ->
+            let
+                submitterFilter = \ paper -> user.name == paper.submitter
+                paperCount = (List.length (List.filter submitterFilter (getPaperList model)))
+            in
+                    
+            (getMaxPapers model) > paperCount
+
+        Nothing -> False
 
 userLine : Model -> String
 userLine model =
-    let
-        paperCount =
-            List.length (List.filter (\paper -> model.name == paper.submitter) (getPapers model))
+    case model.currentUser of
+        Just user ->
+            let
+                paperCount =
+                    List.length (List.filter (\paper -> user.name == paper.submitter) (getPaperList model))
 
-        paperString =
-            toString paperCount
+                paperString =
+                    toString paperCount
 
-        maxPaperString =
-            toString (getMaxPapers model)
+                maxPaperString =
+                    toString (getMaxPapers model)
 
-        voteString =
-            toString (countVotes model)
+                voteString =
+                    toString (countVotes model)
 
-        maxVoteString =
-            toString (getMaxVotes model)
+                maxVoteString =
+                    toString (getMaxVotes model)
 
-        submitString =
-            " submitted " ++ paperString ++ " of " ++ maxPaperString ++ " possible, "
+                submitString =
+                    " submitted " ++ paperString ++ " of " ++ maxPaperString ++ " possible, "
 
-        votingString =
-            " cast  " ++ voteString ++ " of " ++ maxVoteString ++ " possible votes, "
+                votingString =
+                    " cast  " ++ voteString ++ " of " ++ maxVoteString ++ " possible votes, "
 
-        totalString =
-            "out of " ++ (toString (List.length (getPapers model))) ++ " total."
-    in
-        "User: " ++ model.name ++ submitString ++ votingString ++ totalString
+                totalString =
+                    "out of " ++ (toString (List.length (getPaperList model))) ++ " total."
+            in
+                "User: " ++ user.name ++ submitString ++ votingString ++ totalString
+
+        Nothing ->
+            (toString (List.length (getPaperList model))) ++ " total papers"
 
 
 nameIn : String -> Paper -> Bool

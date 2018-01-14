@@ -9829,7 +9829,7 @@ var _jrootham$cabal_voting$Types$getMaxPerPaper = function (model) {
 var _jrootham$cabal_voting$Types$getMaxPapers = function (model) {
 	return model.rules.maxPapers;
 };
-var _jrootham$cabal_voting$Types$setUser = F2(
+var _jrootham$cabal_voting$Types$setEditUser = F2(
 	function (user, model) {
 		var temp = model.userModel;
 		var userModel = _elm_lang$core$Native_Utils.update(
@@ -9839,7 +9839,7 @@ var _jrootham$cabal_voting$Types$setUser = F2(
 			model,
 			{userModel: userModel});
 	});
-var _jrootham$cabal_voting$Types$getUser = function (model) {
+var _jrootham$cabal_voting$Types$getEditUser = function (model) {
 	return model.userModel.user;
 };
 var _jrootham$cabal_voting$Types$setUserList = F2(
@@ -9868,18 +9868,18 @@ var _jrootham$cabal_voting$Types$setEdit = F2(
 var _jrootham$cabal_voting$Types$getEdit = function (model) {
 	return model.paperModel.edit;
 };
-var _jrootham$cabal_voting$Types$setVoters = F2(
-	function (voters, model) {
+var _jrootham$cabal_voting$Types$setVoterList = F2(
+	function (voterList, model) {
 		var temp = model.paperModel;
 		var paperModel = _elm_lang$core$Native_Utils.update(
 			temp,
-			{voters: voters});
+			{voterList: voterList});
 		return _elm_lang$core$Native_Utils.update(
 			model,
 			{paperModel: paperModel});
 	});
-var _jrootham$cabal_voting$Types$getVoters = function (model) {
-	return model.paperModel.voters;
+var _jrootham$cabal_voting$Types$getVoterList = function (model) {
+	return model.paperModel.voterList;
 };
 var _jrootham$cabal_voting$Types$setVoter = F2(
 	function (voter, model) {
@@ -9907,55 +9907,38 @@ var _jrootham$cabal_voting$Types$setPaperOrder = F2(
 var _jrootham$cabal_voting$Types$getPaperOrder = function (model) {
 	return model.paperModel.order;
 };
-var _jrootham$cabal_voting$Types$setPapers = F2(
-	function (papers, model) {
+var _jrootham$cabal_voting$Types$setPaperList = F2(
+	function (paperList, model) {
 		var temp = model.paperModel;
 		var paperModel = _elm_lang$core$Native_Utils.update(
 			temp,
-			{papers: papers});
+			{paperList: paperList});
 		return _elm_lang$core$Native_Utils.update(
 			model,
 			{paperModel: paperModel});
 	});
-var _jrootham$cabal_voting$Types$getPapers = function (model) {
-	return model.paperModel.papers;
+var _jrootham$cabal_voting$Types$getPaperList = function (model) {
+	return model.paperModel.paperList;
 };
 var _jrootham$cabal_voting$Types$totalCount = 30 * 60;
 var _jrootham$cabal_voting$Types$PaperModel = F5(
 	function (a, b, c, d, e) {
-		return {papers: a, order: b, voter: c, voters: d, edit: e};
+		return {paperList: a, order: b, voter: c, voterList: d, edit: e};
 	});
 var _jrootham$cabal_voting$Types$UserModel = F2(
 	function (a, b) {
 		return {userList: a, user: b};
 	});
-var _jrootham$cabal_voting$Types$Model = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {target: a, rules: b, page: c, admin: d, countDown: e, name: f, errorMessage: g, debounce: h, paperModel: i, userModel: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
+var _jrootham$cabal_voting$Types$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {target: a, rules: b, page: c, countDown: d, currentUser: e, errorMessage: f, debounce: g, paperModel: h, userModel: i};
+	});
 var _jrootham$cabal_voting$Types$Rules = F3(
 	function (a, b, c) {
 		return {maxPapers: a, maxVotes: b, maxPerPaper: c};
 	});
 var _jrootham$cabal_voting$Types$PaperList = function (a) {
-	return {papers: a};
+	return {paperList: a};
 };
 var _jrootham$cabal_voting$Types$Paper = F8(
 	function (a, b, c, d, e, f, g, h) {
@@ -9976,15 +9959,17 @@ var _jrootham$cabal_voting$Types$Vote = F2(
 var _jrootham$cabal_voting$Types$Admin = function (a) {
 	return {admin: a};
 };
-var _jrootham$cabal_voting$Types$LoginData = F2(
-	function (a, b) {
-		return {cookie: a, admin: b};
-	});
+var _jrootham$cabal_voting$Types$LoginData = function (a) {
+	return {admin: a};
+};
 var _jrootham$cabal_voting$Types$User = F4(
 	function (a, b, c, d) {
 		return {id: a, name: b, valid: c, admin: d};
 	});
 var _jrootham$cabal_voting$Types$newUser = A4(_jrootham$cabal_voting$Types$User, 0, '', true, false);
+var _jrootham$cabal_voting$Types$newCurrentUser = function (name) {
+	return A4(_jrootham$cabal_voting$Types$User, 0, name, true, false);
+};
 var _jrootham$cabal_voting$Types$UserList = function (a) {
 	return {userList: a};
 };
@@ -10012,8 +9997,11 @@ var _jrootham$cabal_voting$Types$initialModel = function (target) {
 		{ctor: '[]'},
 		_elm_lang$core$Maybe$Nothing);
 	var rules = A3(_jrootham$cabal_voting$Types$Rules, 5, 15, 5);
-	return _jrootham$cabal_voting$Types$Model(target)(rules)(_jrootham$cabal_voting$Types$Wait)(false)(_jrootham$cabal_voting$Types$totalCount)('')('')(true)(paperModel)(userModel);
+	return A9(_jrootham$cabal_voting$Types$Model, target, rules, _jrootham$cabal_voting$Types$Wait, _jrootham$cabal_voting$Types$totalCount, _elm_lang$core$Maybe$Nothing, '', true, paperModel, userModel);
 };
+var _jrootham$cabal_voting$Types$UpdateRules = {ctor: 'UpdateRules'};
+var _jrootham$cabal_voting$Types$OpenList = {ctor: 'OpenList'};
+var _jrootham$cabal_voting$Types$CloseList = {ctor: 'CloseList'};
 var _jrootham$cabal_voting$Types$ShutUserList = {ctor: 'ShutUserList'};
 var _jrootham$cabal_voting$Types$CloseUser = {ctor: 'CloseUser'};
 var _jrootham$cabal_voting$Types$UpdateUser = {ctor: 'UpdateUser'};
@@ -10065,7 +10053,7 @@ var _jrootham$cabal_voting$Types$Close = function (a) {
 var _jrootham$cabal_voting$Types$DoEdit = function (a) {
 	return {ctor: 'DoEdit', _0: a};
 };
-var _jrootham$cabal_voting$Types$ClearFetch = {ctor: 'ClearFetch'};
+var _jrootham$cabal_voting$Types$ClearError = {ctor: 'ClearError'};
 var _jrootham$cabal_voting$Types$FetchResult = function (a) {
 	return {ctor: 'FetchResult', _0: a};
 };
@@ -10086,6 +10074,7 @@ var _jrootham$cabal_voting$Types$Add = {ctor: 'Add'};
 var _jrootham$cabal_voting$Types$UpdateLogin = function (a) {
 	return {ctor: 'UpdateLogin', _0: a};
 };
+var _jrootham$cabal_voting$Types$Guest = {ctor: 'Guest'};
 var _jrootham$cabal_voting$Types$StartLogin = {ctor: 'StartLogin'};
 var _jrootham$cabal_voting$Types$Name = function (a) {
 	return {ctor: 'Name', _0: a};
@@ -10408,6 +10397,7 @@ var _jrootham$cabal_voting$Edit$editPage = function (model) {
 };
 
 var _jrootham$cabal_voting$Login$loginPage = function (model) {
+	var canLogin = (!_elm_lang$core$Native_Utils.eq(model.currentUser, _elm_lang$core$Maybe$Nothing)) && model.debounce;
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -10447,7 +10437,7 @@ var _jrootham$cabal_voting$Login$loginPage = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$StartLogin, 'Login'),
+						_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, canLogin, _jrootham$cabal_voting$Types$StartLogin, 'Login'),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -10461,7 +10451,7 @@ var _jrootham$cabal_voting$Login$loginPage = function (model) {
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(model.errorMessage),
+							_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$Guest, 'Guest'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -10475,10 +10465,25 @@ var _jrootham$cabal_voting$Login$loginPage = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: A3(_jrootham$cabal_voting$Common$wideFlatButton, true, _jrootham$cabal_voting$Types$ClearFetch, 'Clear error'),
+								_0: _elm_lang$html$Html$text(model.errorMessage),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('password-line'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A3(_jrootham$cabal_voting$Common$wideFlatButton, true, _jrootham$cabal_voting$Types$ClearError, 'Clear error'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -10904,8 +10909,8 @@ var _jrootham$cabal_voting$PaperListing$mineOrder = F3(
 		return (_elm_lang$core$Native_Utils.eq(left.submitter, name) && _elm_lang$core$Native_Utils.eq(right.submitter, name)) ? _elm_lang$core$Basics$EQ : ((_elm_lang$core$Native_Utils.eq(left.submitter, name) && (!_elm_lang$core$Native_Utils.eq(right.submitter, name))) ? _elm_lang$core$Basics$LT : (((!_elm_lang$core$Native_Utils.eq(left.submitter, name)) && _elm_lang$core$Native_Utils.eq(right.submitter, name)) ? _elm_lang$core$Basics$GT : (_elm_lang$core$Native_Utils.eq(left.submitter, right.submitter) ? _elm_lang$core$Basics$EQ : ((_elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0) ? _elm_lang$core$Basics$LT : ((_elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) > 0) ? _elm_lang$core$Basics$GT : _elm_lang$core$Native_Utils.crash(
 			'PaperListing',
 			{
-				start: {line: 308, column: 13},
-				end: {line: 308, column: 24}
+				start: {line: 364, column: 13},
+				end: {line: 364, column: 24}
 			})('mineOrder Cannot happen'))))));
 	});
 var _jrootham$cabal_voting$PaperListing$totalOrder = F3(
@@ -10928,8 +10933,8 @@ var _jrootham$cabal_voting$PaperListing$getVotes = F2(
 			return _elm_lang$core$Native_Utils.crashCase(
 				'PaperListing',
 				{
-					start: {line: 245, column: 5},
-					end: {line: 250, column: 44}
+					start: {line: 301, column: 5},
+					end: {line: 306, column: 44}
 				},
 				_p0)('Should have votes');
 		}
@@ -10961,28 +10966,42 @@ var _jrootham$cabal_voting$PaperListing$votes = function (name) {
 			return (voterIn(left) && voterIn(right)) ? A3(_jrootham$cabal_voting$PaperListing$compareVotes, name, left.votes, right.votes) : (((!voterIn(left)) && voterIn(right)) ? _elm_lang$core$Basics$GT : ((voterIn(left) && (!voterIn(right))) ? _elm_lang$core$Basics$LT : (((!voterIn(left)) && (!voterIn(right))) ? _elm_lang$core$Basics$EQ : _elm_lang$core$Native_Utils.crash(
 				'PaperListing',
 				{
-					start: {line: 280, column: 17},
-					end: {line: 280, column: 28}
+					start: {line: 336, column: 17},
+					end: {line: 336, column: 28}
 				})('votes: This should be impossible'))));
 		});
 };
 var _jrootham$cabal_voting$PaperListing$validateAdd = function (model) {
-	var submitterFilter = function (paper) {
-		return _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
-	};
-	var paperCount = _elm_lang$core$List$length(
-		A2(
-			_elm_lang$core$List$filter,
-			submitterFilter,
-			_jrootham$cabal_voting$Types$getPapers(model)));
-	return _elm_lang$core$Native_Utils.cmp(
-		_jrootham$cabal_voting$Types$getMaxPapers(model),
-		paperCount) > 0;
+	var _p2 = model.currentUser;
+	if (_p2.ctor === 'Just') {
+		var submitterFilter = function (paper) {
+			return _elm_lang$core$Native_Utils.eq(_p2._0.name, paper.submitter);
+		};
+		var paperCount = _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				submitterFilter,
+				_jrootham$cabal_voting$Types$getPaperList(model)));
+		return _elm_lang$core$Native_Utils.cmp(
+			_jrootham$cabal_voting$Types$getMaxPapers(model),
+			paperCount) > 0;
+	} else {
+		return false;
+	}
 };
 var _jrootham$cabal_voting$PaperListing$countVotes = function (model) {
-	var filter = function (vote) {
-		return _elm_lang$core$Native_Utils.eq(vote.name, model.name);
-	};
+	var filter = function () {
+		var _p3 = model.currentUser;
+		if (_p3.ctor === 'Just') {
+			return function (vote) {
+				return _elm_lang$core$Native_Utils.eq(vote.name, _p3._0.name);
+			};
+		} else {
+			return function (vote) {
+				return false;
+			};
+		}
+	}();
 	var inner = F2(
 		function (vote, count) {
 			return count + vote.votes;
@@ -10999,7 +11018,7 @@ var _jrootham$cabal_voting$PaperListing$countVotes = function (model) {
 		_elm_lang$core$List$foldl,
 		outer,
 		0,
-		_jrootham$cabal_voting$Types$getPapers(model));
+		_jrootham$cabal_voting$Types$getPaperList(model));
 };
 var _jrootham$cabal_voting$PaperListing$voteLimit = F2(
 	function (model, thisVoterCount) {
@@ -11009,60 +11028,79 @@ var _jrootham$cabal_voting$PaperListing$voteLimit = F2(
 			thisVoterCount) > 0);
 	});
 var _jrootham$cabal_voting$PaperListing$userLine = function (model) {
-	var totalString = A2(
-		_elm_lang$core$Basics_ops['++'],
-		'out of ',
-		A2(
+	var _p4 = model.currentUser;
+	if (_p4.ctor === 'Just') {
+		var _p5 = _p4._0;
+		var totalString = A2(
+			_elm_lang$core$Basics_ops['++'],
+			'out of ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(
+					_elm_lang$core$List$length(
+						_jrootham$cabal_voting$Types$getPaperList(model))),
+				' total.'));
+		var maxVoteString = _elm_lang$core$Basics$toString(
+			_jrootham$cabal_voting$Types$getMaxVotes(model));
+		var voteString = _elm_lang$core$Basics$toString(
+			_jrootham$cabal_voting$PaperListing$countVotes(model));
+		var votingString = A2(
+			_elm_lang$core$Basics_ops['++'],
+			' cast  ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				voteString,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' of ',
+					A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible votes, '))));
+		var maxPaperString = _elm_lang$core$Basics$toString(
+			_jrootham$cabal_voting$Types$getMaxPapers(model));
+		var paperCount = _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (paper) {
+					return _elm_lang$core$Native_Utils.eq(_p5.name, paper.submitter);
+				},
+				_jrootham$cabal_voting$Types$getPaperList(model)));
+		var paperString = _elm_lang$core$Basics$toString(paperCount);
+		var submitString = A2(
+			_elm_lang$core$Basics_ops['++'],
+			' submitted ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				paperString,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' of ',
+					A2(_elm_lang$core$Basics_ops['++'], maxPaperString, ' possible, '))));
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'User: ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p5.name,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					submitString,
+					A2(_elm_lang$core$Basics_ops['++'], votingString, totalString))));
+	} else {
+		return A2(
 			_elm_lang$core$Basics_ops['++'],
 			_elm_lang$core$Basics$toString(
 				_elm_lang$core$List$length(
-					_jrootham$cabal_voting$Types$getPapers(model))),
-			' total.'));
-	var maxVoteString = _elm_lang$core$Basics$toString(
-		_jrootham$cabal_voting$Types$getMaxVotes(model));
-	var voteString = _elm_lang$core$Basics$toString(
-		_jrootham$cabal_voting$PaperListing$countVotes(model));
-	var votingString = A2(
-		_elm_lang$core$Basics_ops['++'],
-		' cast  ',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			voteString,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				' of ',
-				A2(_elm_lang$core$Basics_ops['++'], maxVoteString, ' possible votes, '))));
-	var maxPaperString = _elm_lang$core$Basics$toString(
-		_jrootham$cabal_voting$Types$getMaxPapers(model));
-	var paperCount = _elm_lang$core$List$length(
-		A2(
-			_elm_lang$core$List$filter,
-			function (paper) {
-				return _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
-			},
-			_jrootham$cabal_voting$Types$getPapers(model)));
-	var paperString = _elm_lang$core$Basics$toString(paperCount);
-	var submitString = A2(
-		_elm_lang$core$Basics_ops['++'],
-		' submitted ',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			paperString,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				' of ',
-				A2(_elm_lang$core$Basics_ops['++'], maxPaperString, ' possible, '))));
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'User: ',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			model.name,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				submitString,
-				A2(_elm_lang$core$Basics_ops['++'], votingString, totalString))));
+					_jrootham$cabal_voting$Types$getPaperList(model))),
+			' total papers');
+	}
 };
+var _jrootham$cabal_voting$PaperListing$canIncrement = F2(
+	function (votes, model) {
+		return (!_elm_lang$core$Native_Utils.eq(model.currentUser, _elm_lang$core$Maybe$Nothing)) && (model.debounce && A2(_jrootham$cabal_voting$PaperListing$voteLimit, model, votes));
+	});
+var _jrootham$cabal_voting$PaperListing$canDecrement = F2(
+	function (votes, model) {
+		return (!_elm_lang$core$Native_Utils.eq(model.currentUser, _elm_lang$core$Maybe$Nothing)) && (model.debounce && (_elm_lang$core$Native_Utils.cmp(votes, 0) > 0));
+	});
 var _jrootham$cabal_voting$PaperListing$voteTable = function (votes) {
 	var rawDisplayVotes = F2(
 		function (name, votes) {
@@ -11128,16 +11166,32 @@ var _jrootham$cabal_voting$PaperListing$voteTable = function (votes) {
 };
 var _jrootham$cabal_voting$PaperListing$displayPaper = F2(
 	function (model, paper) {
-		var belongsTo = _elm_lang$core$Native_Utils.eq(model.name, paper.submitter);
-		var testVote = function (vote) {
-			return _elm_lang$core$Native_Utils.eq(vote.name, model.name);
-		};
+		var belongsTo = function () {
+			var _p6 = model.currentUser;
+			if (_p6.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p6._0.name, paper.submitter);
+			} else {
+				return false;
+			}
+		}();
+		var testVote = function () {
+			var _p7 = model.currentUser;
+			if (_p7.ctor === 'Just') {
+				return function (vote) {
+					return _elm_lang$core$Native_Utils.eq(vote.name, _p7._0.name);
+				};
+			} else {
+				return function (vote) {
+					return false;
+				};
+			}
+		}();
 		var thisVoterCount = function () {
 			var possible = _elm_lang$core$List$head(
 				A2(_elm_lang$core$List$filter, testVote, paper.votes));
-			var _p2 = possible;
-			if (_p2.ctor === 'Just') {
-				return _p2._0.votes;
+			var _p8 = possible;
+			if (_p8.ctor === 'Just') {
+				return _p8._0.votes;
 			} else {
 				return 0;
 			}
@@ -11297,7 +11351,7 @@ var _jrootham$cabal_voting$PaperListing$displayPaper = F2(
 										ctor: '::',
 										_0: A3(
 											_jrootham$cabal_voting$Common$thinFlatButton,
-											model.debounce && (_elm_lang$core$Native_Utils.cmp(thisVoterCount, 0) > 0),
+											A2(_jrootham$cabal_voting$PaperListing$canDecrement, thisVoterCount, model),
 											_jrootham$cabal_voting$Types$DecrementVote(paper.id),
 											'-'),
 										_1: {
@@ -11314,7 +11368,7 @@ var _jrootham$cabal_voting$PaperListing$displayPaper = F2(
 														ctor: '::',
 														_0: A3(
 															_jrootham$cabal_voting$Common$thinFlatButton,
-															model.debounce && A2(_jrootham$cabal_voting$PaperListing$voteLimit, model, thisVoterCount),
+															A2(_jrootham$cabal_voting$PaperListing$canIncrement, thisVoterCount, model),
 															_jrootham$cabal_voting$Types$IncrementVote(paper.id),
 															'+'),
 														_1: {ctor: '[]'}
@@ -11386,24 +11440,12 @@ var _jrootham$cabal_voting$PaperListing$radioBase = F4(
 			});
 	});
 var _jrootham$cabal_voting$PaperListing$displayAdmin = function (model) {
-	return model.admin ? A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('group'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Admin'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+	var _p9 = model.currentUser;
+	if (_p9.ctor === 'Just') {
+		return _p9._0.admin ? A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
@@ -11414,15 +11456,80 @@ var _jrootham$cabal_voting$PaperListing$displayAdmin = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$LoadUsers, 'Users'),
+						_0: _elm_lang$html$Html$text('Admin'),
 						_1: {ctor: '[]'}
 					}),
-				_1: {ctor: '[]'}
-			}
-		}) : A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{ctor: '[]'});
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('group'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$LoadUsers, 'Users'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('group'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$CloseList, 'Close'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('group'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$OpenList, 'Open'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('group'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, model.debounce, _jrootham$cabal_voting$Types$UpdateRules, 'Rules'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}) : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	}
 };
 var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 	var sumVotes = function (voteList) {
@@ -11435,8 +11542,8 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 				voteList));
 	};
 	var compare = function () {
-		var _p3 = _jrootham$cabal_voting$Types$getPaperOrder(model);
-		switch (_p3.ctor) {
+		var _p10 = _jrootham$cabal_voting$Types$getPaperOrder(model);
+		switch (_p10.ctor) {
 			case 'Title':
 				return _jrootham$cabal_voting$PaperListing$totalOrder(
 					F2(
@@ -11482,7 +11589,16 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 							return _elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0;
 						}));
 			case 'Mine':
-				return _jrootham$cabal_voting$PaperListing$mineOrder(model.name);
+				var _p11 = model.currentUser;
+				if (_p11.ctor === 'Just') {
+					return _jrootham$cabal_voting$PaperListing$mineOrder(_p11._0.name);
+				} else {
+					return _jrootham$cabal_voting$PaperListing$totalOrder(
+						F2(
+							function (left, right) {
+								return _elm_lang$core$Native_Utils.cmp(left.submitter, right.submitter) < 0;
+							}));
+				}
 			default:
 				return _jrootham$cabal_voting$PaperListing$votes(
 					_jrootham$cabal_voting$Types$getVoter(model));
@@ -11491,6 +11607,7 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 	var radioSelected = _jrootham$cabal_voting$PaperListing$radioBase(
 		_jrootham$cabal_voting$Types$getPaperOrder(model));
 	var radio = radioSelected(true);
+	var _p12 = A2(_elm_lang$core$Debug$log, 'listing papers', model.paperModel.voterList);
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -11547,7 +11664,14 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 													_0: A2(radio, ' Submitter ', _jrootham$cabal_voting$Types$Submitter),
 													_1: {
 														ctor: '::',
-														_0: A2(radio, ' My Papers ', _jrootham$cabal_voting$Types$Mine),
+														_0: (!_elm_lang$core$Native_Utils.eq(model.currentUser, _elm_lang$core$Maybe$Nothing)) ? A2(radio, ' My Papers ', _jrootham$cabal_voting$Types$Mine) : A2(
+															_elm_lang$html$Html$div,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('group'),
+																_1: {ctor: '[]'}
+															},
+															{ctor: '[]'}),
 														_1: {
 															ctor: '::',
 															_0: A2(
@@ -11593,7 +11717,7 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 																							_1: {ctor: '[]'}
 																						});
 																				},
-																				_jrootham$cabal_voting$Types$getVoters(model))),
+																				_jrootham$cabal_voting$Types$getVoterList(model))),
 																		_1: {ctor: '[]'}
 																	}
 																}),
@@ -11698,7 +11822,7 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 												A2(
 													_elm_lang$core$List$sortWith,
 													compare,
-													_jrootham$cabal_voting$Types$getPapers(model)))
+													_jrootham$cabal_voting$Types$getPaperList(model)))
 										}),
 									_1: {ctor: '[]'}
 								}),
@@ -11711,7 +11835,7 @@ var _jrootham$cabal_voting$PaperListing$paperListPage = function (model) {
 };
 
 var _jrootham$cabal_voting$User$canSave = function (model) {
-	var _p0 = _jrootham$cabal_voting$Types$getUser(model);
+	var _p0 = _jrootham$cabal_voting$Types$getEditUser(model);
 	if (_p0.ctor === 'Just') {
 		return model.debounce && (!_elm_lang$core$Native_Utils.eq(_p0._0.name, ''));
 	} else {
@@ -11888,7 +12012,7 @@ var _jrootham$cabal_voting$User$userForm = F2(
 			});
 	});
 var _jrootham$cabal_voting$User$editUser = function (model) {
-	var _p1 = _jrootham$cabal_voting$Types$getUser(model);
+	var _p1 = _jrootham$cabal_voting$Types$getEditUser(model);
 	if (_p1.ctor === 'Just') {
 		return A2(_jrootham$cabal_voting$User$userForm, model, _p1._0);
 	} else {
@@ -12131,7 +12255,7 @@ var _jrootham$cabal_voting$Main$fetchReload = A5(_jrootham$cabal_voting$Main$fet
 var _jrootham$cabal_voting$Main$fetchLogin = A4(_jrootham$cabal_voting$Main$fetch, 'POST', 'login', true, _jrootham$cabal_voting$Types$UpdateLogin);
 var _jrootham$cabal_voting$Main$fetchRules = A5(_jrootham$cabal_voting$Main$fetch, 'POST', 'rules', true, _jrootham$cabal_voting$Types$RulesResult, _elm_lang$http$Http$emptyBody);
 var _jrootham$cabal_voting$Main$formatError = function (error) {
-	var _p0 = A2(_elm_lang$core$Debug$log, 'error', error);
+	var _p0 = error;
 	switch (_p0.ctor) {
 		case 'BadUrl':
 			return A2(_elm_lang$core$Basics_ops['++'], 'Bad URL ', _p0._0);
@@ -12144,42 +12268,6 @@ var _jrootham$cabal_voting$Main$formatError = function (error) {
 		default:
 			return A2(_elm_lang$core$Basics_ops['++'], 'Bad payload', _p0._0);
 	}
-};
-var _jrootham$cabal_voting$Main$updateLogin = F2(
-	function (model, response) {
-		var _p1 = _jrootham$cabal_voting$Parse$parseLogin(response);
-		if (_p1.ctor === 'Ok') {
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{admin: _p1._0.admin});
-		} else {
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{errorMessage: _p1._0});
-		}
-	});
-var _jrootham$cabal_voting$Main$updateRules = F2(
-	function (model, response) {
-		var _p2 = _jrootham$cabal_voting$Parse$parseRules(response);
-		if (_p2.ctor === 'Ok') {
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{rules: _p2._0, countDown: 0, page: _jrootham$cabal_voting$Types$Login});
-		} else {
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{errorMessage: _p2._0, countDown: 0});
-		}
-	});
-var _jrootham$cabal_voting$Main$bounce = function (model) {
-	return _elm_lang$core$Native_Utils.update(
-		model,
-		{debounce: false});
-};
-var _jrootham$cabal_voting$Main$debounce = function (model) {
-	return _elm_lang$core$Native_Utils.update(
-		model,
-		{debounce: true});
 };
 var _jrootham$cabal_voting$Main$getVoters = function (paperList) {
 	var insert = F2(
@@ -12203,28 +12291,92 @@ var _jrootham$cabal_voting$Main$getVoters = function (paperList) {
 };
 var _jrootham$cabal_voting$Main$updateModel = F2(
 	function (model, response) {
-		var _p3 = _jrootham$cabal_voting$Parse$parsePaperList(response);
-		if (_p3.ctor === 'Ok') {
-			var sortVoter = _elm_lang$core$Native_Utils.eq(
-				_jrootham$cabal_voting$Types$getVoter(model),
-				'') ? model.name : _jrootham$cabal_voting$Types$getVoter(model);
-			var papers = _p3._0.papers;
+		var _p1 = _jrootham$cabal_voting$Parse$parsePaperList(response);
+		if (_p1.ctor === 'Ok') {
+			var voter = _jrootham$cabal_voting$Types$getVoter(model);
+			var paperList = _p1._0.paperList;
+			var voterList = _jrootham$cabal_voting$Main$getVoters(paperList);
+			var sortVoter = function () {
+				if (_elm_lang$core$Native_Utils.eq(voter, '')) {
+					var _p2 = model.currentUser;
+					if (_p2.ctor === 'Just') {
+						return _p2._0.name;
+					} else {
+						var _p3 = _elm_lang$core$List$minimum(voterList);
+						if (_p3.ctor === 'Just') {
+							return _p3._0;
+						} else {
+							return '';
+						}
+					}
+				} else {
+					return voter;
+				}
+			}();
 			var temp = A2(
-				_jrootham$cabal_voting$Types$setVoters,
-				_jrootham$cabal_voting$Main$getVoters(papers),
+				_jrootham$cabal_voting$Types$setVoterList,
+				voterList,
 				A2(
 					_jrootham$cabal_voting$Types$setVoter,
 					sortVoter,
-					A2(_jrootham$cabal_voting$Types$setPapers, papers, model)));
+					A2(_jrootham$cabal_voting$Types$setPaperList, paperList, model)));
 			return _elm_lang$core$Native_Utils.update(
 				temp,
 				{errorMessage: '', page: _jrootham$cabal_voting$Types$List});
 		} else {
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{errorMessage: _p3._0});
+				{errorMessage: _p1._0});
 		}
 	});
+var _jrootham$cabal_voting$Main$updateLogin = F2(
+	function (model, response) {
+		var _p4 = _jrootham$cabal_voting$Parse$parseLogin(response);
+		if (_p4.ctor === 'Ok') {
+			var _p5 = model.currentUser;
+			if (_p5.ctor === 'Just') {
+				var newUser = _elm_lang$core$Native_Utils.update(
+					_p5._0,
+					{admin: _p4._0.admin});
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						currentUser: _elm_lang$core$Maybe$Just(newUser)
+					});
+			} else {
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{errorMessage: 'No user.  Should not happen'});
+			}
+		} else {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{errorMessage: _p4._0});
+		}
+	});
+var _jrootham$cabal_voting$Main$updateRules = F2(
+	function (model, response) {
+		var _p6 = _jrootham$cabal_voting$Parse$parseRules(response);
+		if (_p6.ctor === 'Ok') {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{rules: _p6._0, countDown: 0, page: _jrootham$cabal_voting$Types$Login});
+		} else {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{errorMessage: _p6._0, countDown: 0});
+		}
+	});
+var _jrootham$cabal_voting$Main$bounce = function (model) {
+	return _elm_lang$core$Native_Utils.update(
+		model,
+		{debounce: false});
+};
+var _jrootham$cabal_voting$Main$debounce = function (model) {
+	return _elm_lang$core$Native_Utils.update(
+		model,
+		{debounce: true});
+};
 var _jrootham$cabal_voting$Main$setLinkLink = F2(
 	function (link, text) {
 		return _elm_lang$core$Native_Utils.update(
@@ -12239,9 +12391,9 @@ var _jrootham$cabal_voting$Main$setLinkText = F2(
 	});
 var _jrootham$cabal_voting$Main$makeNewReference = F4(
 	function (setFunction, maybePaper, referenceIndex, newText) {
-		var _p4 = maybePaper;
-		if (_p4.ctor === 'Just') {
-			var _p5 = _p4._0;
+		var _p7 = maybePaper;
+		if (_p7.ctor === 'Just') {
+			var _p8 = _p7._0;
 			var setLink = function (reference) {
 				return _elm_lang$core$Native_Utils.eq(reference.index, referenceIndex) ? _elm_lang$core$Native_Utils.update(
 					reference,
@@ -12249,19 +12401,19 @@ var _jrootham$cabal_voting$Main$makeNewReference = F4(
 						link: A2(setFunction, reference.link, newText)
 					}) : reference;
 			};
-			var newReferences = A2(_elm_lang$core$List$map, setLink, _p5.references);
+			var newReferences = A2(_elm_lang$core$List$map, setLink, _p8.references);
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p5,
+					_p8,
 					{references: newReferences}));
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Main',
 				{
-					start: {line: 357, column: 5},
-					end: {line: 372, column: 52}
+					start: {line: 378, column: 5},
+					end: {line: 393, column: 52}
 				},
-				_p4)('Paper needs to be present');
+				_p7)('Paper needs to be present');
 		}
 	});
 var _jrootham$cabal_voting$Main$makeNewReferenceLink = _jrootham$cabal_voting$Main$makeNewReference(_jrootham$cabal_voting$Main$setLinkLink);
@@ -12274,44 +12426,44 @@ var _jrootham$cabal_voting$Main$makeSetIndex = F2(
 	});
 var _jrootham$cabal_voting$Main$deleteReference = F2(
 	function (maybePaper, referenceIndex) {
-		var _p7 = maybePaper;
-		if (_p7.ctor === 'Just') {
-			var _p8 = _p7._0;
+		var _p10 = maybePaper;
+		if (_p10.ctor === 'Just') {
+			var _p11 = _p10._0;
 			var setIndex = _jrootham$cabal_voting$Main$makeSetIndex(referenceIndex);
 			var trim = function (reference) {
 				return !_elm_lang$core$Native_Utils.eq(reference.index, referenceIndex);
 			};
-			var trimmedReferences = A2(_elm_lang$core$List$filter, trim, _p8.references);
+			var trimmedReferences = A2(_elm_lang$core$List$filter, trim, _p11.references);
 			var newReferences = A2(_elm_lang$core$List$map, setIndex, trimmedReferences);
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p8,
+					_p11,
 					{references: newReferences}));
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Main',
 				{
-					start: {line: 342, column: 5},
-					end: {line: 353, column: 52}
+					start: {line: 363, column: 5},
+					end: {line: 374, column: 52}
 				},
-				_p7)('Paper needs to be present');
+				_p10)('Paper needs to be present');
 		}
 	});
 var _jrootham$cabal_voting$Main$addReference = function (maybePaper) {
-	var _p10 = maybePaper;
-	if (_p10.ctor === 'Just') {
-		var _p12 = _p10._0;
+	var _p13 = maybePaper;
+	if (_p13.ctor === 'Just') {
+		var _p15 = _p13._0;
 		var maybeMax = _elm_lang$core$List$maximum(
 			A2(
 				_elm_lang$core$List$map,
 				function (reference) {
 					return reference.index;
 				},
-				_p12.references));
+				_p15.references));
 		var newIndex = function () {
-			var _p11 = maybeMax;
-			if (_p11.ctor === 'Just') {
-				return _p11._0 + 1;
+			var _p14 = maybeMax;
+			if (_p14.ctor === 'Just') {
+				return _p14._0 + 1;
 			} else {
 				return 1;
 			}
@@ -12322,32 +12474,32 @@ var _jrootham$cabal_voting$Main$addReference = function (maybePaper) {
 			A2(_jrootham$cabal_voting$Types$Link, '', ''));
 		return _elm_lang$core$Maybe$Just(
 			_elm_lang$core$Native_Utils.update(
-				_p12,
+				_p15,
 				{
-					references: {ctor: '::', _0: newReference, _1: _p12.references}
+					references: {ctor: '::', _0: newReference, _1: _p15.references}
 				}));
 	} else {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Main',
 			{
-				start: {line: 315, column: 5},
-				end: {line: 330, column: 52}
+				start: {line: 336, column: 5},
+				end: {line: 351, column: 52}
 			},
-			_p10)('Paper needs to be present');
+			_p13)('Paper needs to be present');
 	}
 };
 var _jrootham$cabal_voting$Main$makeNewPaperLink = F2(
 	function (maybePaper, newLink) {
-		var _p14 = maybePaper;
-		if (_p14.ctor === 'Just') {
-			var _p15 = _p14._0;
-			var oldPaper = _p15.paper;
+		var _p17 = maybePaper;
+		if (_p17.ctor === 'Just') {
+			var _p18 = _p17._0;
+			var oldPaper = _p18.paper;
 			var newPaper = _elm_lang$core$Native_Utils.update(
 				oldPaper,
 				{link: newLink});
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p15,
+					_p18,
 					{paper: newPaper}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -12355,16 +12507,16 @@ var _jrootham$cabal_voting$Main$makeNewPaperLink = F2(
 	});
 var _jrootham$cabal_voting$Main$makeNewPaperText = F2(
 	function (maybePaper, newText) {
-		var _p16 = maybePaper;
-		if (_p16.ctor === 'Just') {
-			var _p17 = _p16._0;
-			var oldPaper = _p17.paper;
+		var _p19 = maybePaper;
+		if (_p19.ctor === 'Just') {
+			var _p20 = _p19._0;
+			var oldPaper = _p20.paper;
 			var newPaper = _elm_lang$core$Native_Utils.update(
 				oldPaper,
 				{text: newText});
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p17,
+					_p20,
 					{paper: newPaper}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -12372,11 +12524,11 @@ var _jrootham$cabal_voting$Main$makeNewPaperText = F2(
 	});
 var _jrootham$cabal_voting$Main$makeNewComment = F2(
 	function (maybePaper, newComment) {
-		var _p18 = maybePaper;
-		if (_p18.ctor === 'Just') {
+		var _p21 = maybePaper;
+		if (_p21.ctor === 'Just') {
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p18._0,
+					_p21._0,
 					{comment: newComment}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -12384,11 +12536,11 @@ var _jrootham$cabal_voting$Main$makeNewComment = F2(
 	});
 var _jrootham$cabal_voting$Main$makeNewTitle = F2(
 	function (maybePaper, newTitle) {
-		var _p19 = maybePaper;
-		if (_p19.ctor === 'Just') {
+		var _p22 = maybePaper;
+		if (_p22.ctor === 'Just') {
 			return _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
-					_p19._0,
+					_p22._0,
 					{title: newTitle}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -12418,11 +12570,11 @@ var _jrootham$cabal_voting$Main$newPaper = function (submitter) {
 };
 var _jrootham$cabal_voting$Main$putUserList = F2(
 	function (model, response) {
-		var _p20 = _jrootham$cabal_voting$Parse$parseUserList(response);
-		if (_p20.ctor === 'Ok') {
+		var _p23 = _jrootham$cabal_voting$Parse$parseUserList(response);
+		if (_p23.ctor === 'Ok') {
 			var temp = A2(
 				_jrootham$cabal_voting$Types$setUserList,
-				_elm_lang$core$Maybe$Just(_p20._0.userList),
+				_elm_lang$core$Maybe$Just(_p23._0.userList),
 				model);
 			return _elm_lang$core$Native_Utils.update(
 				temp,
@@ -12430,13 +12582,13 @@ var _jrootham$cabal_voting$Main$putUserList = F2(
 		} else {
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{errorMessage: _p20._0});
+				{errorMessage: _p23._0});
 		}
 	});
 var _jrootham$cabal_voting$Main$updateUserValid = F3(
 	function (model, user, valid) {
 		return A2(
-			_jrootham$cabal_voting$Types$setUser,
+			_jrootham$cabal_voting$Types$setEditUser,
 			_elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
 					user,
@@ -12446,17 +12598,17 @@ var _jrootham$cabal_voting$Main$updateUserValid = F3(
 var _jrootham$cabal_voting$Main$updateUserAdmin = F3(
 	function (model, user, admin) {
 		return A2(
-			_jrootham$cabal_voting$Types$setUser,
+			_jrootham$cabal_voting$Types$setEditUser,
 			_elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
 					user,
 					{admin: admin})),
 			model);
 	});
-var _jrootham$cabal_voting$Main$updateUserName = F3(
+var _jrootham$cabal_voting$Main$updateEditUserName = F3(
 	function (model, user, name) {
 		return A2(
-			_jrootham$cabal_voting$Types$setUser,
+			_jrootham$cabal_voting$Types$setEditUser,
 			_elm_lang$core$Maybe$Just(
 				_elm_lang$core$Native_Utils.update(
 					user,
@@ -12465,9 +12617,9 @@ var _jrootham$cabal_voting$Main$updateUserName = F3(
 	});
 var _jrootham$cabal_voting$Main$updateUserField = F3(
 	function (update, model, value) {
-		var _p21 = _jrootham$cabal_voting$Types$getUser(model);
-		if (_p21.ctor === 'Just') {
-			return A3(update, model, _p21._0, value);
+		var _p24 = _jrootham$cabal_voting$Types$getEditUser(model);
+		if (_p24.ctor === 'Just') {
+			return A3(update, model, _p24._0, value);
 		} else {
 			return _elm_lang$core$Native_Utils.update(
 				model,
@@ -12476,8 +12628,8 @@ var _jrootham$cabal_voting$Main$updateUserField = F3(
 	});
 var _jrootham$cabal_voting$Main$update = F2(
 	function (msg, model) {
-		var _p22 = msg;
-		switch (_p22.ctor) {
+		var _p25 = msg;
+		switch (_p25.ctor) {
 			case 'Waiting':
 				return {
 					ctor: '_Tuple2',
@@ -12487,11 +12639,14 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'RulesResult':
-				if (_p22._0.ctor === 'Ok') {
+				if (_p25._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _jrootham$cabal_voting$Main$debounce(
-							A2(_jrootham$cabal_voting$Main$updateRules, model, _p22._0._0)),
+							A2(
+								_elm_lang$core$Debug$log,
+								'starting',
+								A2(_jrootham$cabal_voting$Main$updateRules, model, _p25._0._0))),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -12501,7 +12656,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									errorMessage: _jrootham$cabal_voting$Main$formatError(_p22._0._0)
+									errorMessage: _jrootham$cabal_voting$Main$formatError(_p25._0._0)
 								})),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -12511,23 +12666,46 @@ var _jrootham$cabal_voting$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{name: _p22._0}),
+						{
+							currentUser: _elm_lang$core$Maybe$Just(
+								_jrootham$cabal_voting$Types$newCurrentUser(_p25._0))
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'StartLogin':
-				return {
-					ctor: '_Tuple2',
-					_0: _jrootham$cabal_voting$Main$bounce(model),
-					_1: A2(
-						_jrootham$cabal_voting$Main$fetchLogin,
-						_jrootham$cabal_voting$Payload$loginPayload(model.name),
-						model)
-				};
-			case 'UpdateLogin':
-				if (_p22._0.ctor === 'Ok') {
+				var _p26 = model.currentUser;
+				if (_p26.ctor === 'Just') {
 					return {
 						ctor: '_Tuple2',
-						_0: A2(_jrootham$cabal_voting$Main$updateLogin, model, _p22._0._0),
+						_0: _jrootham$cabal_voting$Main$bounce(model),
+						_1: A2(
+							_jrootham$cabal_voting$Main$fetchLogin,
+							_jrootham$cabal_voting$Payload$loginPayload(_p26._0.name),
+							model)
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{errorMessage: 'No name entered'}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			case 'Guest':
+				return {
+					ctor: '_Tuple2',
+					_0: _jrootham$cabal_voting$Main$bounce(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{currentUser: _elm_lang$core$Maybe$Nothing})),
+					_1: _jrootham$cabal_voting$Main$fetchReload(model)
+				};
+			case 'UpdateLogin':
+				if (_p25._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: A2(_jrootham$cabal_voting$Main$updateLogin, model, _p25._0._0),
 						_1: _jrootham$cabal_voting$Main$fetchReload(model)
 					};
 				} else {
@@ -12537,17 +12715,17 @@ var _jrootham$cabal_voting$Main$update = F2(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									errorMessage: _jrootham$cabal_voting$Main$formatError(_p22._0._0)
+									errorMessage: _jrootham$cabal_voting$Main$formatError(_p25._0._0)
 								})),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			case 'FetchResult':
-				if (_p22._0.ctor === 'Ok') {
+				if (_p25._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _jrootham$cabal_voting$Main$debounce(
-							A2(_jrootham$cabal_voting$Main$updateModel, model, _p22._0._0)),
+							A2(_jrootham$cabal_voting$Main$updateModel, model, _p25._0._0)),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -12557,12 +12735,12 @@ var _jrootham$cabal_voting$Main$update = F2(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									errorMessage: _jrootham$cabal_voting$Main$formatError(_p22._0._0)
+									errorMessage: _jrootham$cabal_voting$Main$formatError(_p25._0._0)
 								})),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			case 'ClearFetch':
+			case 'ClearError':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -12571,18 +12749,29 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Add':
-				var temp = A2(
-					_jrootham$cabal_voting$Types$setEdit,
-					_elm_lang$core$Maybe$Just(
-						_jrootham$cabal_voting$Main$newPaper(model.name)),
-					model);
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						temp,
-						{page: _jrootham$cabal_voting$Types$Edit}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				var _p27 = model.currentUser;
+				if (_p27.ctor === 'Just') {
+					var temp = A2(
+						_jrootham$cabal_voting$Types$setEdit,
+						_elm_lang$core$Maybe$Just(
+							_jrootham$cabal_voting$Main$newPaper(_p27._0.name)),
+						model);
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							temp,
+							{page: _jrootham$cabal_voting$Types$Edit}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{errorMessage: 'No user.  Should not happen'}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
 			case 'Reload':
 				return {
 					ctor: '_Tuple2',
@@ -12592,13 +12781,13 @@ var _jrootham$cabal_voting$Main$update = F2(
 			case 'ChangeOrder':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_jrootham$cabal_voting$Types$setPaperOrder, _p22._0, model),
+					_0: A2(_jrootham$cabal_voting$Types$setPaperOrder, _p25._0, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeVoter':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_jrootham$cabal_voting$Types$setVoter, _p22._0, model),
+					_0: A2(_jrootham$cabal_voting$Types$setVoter, _p25._0, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'DoEdit':
@@ -12606,8 +12795,8 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_jrootham$cabal_voting$Types$setEdit,
 					A2(
 						_jrootham$cabal_voting$Main$getPaper,
-						_jrootham$cabal_voting$Types$getPapers(model),
-						_p22._0),
+						_jrootham$cabal_voting$Types$getPaperList(model),
+						_p25._0),
 					model);
 				return {
 					ctor: '_Tuple2',
@@ -12622,7 +12811,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_0: _jrootham$cabal_voting$Main$bounce(model),
 					_1: A2(
 						_jrootham$cabal_voting$Main$fetchClose,
-						_jrootham$cabal_voting$Payload$closePayload(_p22._0),
+						_jrootham$cabal_voting$Payload$closePayload(_p25._0),
 						model)
 				};
 			case 'IncrementVote':
@@ -12631,7 +12820,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_0: _jrootham$cabal_voting$Main$bounce(model),
 					_1: A2(
 						_jrootham$cabal_voting$Main$fetchVote,
-						_jrootham$cabal_voting$Payload$votePayload(_p22._0),
+						_jrootham$cabal_voting$Payload$votePayload(_p25._0),
 						model)
 				};
 			case 'DecrementVote':
@@ -12640,7 +12829,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_0: _jrootham$cabal_voting$Main$bounce(model),
 					_1: A2(
 						_jrootham$cabal_voting$Main$fetchUnvote,
-						_jrootham$cabal_voting$Payload$votePayload(_p22._0),
+						_jrootham$cabal_voting$Payload$votePayload(_p25._0),
 						model)
 				};
 			case 'InputTitle':
@@ -12651,7 +12840,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A2(
 							_jrootham$cabal_voting$Main$makeNewTitle,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0),
+							_p25._0),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12663,7 +12852,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A2(
 							_jrootham$cabal_voting$Main$makeNewPaperText,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0),
+							_p25._0),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12675,7 +12864,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A2(
 							_jrootham$cabal_voting$Main$makeNewPaperLink,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0),
+							_p25._0),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12687,7 +12876,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A2(
 							_jrootham$cabal_voting$Main$makeNewComment,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0),
+							_p25._0),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12709,7 +12898,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A2(
 							_jrootham$cabal_voting$Main$deleteReference,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0),
+							_p25._0),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12721,8 +12910,8 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A3(
 							_jrootham$cabal_voting$Main$makeNewReferenceText,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0,
-							_p22._1),
+							_p25._0,
+							_p25._1),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -12734,20 +12923,20 @@ var _jrootham$cabal_voting$Main$update = F2(
 						A3(
 							_jrootham$cabal_voting$Main$makeNewReferenceLink,
 							_jrootham$cabal_voting$Types$getEdit(model),
-							_p22._0,
-							_p22._1),
+							_p25._0,
+							_p25._1),
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Save':
-				var _p23 = _jrootham$cabal_voting$Types$getEdit(model);
-				if (_p23.ctor === 'Just') {
+				var _p28 = _jrootham$cabal_voting$Types$getEdit(model);
+				if (_p28.ctor === 'Just') {
 					return {
 						ctor: '_Tuple2',
 						_0: _jrootham$cabal_voting$Main$bounce(model),
 						_1: A2(
 							_jrootham$cabal_voting$Main$fetchSave,
-							_jrootham$cabal_voting$Payload$paperPayload(_p23._0),
+							_jrootham$cabal_voting$Payload$paperPayload(_p28._0),
 							model)
 					};
 				} else {
@@ -12777,14 +12966,14 @@ var _jrootham$cabal_voting$Main$update = F2(
 					_1: _jrootham$cabal_voting$Main$fetchUsers(model)
 				};
 			case 'ListUsers':
-				if (_p22._0.ctor === 'Ok') {
+				if (_p25._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _jrootham$cabal_voting$Main$debounce(
 							A2(
-								_jrootham$cabal_voting$Types$setUser,
+								_jrootham$cabal_voting$Types$setEditUser,
 								_elm_lang$core$Maybe$Nothing,
-								A2(_jrootham$cabal_voting$Main$putUserList, model, _p22._0._0))),
+								A2(_jrootham$cabal_voting$Main$putUserList, model, _p25._0._0))),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -12794,7 +12983,7 @@ var _jrootham$cabal_voting$Main$update = F2(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									errorMessage: _jrootham$cabal_voting$Main$formatError(_p22._0._0)
+									errorMessage: _jrootham$cabal_voting$Main$formatError(_p25._0._0)
 								})),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -12803,8 +12992,8 @@ var _jrootham$cabal_voting$Main$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
-						_jrootham$cabal_voting$Types$setUser,
-						_elm_lang$core$Maybe$Just(_p22._0),
+						_jrootham$cabal_voting$Types$setEditUser,
+						_elm_lang$core$Maybe$Just(_p25._0),
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{page: _jrootham$cabal_voting$Types$UserPage})),
@@ -12813,30 +13002,30 @@ var _jrootham$cabal_voting$Main$update = F2(
 			case 'UserName':
 				return {
 					ctor: '_Tuple2',
-					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateUserName, model, _p22._0),
+					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateEditUserName, model, _p25._0),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UserAdmin':
 				return {
 					ctor: '_Tuple2',
-					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateUserAdmin, model, _p22._0),
+					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateUserAdmin, model, _p25._0),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UserValid':
 				return {
 					ctor: '_Tuple2',
-					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateUserValid, model, _p22._0),
+					_0: A3(_jrootham$cabal_voting$Main$updateUserField, _jrootham$cabal_voting$Main$updateUserValid, model, _p25._0),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdateUser':
-				var _p24 = _jrootham$cabal_voting$Types$getUser(model);
-				if (_p24.ctor === 'Just') {
+				var _p29 = _jrootham$cabal_voting$Types$getEditUser(model);
+				if (_p29.ctor === 'Just') {
 					return {
 						ctor: '_Tuple2',
 						_0: _jrootham$cabal_voting$Main$bounce(model),
 						_1: A2(
 							_jrootham$cabal_voting$Main$fetchUpdateUser,
-							_jrootham$cabal_voting$Payload$userPayload(_p24._0),
+							_jrootham$cabal_voting$Payload$userPayload(_p29._0),
 							model)
 					};
 				} else {
@@ -12852,14 +13041,14 @@ var _jrootham$cabal_voting$Main$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
-						_jrootham$cabal_voting$Types$setUser,
+						_jrootham$cabal_voting$Types$setEditUser,
 						_elm_lang$core$Maybe$Nothing,
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{page: _jrootham$cabal_voting$Types$Users})),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ShutUserList':
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
@@ -12870,30 +13059,42 @@ var _jrootham$cabal_voting$Main$update = F2(
 							{page: _jrootham$cabal_voting$Types$List})),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'CloseList':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'OpenList':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _jrootham$cabal_voting$Main$ifError = F2(
 	function (page, model) {
-		if (_elm_lang$core$Native_Utils.eq(model.errorMessage, '')) {
-			var _p25 = A2(_elm_lang$core$Debug$log, 'page', page);
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{
+		return _elm_lang$core$Native_Utils.eq(model.errorMessage, '') ? page(model) : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(model.errorMessage),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
 					ctor: '::',
-					_0: page(model),
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A3(_jrootham$cabal_voting$Common$normalFlatButton, true, _jrootham$cabal_voting$Types$ClearError, 'Clear Error'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
-				});
-		} else {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(model.errorMessage),
-					_1: {ctor: '[]'}
-				});
-		}
+				}
+			});
 	});
 var _jrootham$cabal_voting$Main$view = function (model) {
 	return A2(
@@ -12923,8 +13124,8 @@ var _jrootham$cabal_voting$Main$view = function (model) {
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p26 = model.page;
-					switch (_p26.ctor) {
+					var _p30 = model.page;
+					switch (_p30.ctor) {
 						case 'Wait':
 							return A2(_jrootham$cabal_voting$Main$ifError, _jrootham$cabal_voting$Wait$waitPage, model);
 						case 'Login':

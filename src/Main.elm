@@ -8,6 +8,7 @@ import Date
 import Set
 
 import Types exposing (..)
+import Common exposing (normalFlatButton)
 import Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList)
 import Payload exposing (loginPayload, paperPayload, votePayload, closePayload, userPayload)
 import Wait exposing (waitPage)
@@ -33,7 +34,7 @@ init target =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     if model.countDown > 0 then
-        times (\time -> Waiting)
+        times (\ time -> Waiting)
     else
         Sub.none
 
@@ -67,14 +68,11 @@ view model =
 ifError : (Model -> Html Msg) -> Model -> Html Msg
 ifError page model =
     if model.errorMessage == "" then
-        let
-            _ = Debug.log "page" page
-                
-        in
-                
-        div [] [ page model ]
+        page model
     else
-        div [] [text model.errorMessage]
+        div []  [ div [] [text model.errorMessage]
+                , div [] [normalFlatButton True ClearError "Clear Error"]
+                ]
 
 
 -- UPDATE
@@ -88,7 +86,7 @@ update msg model =
             ({model | countDown = model.countDown - 1}, Cmd.none)
 
         RulesResult (Ok response) ->
-            (debounce (updateRules model response), Cmd.none)
+            (debounce (Debug.log "starting" (updateRules model response)), Cmd.none)
 
         RulesResult (Err error) ->
             (debounce {model | errorMessage = formatError error}, Cmd.none )
@@ -96,10 +94,18 @@ update msg model =
 --  Login page updates
 
         Name newName ->
-            ( { model | name = newName}, Cmd.none)
+            ({model | currentUser = Just (newCurrentUser newName)}, Cmd.none)
 
         StartLogin ->
-            (bounce model, fetchLogin (loginPayload model.name) model)
+            case model.currentUser of
+                Just user ->
+                    (bounce model, fetchLogin (loginPayload user.name) model)
+
+                Nothing ->
+                    ({model | errorMessage = "No name entered"} , Cmd.none)
+
+        Guest ->
+            (bounce {model | currentUser = Nothing}, fetchReload model)
 
         UpdateLogin (Ok response) ->
             (updateLogin model response, fetchReload model)
@@ -114,17 +120,22 @@ update msg model =
         FetchResult (Err error) ->
             (debounce { model | errorMessage = formatError error}, Cmd.none )
 
-        ClearFetch ->
+        ClearError ->
             ( { model | errorMessage = "" }, Cmd.none )
 
 --  List page updates
 
         Add ->
-            let
-                temp = setEdit (Just (newPaper model.name)) model
-            in
-                    
-            ({temp | page = Edit}, Cmd.none)
+            case model.currentUser of
+                Just user ->
+                    let
+                        temp = setEdit (Just (newPaper user.name)) model
+                    in
+                            
+                    ({temp | page = Edit}, Cmd.none)
+
+                Nothing ->
+                    ({model | errorMessage = "No user.  Should not happen"}, Cmd.none)
 
         Reload ->
             (bounce model, fetchReload model)
@@ -137,7 +148,7 @@ update msg model =
 
         DoEdit id ->
             let
-                temp = setEdit (getPaper (getPapers model) id) model
+                temp = setEdit (getPaper (getPaperList model) id) model
             in
                 ({temp | page = Edit}, Cmd.none)
 
@@ -190,16 +201,16 @@ update msg model =
             (bounce model, fetchUsers model)
 
         ListUsers (Ok response) ->
-            (debounce (setUser Nothing (putUserList model response)), Cmd.none)
+            (debounce (setEditUser Nothing (putUserList model response)), Cmd.none)
 
         ListUsers (Err error) ->
             (debounce { model | errorMessage = formatError error}, Cmd.none )
 
         EditUser user ->
-            (setUser (Just user) {model | page = UserPage}, Cmd.none)   
+            (setEditUser (Just user) {model | page = UserPage}, Cmd.none)   
 
         UserName name ->
-            (updateUserField updateUserName model name, Cmd.none)
+            (updateUserField updateEditUserName model name, Cmd.none)
 
         UserAdmin admin ->
             (updateUserField updateUserAdmin model admin, Cmd.none)
@@ -208,7 +219,7 @@ update msg model =
             (updateUserField updateUserValid model valid, Cmd.none)
 
         UpdateUser ->
-            case getUser model of
+            case getEditUser model of
                 Just user ->
                     (bounce model, fetchUpdateUser (userPayload user) model)
 
@@ -216,31 +227,41 @@ update msg model =
                     ({model | errorMessage = "No user.  Should not happen"}, Cmd.none)
 
         CloseUser ->
-            (setUser Nothing {model | page = Users}, Cmd.none)
+            (setEditUser Nothing {model | page = Users}, Cmd.none)
 
         ShutUserList ->
-            (setUserList Nothing {model | page = List}, Cmd.none)            
+            (setUserList Nothing {model | page = List}, Cmd.none)
+
+        CloseList ->
+            (model, Cmd.none)       
+
+        OpenList ->
+            (model, Cmd.none)       
+
+        UpdateRules ->
+            (model, Cmd.none)       
+
 
 updateUserField : (Model -> User -> a -> Model) -> Model -> a -> Model
 updateUserField update model value =
-    case getUser model of
+    case getEditUser model of
         Just user ->
             update model user value
 
         Nothing ->
             {model | errorMessage = "No user.  Should not happen"}
 
-updateUserName : Model -> User -> String -> Model
-updateUserName model user name =
-    setUser (Just {user | name = name}) model
+updateEditUserName : Model -> User -> String -> Model
+updateEditUserName model user name =
+    setEditUser (Just {user | name = name}) model
 
 updateUserAdmin : Model -> User -> Bool -> Model
 updateUserAdmin model user admin =
-    setUser (Just {user | admin = admin}) model
+    setEditUser (Just {user | admin = admin}) model
     
 updateUserValid : Model -> User -> Bool -> Model
 updateUserValid model user valid =
-    setUser (Just {user | valid = valid}) model
+    setEditUser (Just {user | valid = valid}) model
     
 
 putUserList : Model -> String -> Model
@@ -382,17 +403,6 @@ setLinkLink link text =
 makeNewReferenceLink = makeNewReference setLinkLink
 makeNewReferenceText = makeNewReference setLinkText
 
-getVoters : List Paper -> List String
-getVoters paperList = 
-    let
-        insert : Vote -> (Set.Set String) -> Set.Set String
-        insert = \ vote nameSet -> Set.insert vote.name nameSet
-        inner:  (List Vote) -> (Set.Set String) -> Set.Set String
-        inner = \ voteList nameSet-> List.foldl insert nameSet voteList
-        nameSet = List.foldl (\ paper nameSet-> inner paper.votes nameSet) (Set.fromList []) paperList 
-    in
-        Set.toList nameSet
-
 
 debounce : Model -> Model
 debounce model = 
@@ -401,6 +411,7 @@ debounce model =
 bounce : Model -> Model
 bounce model = 
     {model | debounce = False}
+
 
 updateRules: Model -> String -> Model
 updateRules model response =
@@ -415,28 +426,62 @@ updateLogin : Model -> String -> Model
 updateLogin model response =
     case parseLogin response of
         Ok admin ->
-            {model | admin = admin.admin}
+            case model.currentUser of
+                Just user ->
+                    let
+                        newUser = {user | admin = admin.admin}                            
+                    in
+                        {model | currentUser = Just newUser}
 
+                Nothing ->
+                    {model | errorMessage = "No user.  Should not happen"}
+                            
         Err error ->
             {model | errorMessage = error}
+
+getVoters : List Paper -> List String
+getVoters paperList = 
+    let
+        insert : Vote -> (Set.Set String) -> Set.Set String
+        insert = \ vote nameSet -> Set.insert vote.name nameSet
+        inner:  (List Vote) -> (Set.Set String) -> Set.Set String
+        inner = \ voteList nameSet-> List.foldl insert nameSet voteList
+        nameSet = List.foldl (\ paper nameSet-> inner paper.votes nameSet) (Set.fromList []) paperList 
+    in
+        Set.toList nameSet
 
 updateModel : Model -> String -> Model
 updateModel model response =
     case parsePaperList response of
-        Ok paperList ->
+        Ok paperInput ->
             let
-                papers = paperList.papers
+                paperList = paperInput.paperList
+                
+                voterList = getVoters paperList
+
+                voter = getVoter model
 
                 sortVoter = 
-                    if (getVoter model) == "" then
-                        model.name
-                    else
-                        getVoter model
+                    if voter == "" then
 
-                temp = setVoters (getVoters papers) (setVoter sortVoter (setPapers papers model))
-            in
-                    
-            {temp | errorMessage = "", page = List}
+                        case model.currentUser of
+                            Just user ->
+                                user.name
+
+                            Nothing ->
+                                case List.minimum voterList of
+                                    Just voter ->
+                                        voter
+
+                                    Nothing ->
+                                        ""
+                    else
+                        voter
+
+                temp = setVoterList voterList (setVoter sortVoter (setPaperList paperList model))
+
+            in                
+                {temp | errorMessage = "", page = List}
 
         Err error ->
             { model | errorMessage = error }
@@ -444,7 +489,7 @@ updateModel model response =
 
 formatError : Error -> String
 formatError error =
-    case (Debug.log "error" error) of
+    case error of
         Http.BadUrl url ->
             "Bad URL " ++ url
 
