@@ -127,7 +127,7 @@
 )
 
 (defn fill-data [db]
-	(update! db :users {:user_admin true} ["name=?" "jrootham"])
+	(update! db :users {:admin true} ["name=?" "jrootham"])
 	(insert! db :config {:max_papers 5, :max_votes 15, :max_votes_per_paper 5})
 )
 
@@ -157,7 +157,7 @@
          ]
 
 
-	(http/post "https://api.github.com/graphql" options
+		(http/post "https://api.github.com/graphql" options
           	(fn [{:keys [status headers body error]}] ;; asynchronous response handling
             	(if error
               		(println "Failed, exception is " error)
