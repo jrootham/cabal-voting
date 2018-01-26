@@ -1,4 +1,5 @@
-module Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList)
+module Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList,parseClosedPaperList
+    ,parseOpenPaperList)
 
 import Json.Decode exposing (Decoder, decodeString, int, string, bool, list, succeed, fail, andThen)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -7,6 +8,40 @@ import Result
 import Date
 
 import Types exposing (..)
+
+parseClosedPaperList : String -> Result String ClosedPaperList
+parseClosedPaperList responseString =
+    decodeString decodeClosedPaperList responseString
+
+decodeClosedPaperList : Decoder ClosedPaperList
+decodeClosedPaperList =
+    decode ClosedPaperList
+        |> required "paper_list" (list decodeClosedPaper)
+
+decodeClosedPaper : Decoder ClosedPaper
+decodeClosedPaper =
+    decode ClosedPaper
+        |> required "paper_id" int
+        |> required "closed_at" dateDecoder
+        |> required "title" string
+        |> required "paper_comment" string
+
+parseOpenPaperList : String -> Result String OpenPaperList
+parseOpenPaperList responseString =
+    decodeString decodeOpenPaperList responseString
+
+decodeOpenPaperList : Decoder OpenPaperList
+decodeOpenPaperList =
+    decode OpenPaperList
+        |> required "paper_list" (list decodeOpenPaper)
+
+decodeOpenPaper : Decoder OpenPaper
+decodeOpenPaper =
+    decode OpenPaper
+        |> required "paper_id" int
+        |> required "title" string
+        |> required "paper_comment" string
+        |> required "total_votes" int
 
 parseUserList : String -> Result String UserList 
 parseUserList responseString =

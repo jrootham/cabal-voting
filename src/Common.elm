@@ -1,4 +1,5 @@
-module Common exposing (flatButton, normalFlatButton, wideFlatButton, widerFlatButton, thinFlatButton, makeLink)
+module Common exposing (flatButton, normalFlatButton, wideFlatButton, widerFlatButton, thinFlatButton, makeLink
+    , flipOrder)
 
 import Html exposing (Html, a, button, text)
 import Html.Attributes  exposing (class, href, target)
@@ -27,3 +28,9 @@ makeLink: Link -> Html msg
 makeLink link =
     a [(href link.link), (target "_blank")] [text link.text]
 
+flipOrder: Order -> Order
+flipOrder order =
+    case order of
+      LT -> GT
+      EQ -> EQ
+      GT -> LT

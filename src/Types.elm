@@ -28,6 +28,8 @@ type alias Model =
     , debounce : Bool
     , paperModel : PaperModel
     , userModel : UserModel
+    , openPaperList : Maybe (List OpenPaper)
+    , closedPaperList : Maybe (List ClosedPaper)
     }
 
 initialModel target =
@@ -36,7 +38,7 @@ initialModel target =
         paperModel = PaperModel [] Title "" [] Nothing
         userModel = UserModel Nothing Nothing
     in
-    Model target rules Wait totalCount Nothing "" True paperModel userModel
+    Model target rules Wait totalCount Nothing "" True paperModel userModel Nothing Nothing
  
 getPaperList : Model -> List Paper
 getPaperList model =
@@ -151,7 +153,7 @@ type PaperOrder
     | Mine
     | Voter
 
-type Page = Wait | Login | List | Edit | Users | UserPage
+type Page = Wait | Login | List | Edit | Users | UserPage | OpenListPage | ClosedListPage
 
 type Msg
     = Waiting
@@ -189,9 +191,15 @@ type Msg
     | UpdateUser
     | CloseUser
     | ShutUserList
-    | CloseList
     | OpenList
-    | UpdateRules
+    | ListOpen (Result Http.Error String)
+    | AdminClose Int
+    | ShutOpenList
+    | ClosedList
+    | ListClosed (Result Http.Error String)
+    | AdminOpen Int
+    | ShutClosedList
+    | ShowRules
 
 type alias PaperList = {paperList: List Paper}
 
@@ -239,3 +247,23 @@ newCurrentUser name =
     User 0 name True False
 
 type alias UserList = {userList : List User}
+
+type alias ClosedPaper =
+    { id : Int
+    , closedAt : Date.Date
+    , title : String
+    , comment : String
+    }
+
+type alias ClosedPaperList = {paperList : List ClosedPaper}
+
+type alias OpenPaper =
+    { id : Int
+    , title : String
+    , comment : String
+    , totalVotes : Int
+    }
+
+type alias OpenPaperList = {paperList : List OpenPaper}
+
+    

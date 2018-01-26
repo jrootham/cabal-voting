@@ -1,4 +1,4 @@
-module Payload exposing (loginPayload, paperPayload, votePayload, closePayload, userPayload)
+module Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload)
 
 import Json.Encode exposing (Value, object, string, int, bool, list)
 import Http exposing (Body, jsonBody)
@@ -48,12 +48,8 @@ referenceListContents : (List Reference) -> Value
 referenceListContents references =
   list (List.map (\ reference -> referenceContents reference) references)
 
-votePayload : Int -> Body
-votePayload paperId = 
-  jsonBody (object [("paper_id", int paperId)])
-
-closePayload : Int -> Body
-closePayload paperId = 
+paperIdPayload : Int -> Body
+paperIdPayload paperId = 
   jsonBody (object [("paper_id", int paperId)])
 
 

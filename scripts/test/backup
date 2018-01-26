@@ -1,0 +1,5 @@
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/heroku/bin/heroku
+
+cd /home/jrootham/test/cabalVoting/backups
+
+heroku pg:backups:download --app test-voting-server

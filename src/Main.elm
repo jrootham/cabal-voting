@@ -9,13 +9,15 @@ import Set
 
 import Types exposing (..)
 import Common exposing (normalFlatButton)
-import Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList)
-import Payload exposing (loginPayload, paperPayload, votePayload, closePayload, userPayload)
+import Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList, parseOpenPaperList
+    , parseClosedPaperList)
+import Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload)
 import Wait exposing (waitPage)
 import Login exposing (loginPage)
 import PaperListing exposing (paperListPage)
 import Edit exposing (editPage)
 import User exposing (userPage, editUser)
+import AdminPaper exposing (openList, closedList)
 
 main =
     Html.programWithFlags { init = init, view = view, update = update, subscriptions = subscriptions }
@@ -62,6 +64,12 @@ view model =
 
             UserPage ->
                 ifError editUser model
+
+            OpenListPage ->
+                ifError openList model
+
+            ClosedListPage ->
+                ifError closedList model
         ]
 
 
@@ -86,7 +94,7 @@ update msg model =
             ({model | countDown = model.countDown - 1}, Cmd.none)
 
         RulesResult (Ok response) ->
-            (debounce (Debug.log "starting" (updateRules model response)), Cmd.none)
+            (debounce (updateRules model response), Cmd.none)
 
         RulesResult (Err error) ->
             (debounce {model | errorMessage = formatError error}, Cmd.none )
@@ -153,13 +161,13 @@ update msg model =
                 ({temp | page = Edit}, Cmd.none)
 
         Close id ->
-            (bounce model, fetchClose (closePayload id) model)
+            (bounce model, fetchClose (paperIdPayload id) model)
 
         IncrementVote id ->
-            (bounce model, fetchVote (votePayload id) model)
+            (bounce model, fetchVote (paperIdPayload id) model)
 
         DecrementVote id ->
-            (bounce model, fetchUnvote (votePayload id) model)
+            (bounce model, fetchUnvote (paperIdPayload id) model)
 
 --  Edit page updates
 
@@ -232,14 +240,57 @@ update msg model =
         ShutUserList ->
             (setUserList Nothing {model | page = List}, Cmd.none)
 
-        CloseList ->
-            (model, Cmd.none)       
-
         OpenList ->
+            (bounce model, fetchOpenList model)   
+
+        ListOpen  (Ok response) ->
+            (debounce (displayOpenList response model), Cmd.none)    
+
+        ListOpen (Err error) ->
+            (debounce { model | errorMessage = formatError error}, Cmd.none)
+
+        AdminClose paperId ->
+            (bounce model, fetchAdminClose (paperIdPayload paperId) model)
+
+        ShutOpenList ->
+            (bounce {model | page = List, openPaperList = Nothing}, fetchReload model)
+
+        ClosedList ->
+            (bounce model, fetchClosedList model)       
+
+        ListClosed  (Ok response) ->
+            (debounce (displayClosedList response model), Cmd.none)    
+
+        ListClosed (Err error) ->
+            (debounce { model | errorMessage = formatError error}, Cmd.none)
+
+        AdminOpen paperId ->
+            (bounce model, fetchAdminOpen (paperIdPayload paperId) model)
+
+        ShutClosedList ->
+            (bounce {model | page = List, closedPaperList = Nothing}, fetchReload model)
+
+        ShowRules ->
             (model, Cmd.none)       
 
-        UpdateRules ->
-            (model, Cmd.none)       
+displayClosedList: String -> Model -> Model
+displayClosedList response model =
+    case parseClosedPaperList response of
+        Ok closedList ->
+            {model | page = ClosedListPage, closedPaperList = Just closedList.paperList}
+
+        Err error ->
+            {model | errorMessage = error}
+
+
+displayOpenList: String -> Model -> Model
+displayOpenList response model =
+    case parseOpenPaperList response of
+        Ok openList ->
+            {model | page = OpenListPage, openPaperList = Just openList.paperList}
+
+        Err error ->
+            {model | errorMessage = error}
 
 
 updateUserField : (Model -> User -> a -> Model) -> Model -> a -> Model
@@ -523,6 +574,14 @@ fetchSave = fetch "POST" "save" True FetchResult
 fetchUsers = fetch "POST" "userList" True ListUsers emptyBody
 
 fetchUpdateUser = fetch "POST" "updateUser" True ListUsers
+
+fetchOpenList = fetch "POST" "openList" True ListOpen emptyBody
+
+fetchAdminClose = fetch "POST" "adminClose" True ListOpen
+
+fetchClosedList = fetch "POST" "closedList" True ListClosed emptyBody
+
+fetchAdminOpen = fetch "POST" "adminUnclose" True ListClosed
 
 fetch : String -> String -> Bool -> (Result Error String -> Msg) -> Body -> Model -> Cmd Msg
 fetch method route credential action body model =

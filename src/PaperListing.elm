@@ -11,8 +11,6 @@ import Common exposing (normalFlatButton, thinFlatButton, makeLink)
 paperListPage : Model -> Html Msg
 paperListPage model =
     let
-        _ = Debug.log "listing papers" model.paperModel.voterList
-
         radioSelected =
             radioBase (getPaperOrder model)
 
@@ -114,9 +112,9 @@ displayAdmin model =
                 [
                       div [class "group"]  [text "Admin"]
                     , div [class "group"]  [normalFlatButton model.debounce LoadUsers "Users"]
-                    , div [class "group"]  [normalFlatButton model.debounce CloseList "Close"]
-                    , div [class "group"]  [normalFlatButton model.debounce OpenList "Open"]
-                    , div [class "group"]  [normalFlatButton model.debounce UpdateRules "Rules"]
+                    , div [class "group"]  [normalFlatButton model.debounce OpenList "Close"]
+                    , div [class "group"]  [normalFlatButton model.debounce ClosedList "Open"]
+                    , div [class "group"]  [normalFlatButton model.debounce ShowRules "Rules"]
                 ]
             else
                 div [] []
