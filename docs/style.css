@@ -26,7 +26,7 @@ h5
 .contents
 {
 	margin: 5px;
-	width:	40em;
+	max-width:	40em;
 }
 
 .vote
@@ -44,7 +44,7 @@ h5
 
 .entry
 {
-	margin-top: 20px;
+	padding-top: 40px;
 }
 
 .submitter
@@ -64,6 +64,7 @@ h5
 	background-color: blue;
 	padding: 2px;
 	margin: 2px;
+	text-align: center;
 }
 
 .normal
@@ -83,7 +84,7 @@ h5
 
 .thin
 {
-	width: 1em;
+	width: 1.5em;
 }
 
 .flat-enabled
@@ -96,3 +97,18 @@ h5
 	color: grey;
 }
 
+.group
+{
+	display: inline-block;
+}
+
+.column
+{
+	vertical-align: top;
+	padding-top: 20px;
+}
+
+.vote-name
+{
+	min-width: 10em;
+}
