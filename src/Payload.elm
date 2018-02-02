@@ -1,9 +1,21 @@
-module Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload)
+module Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload, rulesPayload)
 
 import Json.Encode exposing (Value, object, string, int, bool, list)
 import Http exposing (Body, jsonBody)
 
 import Types exposing(..)
+
+rulesPayload : Rules -> Body
+rulesPayload rules =
+  jsonBody (object [("rules", rulesContents rules)])
+
+rulesContents : Rules -> Value
+rulesContents rules =
+  object
+    [ ("max_papers", int rules.maxPapers)
+    , ("max_votes", int rules.maxVotes)
+    , ("max_per_paper", int rules.maxPerPaper)
+    ]
 
 userPayload : User -> Body
 userPayload user = 

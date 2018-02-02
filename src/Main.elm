@@ -11,13 +11,14 @@ import Types exposing (..)
 import Common exposing (normalFlatButton)
 import Parse exposing (parsePaperList, parseRules, parseLogin, parseUserList, parseOpenPaperList
     , parseClosedPaperList)
-import Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload)
+import Payload exposing (loginPayload, paperPayload, paperIdPayload, userPayload, rulesPayload)
 import Wait exposing (waitPage)
 import Login exposing (loginPage)
 import PaperListing exposing (paperListPage)
 import Edit exposing (editPage)
 import User exposing (userPage, editUser)
 import AdminPaper exposing (openList, closedList)
+import RulesPage exposing (editRules)
 
 main =
     Html.programWithFlags { init = init, view = view, update = update, subscriptions = subscriptions }
@@ -70,6 +71,9 @@ view model =
 
             ClosedListPage ->
                 ifError closedList model
+
+            EditRulesPage ->
+                editRules model
         ]
 
 
@@ -271,7 +275,48 @@ update msg model =
             (bounce {model | page = List, closedPaperList = Nothing}, fetchReload model)
 
         ShowRules ->
-            (model, Cmd.none)       
+            (bounce model, fetchEditRules model)    
+
+        EditRules  (Ok response) ->
+            (debounce (displayRules response model), Cmd.none)    
+
+        EditRules (Err error) ->
+            (debounce { model | errorMessage = formatError error}, Cmd.none)
+
+        MaxPapers maxPapers ->
+            (setEditMaxPapers model maxPapers, Cmd.none)
+
+        MaxVotes maxVotes ->
+            (setEditMaxVotes model maxVotes, Cmd.none)
+
+        MaxPerPaper maxPerPaper ->
+            (setEditMaxPerPaper model maxPerPaper, Cmd.none)
+
+        SaveRules ->
+            saveRules model
+
+        ShutRules ->
+            (bounce {model | page = List, editRules = Nothing}, fetchReload model)
+
+saveRules: Model -> (Model, Cmd Msg)
+saveRules model =
+    case makeRules model.editRules of
+        Ok rules ->
+            (bounce model, fetchUpdateRules (rulesPayload rules) model)
+
+        Err error ->
+            ({model | errorMessage = error}, Cmd.none)
+
+displayRules: String -> Model -> Model
+displayRules response model =
+    case parseRules response of
+        Ok rules ->
+            {model | page = EditRulesPage, editRules = Just (makeRulesBuffer rules)}
+
+        Err error ->
+            {model | errorMessage = error}
+
+
 
 displayClosedList: String -> Model -> Model
 displayClosedList response model =
@@ -281,7 +326,6 @@ displayClosedList response model =
 
         Err error ->
             {model | errorMessage = error}
-
 
 displayOpenList: String -> Model -> Model
 displayOpenList response model =
@@ -582,6 +626,10 @@ fetchAdminClose = fetch "POST" "adminClose" True ListOpen
 fetchClosedList = fetch "POST" "closedList" True ListClosed emptyBody
 
 fetchAdminOpen = fetch "POST" "adminUnclose" True ListClosed
+
+fetchEditRules = fetch "POST" "rules" True EditRules emptyBody
+
+fetchUpdateRules = fetch "POST" "updateRules" True EditRules
 
 fetch : String -> String -> Bool -> (Result Error String -> Msg) -> Body -> Model -> Cmd Msg
 fetch method route credential action body model =

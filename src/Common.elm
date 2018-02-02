@@ -3,7 +3,7 @@ module Common exposing (flatButton, normalFlatButton, wideFlatButton, widerFlatB
 
 import Html exposing (Html, a, button, text)
 import Html.Attributes  exposing (class, href, target)
-import Html.Events  exposing (onClick)
+import Html.Events exposing (onClick)
 
 import Types exposing (..)
 
@@ -17,7 +17,7 @@ flatButton otherClass enabled click label =
                 [class "flat-disabled"]
     in
             
-    button (List.append [class "flat-button", class otherClass] others) [text label]
+        button (List.append [class "flat-button", class otherClass] others) [text label]
 
 normalFlatButton = flatButton "normal"
 wideFlatButton = flatButton "wide"
@@ -31,6 +31,7 @@ makeLink link =
 flipOrder: Order -> Order
 flipOrder order =
     case order of
-      LT -> GT
-      EQ -> EQ
-      GT -> LT
+        LT -> GT
+        EQ -> EQ
+        GT -> LT
+

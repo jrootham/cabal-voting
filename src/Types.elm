@@ -30,6 +30,7 @@ type alias Model =
     , userModel : UserModel
     , openPaperList : Maybe (List OpenPaper)
     , closedPaperList : Maybe (List ClosedPaper)
+    , editRules : Maybe RulesBuffer
     }
 
 initialModel target =
@@ -38,7 +39,7 @@ initialModel target =
         paperModel = PaperModel [] Title "" [] Nothing
         userModel = UserModel Nothing Nothing
     in
-    Model target rules Wait totalCount Nothing "" True paperModel userModel Nothing Nothing
+        Model target rules Wait totalCount Nothing "" True paperModel userModel Nothing Nothing Nothing
  
 getPaperList : Model -> List Paper
 getPaperList model =
@@ -122,7 +123,7 @@ setEditUser user model =
         temp = model.userModel
         userModel = {temp | user = user}
     in
-    {model | userModel = userModel}
+        {model | userModel = userModel}
 
 
 type alias Rules =
@@ -130,6 +131,111 @@ type alias Rules =
     , maxVotes: Int
     , maxPerPaper: Int
     }
+
+type alias RulesBuffer =
+    { maxPapers: String
+    , maxVotes: String
+    , maxPerPaper: String
+    }
+
+makeRulesBuffer: Rules -> RulesBuffer
+makeRulesBuffer rules =
+    RulesBuffer (toString rules.maxPapers) (toString rules.maxVotes) (toString rules.maxPerPaper)
+
+makeMaxPapers: Rules -> RulesBuffer -> Result String Rules
+makeMaxPapers rules rulesBuffer =
+    case String.toInt rulesBuffer.maxPapers of
+        Ok maxPapers ->
+            Ok {rules | maxPapers = maxPapers}
+
+        Err error ->
+            Err error
+
+makeMaxVotes: Result String Rules -> RulesBuffer -> Result String Rules
+makeMaxVotes result rulesBuffer =
+    case result of
+        Ok rules ->
+            case String.toInt rulesBuffer.maxVotes of
+                Ok maxVotes ->
+                    Ok {rules | maxVotes = maxVotes}
+
+                Err error ->
+                    Err error
+
+        Err error ->
+            Err error
+
+makeMaxPerPaper: Result String Rules -> RulesBuffer -> Result String Rules
+makeMaxPerPaper result rulesBuffer =
+    case result of
+        Ok rules ->
+            case String.toInt rulesBuffer.maxPerPaper of
+                Ok maxPerPaper ->
+                    Ok {rules | maxPerPaper = maxPerPaper}
+
+                Err error ->
+                    Err error
+
+        Err error ->
+            Err error
+
+makeRules: Maybe RulesBuffer -> Result String Rules
+makeRules buffer =
+    case buffer of
+        Just rulesBuffer ->
+            let
+                result0 = makeMaxPapers (Rules 0 0 0) rulesBuffer
+                result1 = makeMaxVotes result0 rulesBuffer
+                result = makeMaxPerPaper result1 rulesBuffer
+            in
+                case result of
+                    Ok rules ->
+                        if rules.maxVotes >= rules.maxPerPaper then
+                            Ok rules
+                        else 
+                            Err "Max per paper cannot be greater than max votes."
+
+                    Err error ->
+                        Err error
+
+        Nothing ->
+            Err "No rules buffer.  Should not happen"
+
+setEditMaxPapers: Model -> String -> Model
+setEditMaxPapers model maxPapers =
+    case model.editRules of
+        Just rules ->
+            let
+                temp = {rules | maxPapers = maxPapers} 
+            in
+                {model | editRules = Just temp}
+
+        Nothing ->
+            {model | errorMessage = "No editRules.  Should not happen."}
+
+setEditMaxVotes: Model -> String -> Model
+setEditMaxVotes model maxVotes =
+    case model.editRules of
+        Just rules ->
+            let
+                temp = {rules | maxVotes = maxVotes} 
+            in
+                {model | editRules = Just temp}
+                
+        Nothing ->
+            {model | errorMessage = "No editRules.  Should not happen."}
+
+setEditMaxPerPaper: Model -> String -> Model
+setEditMaxPerPaper model maxPerPaper =
+    case model.editRules of
+        Just rules ->
+            let
+                temp = {rules | maxPerPaper = maxPerPaper} 
+            in
+                {model | editRules = Just temp}
+                
+        Nothing ->
+            {model | errorMessage = "No editRules.  Should not happen."}
 
 getMaxPapers: Model -> Int
 getMaxPapers model =
@@ -153,7 +259,7 @@ type PaperOrder
     | Mine
     | Voter
 
-type Page = Wait | Login | List | Edit | Users | UserPage | OpenListPage | ClosedListPage
+type Page = Wait | Login | List | Edit | Users | UserPage | OpenListPage | ClosedListPage | EditRulesPage
 
 type Msg
     = Waiting
@@ -200,6 +306,12 @@ type Msg
     | AdminOpen Int
     | ShutClosedList
     | ShowRules
+    | EditRules (Result Http.Error String)
+    | MaxPapers String
+    | MaxVotes String
+    | MaxPerPaper String
+    | SaveRules
+    | ShutRules
 
 type alias PaperList = {paperList: List Paper}
 
