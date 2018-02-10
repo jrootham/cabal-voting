@@ -3,7 +3,7 @@ module Types exposing (..)
 import Date
 import Http
 
-totalCount = 30 * 60
+totalCount = 60 * 60
 
 type alias PaperModel =
     { paperList : List Paper

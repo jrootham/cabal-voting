@@ -10020,7 +10020,7 @@ var _jrootham$cabal_voting$Types$setPaperList = F2(
 var _jrootham$cabal_voting$Types$getPaperList = function (model) {
 	return model.paperModel.paperList;
 };
-var _jrootham$cabal_voting$Types$totalCount = 30 * 60;
+var _jrootham$cabal_voting$Types$totalCount = 60 * 60;
 var _jrootham$cabal_voting$Types$PaperModel = F5(
 	function (a, b, c, d, e) {
 		return {paperList: a, order: b, voter: c, voterList: d, edit: e};
