@@ -1,0 +1,19 @@
+/*
+ *	jrootham.css
+ */
+ 
+body
+{
+	background-color: LightSkyBlue;
+}
+
+#container
+{
+	width: 50em;
+	padding: 1em;
+}
+
+#title
+{
+	text-align: center;
+}
