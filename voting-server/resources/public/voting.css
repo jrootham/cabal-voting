@@ -1,0 +1,64 @@
+/*
+ *		nopassword.css
+ *
+ *		nopassword style sheet
+ */
+
+
+body
+{
+	background-color: LightSkyBlue;
+}
+
+#outer
+{
+	width: 28em;
+}
+
+#title
+{
+	font-size: x-large;
+	font-family: sans-serif;
+	width: 100%;
+	text-align: center;
+}
+
+#container
+{
+	width: 80%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 1em;
+	border-width: 3px;
+	border-color: Blue;
+	border-style: solid;
+}
+
+#data
+{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(5, auto);
+}
+
+#login-group
+{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(1, auto);
+}
+
+#register-group
+{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(2, auto);
+}
+
+#copy
+{
+	background-color: LightCyan;
+	padding: .5em;
+}

@@ -22,10 +22,16 @@ CREATE TABLE config (
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     name text NOT NULL,
+    address text DEFAULT 'jrootham@gmail.com' NOT NULL,
     valid boolean DEFAULT true NOT NULL,
     admin boolean DEFAULT false NOT NULL
 );
 
+CREATE TABLE tokens
+(
+    server_token BIGINT PRIMARY KEY,
+    user_id INT REFERENCES users(id)
+);
 
 --
 -- Name: links; Type: TABLE; Schema: public; Owner: jrootham; Tablespace: 
@@ -78,4 +84,4 @@ CREATE TABLE votes (
 
 
 INSERT INTO config (max_papers, max_votes, max_votes_per_paper) VALUES (5, 15, 5);
-INSERT INTO users (name, admin) VALUES ('Jim', TRUE);
+INSERT INTO users (name, address, admin) VALUES ('Jim', 'jrootham@gmail.com', TRUE);

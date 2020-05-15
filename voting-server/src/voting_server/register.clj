@@ -56,14 +56,32 @@
 	)
 )
 
-(defn validate-address [address]
+(defn unique-address [db address]
 	(let
 		[
-			package {:address address}
-			message (str address " is not a valid email address")
-			errors (valip/validate package [:address pred/email-address? message])
+			query "SELECT COUNT(*) AS count FROM users WHERE valid AND users.address=?;"
+			result (jdbc/query db [query address])
 		]
-		(get errors :address)
+		(if (= 0 (get (first result) :count))
+			[]
+			[(str address " already exists")]
+		)
+	)
+)
+
+(defn validate-address [db address]
+	(let [unique (unique-address db address)]
+		(if (== 0 (count unique))
+			(let
+				[
+					package {:address address}
+					message (str address " is not a valid email address")
+					errors (valip/validate package [:address pred/email-address? message])
+				]
+				(get errors :address)
+			)
+			unique
+		)
 	)
 )
 
@@ -97,7 +115,7 @@
 
 (defn register [useapp name address]
 	(jdbc/with-db-transaction [db stuff/db-spec]
-		(let [error-list (concat (validate-address address) (validate-name db name))]
+		(let [error-list (concat (validate-address db address) (validate-name db name))]
 			(if (= 0 (count error-list))
 				(let [user-id (insert-user db name address)]
 					(if useapp

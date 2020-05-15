@@ -1,0 +1,5 @@
+PASSWORD=$1
+export JDBC_DATABASE_URL="jdbc:postgresql:voting_test?user=jrootham&password=$PASSWORD"
+export PORT=8282
+java -jar target/uberjar/voting-server.jar
+

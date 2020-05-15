@@ -40,8 +40,8 @@
 
 (defn browser-head []
 	[:head 
-		[:title "EMail Login"]
-		[:link {:rel "stylesheet" :type "text/css" :href "emlogin.css"}]
+		[:title stuff/site-name]
+		[:link {:rel "stylesheet" :type "text/css" :href "voting.css"}]
 	]
 )
 
@@ -55,13 +55,8 @@
 	(hiccup/html
 		(browser-head)
 		[:div {:id "outer"}
-			[:div {:id "title"} "EMail Login"]
+			[:div {:id "title"} stuff/site-name]
 			[:div {:id "container"} contents]
-			[:div 
-				[:div [:a {:href (str stuff/site "servers/emlogin/register-prompt")} "Register"]] 
-				[:div [:a {:href (str stuff/site "servers/emlogin/request-prompt")} "Login"]] 
-				[:div [:a {:href (str stuff/site "emlogin/index.html")} "Home"]]
-			]
 		]
 	)
 )
