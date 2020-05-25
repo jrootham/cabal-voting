@@ -29,7 +29,7 @@
 )
 
 (defn href [server-token]
-	(format "%sservers/emlogin/login?server-token=%016x" stuff/site server-token)
+	(format "%sservers/voting/login?server-token=%016x" stuff/site server-token)
 )
 
 ;  The three possible headers

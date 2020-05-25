@@ -66,11 +66,27 @@
 	(route/not-found {:status 404 :body (html/page [:div "Page not found"])})
 )
 
+(defn make-wrap-session-param [param]
+	(let [key (keyword param)]
+		(fn [handler]
+			(fn [request]
+				(println "Session" (get request :session))
+				(println "Params" (get request :params))
+				(handler request)
+			)
+		)
+	)
+)
+
+(def wrap-session-user-id (make-wrap-session-param "user"))
+
 (defn make-handler [] 
 	(-> voting
+;		(debug/wrap-with-logger)
+		(wrap-session-user-id)
 		(params/wrap-params)
 		(session/wrap-session)
-		(debug/wrap-with-logger)
+;		(debug/wrap-with-logger)
 	)
 )
 

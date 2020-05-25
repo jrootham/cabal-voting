@@ -11,7 +11,7 @@
 (defn get-user [nameValue]
 	(let 
 		[
-			query "SELECT user_id,admin FROM users WHERE name =? AND valid;"
+			query "SELECT id,admin FROM users WHERE name =? AND valid;"
 			result (jdbc/query stuff/db-spec [query nameValue])
 		]
 		(if (== 1 (count result))
@@ -22,7 +22,7 @@
 )
 
 (defn get-link [link-id]
-	(first (jdbc/query stuff/db-spec ["SELECT link_text, link FROM links WHERE link_id=?;" link-id]))
+	(first (jdbc/query stuff/db-spec ["SELECT link_text, link FROM links WHERE id=?;" link-id]))
 )
 
 (defn get-reference-mapper []
@@ -49,8 +49,8 @@
 		[
 			columns " votes,users.name AS name"
 			from " FROM votes "
-			join1 "JOIN users ON votes.user_id = users.user_id " 
-			join2 "JOIN papers ON votes.paper_id = papers.paper_id "
+			join1 "JOIN users ON votes.user_id = users.id " 
+			join2 "JOIN papers ON votes.paper_id = papers.id "
 			where "WHERE votes.paper_id=? AND papers.closed_at IS NULL"
 			query (str "SELECT" columns from join1 join2 where ";")
 		]
@@ -60,7 +60,7 @@
 
 (defn make-paper-apply []
 	(fn [paper]
-		(let [paper-id (get paper :paper_id)]
+		(let [paper-id (get paper :id)]
 			{
 				"paper_id" paper-id
 				"title" (get paper :title)
@@ -78,8 +78,8 @@
 
 (defn get-paper-list [] 
 	(let [
-			columns "paper_id, title, link_id, paper_comment, created_at, users.name AS submitter"
-			from " FROM papers JOIN users ON papers.user_id = users.user_id"
+			columns "id, title, link_id, paper_comment, created_at, users.name AS submitter"
+			from " FROM papers JOIN users ON papers.user_id = users.id"
 			where " papers.closed_at IS NULL"
 			query (str "SELECT " columns from " WHERE" where	";")
 			result (jdbc/query stuff/db-spec [query])
@@ -95,13 +95,13 @@
 
 
 (defn return-user-list []
-	{:body {:user_list (jdbc/query stuff/db-spec ["SELECT user_id,name,valid,admin FROM users"])}}
+	{:body {:user_list (jdbc/query stuff/db-spec ["SELECT id,name,valid,admin FROM users"])}}
 )
 
 (defn return-open-list []
 	(let
 		[
-			id-column "papers.paper_id AS paper_id,"
+			id-column "papers.id AS paper_id,"
 			title-column "papers.title AS title,"
 			comment-column "papers.paper_comment AS paper_comment,"
 			votes-column "coalesce(sum(votes.votes),0) AS total_votes "
@@ -110,9 +110,9 @@
 			
 			from "FROM papers,votes "
 
-			where "WHERE papers.closed_at IS NULL AND papers.paper_id = votes.paper_id "
+			where "WHERE papers.closed_at IS NULL AND papers.id = votes.paper_id "
 
-			group "GROUP BY papers.paper_id"
+			group "GROUP BY papers.id"
 		]
 
 		{:body {:paper_list (jdbc/query stuff/db-spec [(str columns from where group ";")])}}
@@ -122,7 +122,7 @@
 (defn return-closed-list []
 	(let 
 		[
-			columns "paper_id, closed_at, title, paper_comment "
+			columns "id, closed_at, title, paper_comment "
 			where "NOT closed_at IS NULL "
 			query (str "SELECT " columns " FROM papers WHERE " where ";")
 		]

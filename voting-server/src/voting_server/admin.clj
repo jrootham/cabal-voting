@@ -13,7 +13,7 @@
 )
 
 (defn change-user [user-id user-record]
-	(jdbc/update! stuff/db-spec :users user-record ["user_id=?" user-id])
+	(jdbc/update! stuff/db-spec :users user-record ["id=?" user-id])
 	(lists/return-user-list)
 )
 

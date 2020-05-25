@@ -19,9 +19,9 @@
 
 (defn request-prompt-contents [name error-list]
 	[:div
-		[:div "Please enter your user name for the site EMail Login."]
+		[:div (str "Please enter your user name for the site" stuff/site-name ".")]
 		[:div "An email will be sent to the email address we have on file with a link to signon to the site with."]
-		(form/form-to [:post "/servers/voting-server/request"]
+		(form/form-to [:post "/servers/voting/request"]
 			(html/show-errors error-list)
 			(html/group [:div {:id "login-group"}] [(html/label-text-field :name "User name " name)])
 			(form/submit-button "Request login")
@@ -36,7 +36,7 @@
 (defn mail-contents [server-token name]
 	[:body
 		[:div
-			[:h1 "EMail Login"]
+			[:h1 (str  stuff/site-name " Login")]
 			[:div (str "EMail login for " name)]
 			[:div [:a {:href (html/href server-token)} "Login"]]
 		]
@@ -49,7 +49,7 @@
 
 (defn mail [db user-id server-token subject head name address]
 	(jdbc/insert! db :tokens {:server_token server-token :user_id user-id})
-	(mail/send-mail mail/std-from address subject (body head server-token name))
+	(mail/send-mail address subject (body head server-token name))
 )
 
 (defn request-body [name address]
@@ -138,6 +138,14 @@
 	)
 )
 
+(defn elm-page [user-id]
+	{:body (html/page "We got here")}
+)
+
+(defn session [user-id]
+	{:session {:user-id user-id}}
+)
+
 (defn login [server-token-string]
 	(jdbc/with-db-transaction [db stuff/db-spec]
 		(let 
@@ -146,9 +154,7 @@
 				user-id (fetch-token-user db server-token)
 			]
 			(if user-id
-				(do 
-;					(assoc app/redirect :session {:user user-id})
-				)
+				(elm-page user-id)
 				(html/page "Attempted to reuse link. They are only good for one try.")
 			)
 		) 

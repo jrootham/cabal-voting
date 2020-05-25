@@ -9,7 +9,7 @@
 --
 
 CREATE TABLE config (
-    config_id integer DEFAULT 1 NOT NULL,
+    id integer DEFAULT 1 NOT NULL,
     max_papers integer NOT NULL,
     max_votes integer NOT NULL,
     max_votes_per_paper integer NOT NULL
@@ -20,7 +20,7 @@ CREATE TABLE config (
 --
 
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name text NOT NULL,
     address text DEFAULT 'jrootham@gmail.com' NOT NULL,
     valid boolean DEFAULT true NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE tokens
 --
 
 CREATE TABLE links (
-    link_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     link_text text NOT NULL,
     link text NOT NULL
 );
@@ -49,10 +49,10 @@ CREATE TABLE links (
 --
 
 CREATE TABLE papers (
-    paper_id SERIAL PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES users(user_id),
+    id SERIAL PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id),
     title text NOT NULL,
-    link_id integer NOT NULL REFERENCES links(link_id),
+    link_id integer NOT NULL REFERENCES links(id),
     paper_comment text NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     closed_at timestamp without time zone DEFAULT NULL
@@ -63,10 +63,10 @@ CREATE TABLE papers (
 --
 
 CREATE TABLE comment_references (
-    comment_reference_id SERIAL PRIMARY KEY,
-    paper_id integer NOT NULL REFERENCES papers(paper_id),
+    id SERIAL PRIMARY KEY,
+    paper_id integer NOT NULL REFERENCES papers(id),
     reference_index integer NOT NULL,
-    link_id integer NOT NULL REFERENCES links(link_id)
+    link_id integer NOT NULL REFERENCES links(id)
 );
 
 
@@ -75,9 +75,9 @@ CREATE TABLE comment_references (
 --
 
 CREATE TABLE votes (
-    vote_id SERIAL PRIMARY KEY,
-    paper_id integer NOT NULL REFERENCES papers(paper_id),
-    user_id integer NOT NULL REFERENCES users(user_id),
+    id SERIAL PRIMARY KEY,
+    paper_id integer NOT NULL REFERENCES papers(id),
+    user_id integer NOT NULL REFERENCES users(id),
     votes integer NOT NULL,
     CONSTRAINT votes_votes_check CHECK ((votes >= 0))
 );
