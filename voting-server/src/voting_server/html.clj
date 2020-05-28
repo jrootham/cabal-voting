@@ -29,7 +29,7 @@
 )
 
 (defn href [server-token]
-	(format "%sservers/voting/login?server-token=%016x" stuff/site server-token)
+	(format "%sservers/voting/launch?server-token=%016x" stuff/site server-token)
 )
 
 ;  The three possible headers
@@ -60,3 +60,16 @@
 		]
 	)
 )
+
+(defn elm-page [server-token]
+	(let [script "var app = Elm.main.init({node: document.getElementById('voting') flags: %016x})"]
+		(hiccup/html
+			[:head
+				[:link {:rel "stylesheet" :type "text/css" :href "voting.css"}]
+				[:script {:src "main.js"}]
+			]
+			[:body [:div {:id "voting"}] [:script (format script server-token)]]
+		)
+	)
+)
+

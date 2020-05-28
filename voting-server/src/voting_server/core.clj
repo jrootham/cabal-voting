@@ -26,11 +26,13 @@
 
 	(compojure/GET "/servers/voting/request-prompt" [] (login/request-prompt "" []))
 	(compojure/POST "/servers/voting/request" [name] (login/request name))
-	(compojure/GET "/servers/voting/app-request" [name token] 
-		(login/app-request name token))
+	(compojure/GET "/servers/voting/app-request" [identifier token] (login/app-request identifier token))
 
+	(compojure/GET "/servers/voting/config-request-prompt" [] (register/config-request-prompt "" []))
+	(compojure/POST "/servers/voting/config-request" [name] (register/config-request name))
 	(compojure/GET "/servers/voting/config" [name] (config/config name))
 
+	(compojure/GET "/servers/voting/launch" [server-token] (login/launch server-token))
 	(compojure/GET "/servers/voting/login" [server-token] (login/login server-token))
 
 	(compojure/POST "/servers/voting/rules" [] (rules/rules))
@@ -70,8 +72,6 @@
 	(let [key (keyword param)]
 		(fn [handler]
 			(fn [request]
-				(println "Session" (get request :session))
-				(println "Params" (get request :params))
 				(handler request)
 			)
 		)
@@ -82,7 +82,6 @@
 
 (defn make-handler [] 
 	(-> voting
-;		(debug/wrap-with-logger)
 		(wrap-session-user-id)
 		(params/wrap-params)
 		(session/wrap-session)

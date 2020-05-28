@@ -17,7 +17,7 @@
 		[
 			record (first result)
 			{name :name address :address} record
-			endpoint (str stuff/site-name "servers/voting/app-request")
+			endpoint (str stuff/site "servers/voting/app-request")
 		]
 		(json/write-str
 			{
@@ -40,7 +40,6 @@
 		(if (== 1 (count result))
 			(config-response result)
 			(do
-				(println "no unique name" name)
 				(json/write-str {:found "false"})
 			)
 		)

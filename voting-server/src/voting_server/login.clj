@@ -37,7 +37,7 @@
 	[:body
 		[:div
 			[:h1 (str  stuff/site-name " Login")]
-			[:div (str "EMail login for " name)]
+			[:div (str "Voting System login for " name)]
 			[:div [:a {:href (html/href server-token)} "Login"]]
 		]
 	]
@@ -64,7 +64,7 @@
 )
 
 (defn get-user [db name]
-	(jdbc/query db ["SELECT id, name, address FROM users WHERE valid AND name=?" name])
+	(jdbc/query db ["SELECT id, name, address FROM users WHERE valid AND name=?;" name])
 )
 
 (defn make-request [name server-token subject headers found not-found]
@@ -82,7 +82,7 @@
 )
 
 (defn app-subject [app-token]
-	(format "[#! voting-server %s] EMail Login" app-token)
+	(format "[#! emlogin %s] Voting Login" app-token)
 )
 
 (defn app-found [name address]
@@ -104,7 +104,7 @@
 	)
 )
 
-(def simple-subject "EMail Login")
+(def simple-subject "Voting Login")
 
 (defn found [name address]
 	(request-page name address)
@@ -138,23 +138,32 @@
 	)
 )
 
-(defn elm-page [user-id]
-	{:body (html/page "We got here")}
-)
-
 (defn session [user-id]
 	{:session {:user-id user-id}}
 )
+
+(defn voting-list [user-id]
+	"Foo"
+)
+
+(defn parse-token-string [server-token-string]
+	(Long/parseUnsignedLong server-token-string 16)
+)
+
+(defn launch [server-token-string]
+	(html/elm-page (parse-token-string server-token-string))
+)
+
 
 (defn login [server-token-string]
 	(jdbc/with-db-transaction [db stuff/db-spec]
 		(let 
 			[
-				server-token (Long/parseUnsignedLong server-token-string 16)
+				server-token (parse-token-string server-token-string)
 				user-id (fetch-token-user db server-token)
 			]
 			(if user-id
-				(elm-page user-id)
+				(voting-list user-id)
 				(html/page "Attempted to reuse link. They are only good for one try.")
 			)
 		) 

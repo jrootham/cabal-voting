@@ -43,16 +43,27 @@
 
 ;  registration actions, mail, page
 
-(defn validate-name [db name]
+(defn is-name [db name]
 	(let
 		[
 			query "SELECT COUNT(*) AS count FROM users WHERE valid AND users.name=?;"
 			result (jdbc/query db [query name])
 		]
-		(if (= 0 (get (first result) :count))
-			[]
-			[(str name " already exists")]
-		)
+		(== 1 (get (first result) :count))
+	)
+)
+
+(defn validate-name [db name]
+	(if (is-name db name)
+		[]
+		[(str name " does not exist")]
+	)
+)
+
+(defn validate-name-new [db name]
+	(if (is-name db name)
+		[(str name " already exists")]
+		[]
 	)
 )
 
@@ -113,10 +124,38 @@
 	(html/page (register-app-contents name address))
 )
 
+(defn config-request-prompt-contents [name error-list]
+	[:div
+		[:div (str "Please enter your user name for the site" stuff/site-name ".")]
+		(form/form-to [:post "/servers/voting/config-request"]
+			(html/show-errors error-list)
+			(html/group [:div {:id "login-group"}] [(html/label-text-field :name "User name " name)])
+			(form/submit-button "Configuration")
+		)
+	]
+)
+
+(defn config-request-prompt [name error-list]
+	(html/page (config-request-prompt-contents name error-list))
+)
+
+(defn config-contents [name]
+	[:div (config/config-link name)]	
+)
+
+(defn config-request [name]
+	(let [error-list (validate-name stuff/db-spec name)]
+		(if (== 0 (count error-list))
+			(html/page (config-contents name))
+			(config-request-prompt name error-list)
+		)
+	)
+)
+
 (defn register [useapp name address]
 	(jdbc/with-db-transaction [db stuff/db-spec]
-		(let [error-list (concat (validate-address db address) (validate-name db name))]
-			(if (= 0 (count error-list))
+		(let [error-list (concat (validate-address db address) (validate-name-new db name))]
+			(if (== 0 (count error-list))
 				(let [user-id (insert-user db name address)]
 					(if useapp
 						(register-app-page name address)
