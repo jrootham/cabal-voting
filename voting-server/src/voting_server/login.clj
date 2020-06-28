@@ -5,7 +5,7 @@
 	(:require [hiccup.core :as hiccup])
 	(:require [hiccup.page :as page])
 	(:require [hiccup.form :as form])
-;	(:require [hiccup.util :as util])
+	(:require [clojure.data.json :as json])
 	(:require [crypto.random :as random])
 	(:require [voting-server.mail :as mail])
 	(:require [voting-server.html :as html])
@@ -128,7 +128,7 @@
 			query "SELECT user_id FROM tokens WHERE server_token=?;"
 			result (jdbc/query db [query server-token])
 		]
-		(if (= 1 (count result))
+		(if (== 1 (count result))
 			(let [user-id (get (first result) :user_id)]
 				(jdbc/delete! db :tokens ["server_token=?" server-token])
 				user-id
@@ -138,12 +138,30 @@
 	)
 )
 
-(defn session [user-id]
-	{:session {:user-id user-id}}
+(defn start-session [body user-id]
+	{:body (json/write-str body) :session {:user-id user-id}}
 )
 
-(defn voting-list [user-id]
-	"Foo"
+(defn user-error []
+	{:status 400 :body (json/write-str {:error "User name not found"})}
+)
+
+(defn name-response [user-id]
+	(if user-id
+		(let 
+			[
+				query "SELECT name FROM users WHERE id=?;"
+				result (jdbc/query stuff/db-spec [query user-id])
+			]
+			(if (== 1 (count result))
+				(let [name (get (first result) :name)]
+					(start-session name user-id)
+				)
+				(user-error)
+			)
+		)
+		(user-error)
+	)
 )
 
 (defn parse-token-string [server-token-string]
@@ -154,18 +172,13 @@
 	(html/elm-page (parse-token-string server-token-string))
 )
 
-
 (defn login [server-token-string]
 	(jdbc/with-db-transaction [db stuff/db-spec]
-		(let 
-			[
-				server-token (parse-token-string server-token-string)
-				user-id (fetch-token-user db server-token)
-			]
-			(if user-id
-				(voting-list user-id)
-				(html/page "Attempted to reuse link. They are only good for one try.")
+		(let [server-token (parse-token-string server-token-string)]
+			(if (== 0 server-token)
+				(start-session nil 0)
+				(name-response (fetch-token-user db server-token))
 			)
-		) 
+		)
 	)
 )

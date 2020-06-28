@@ -39,9 +39,7 @@
 		]
 		(if (== 1 (count result))
 			(config-response result)
-			(do
-				(json/write-str {:found "false"})
-			)
+			(json/write-str {:found "false"})
 		)
 	)
 )

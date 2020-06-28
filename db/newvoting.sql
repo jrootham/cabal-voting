@@ -21,10 +21,9 @@ CREATE TABLE config (
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name text NOT NULL,
+    name text NOT NULL UNIQUE,
     address text DEFAULT 'jrootham@gmail.com' NOT NULL,
-    valid boolean DEFAULT true NOT NULL,
-    admin boolean DEFAULT false NOT NULL
+    valid boolean DEFAULT true NOT NULL
 );
 
 CREATE TABLE tokens
@@ -34,17 +33,6 @@ CREATE TABLE tokens
 );
 
 --
--- Name: links; Type: TABLE; Schema: public; Owner: jrootham; Tablespace: 
---
-
-CREATE TABLE links (
-    id SERIAL PRIMARY KEY,
-    link_text text NOT NULL,
-    link text NOT NULL
-);
-
-
---
 -- Name: papers; Type: TABLE; Schema: public; Owner: jrootham; Tablespace: 
 --
 
@@ -52,21 +40,22 @@ CREATE TABLE papers (
     id SERIAL PRIMARY KEY,
     user_id integer NOT NULL REFERENCES users(id),
     title text NOT NULL,
-    link_id integer NOT NULL REFERENCES links(id),
+    link text NOT NULL,
     paper_comment text NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    closed_at timestamp without time zone DEFAULT NULL
+    created_at integer NOT NULL,
+    closed_at integer DEFAULT NULL
 );
 
 --
 -- Name: comment_references; Type: TABLE; Schema: public; Owner: jrootham; Tablespace: 
 --
 
-CREATE TABLE comment_references (
+CREATE TABLE paper_references (
     id SERIAL PRIMARY KEY,
     paper_id integer NOT NULL REFERENCES papers(id),
     reference_index integer NOT NULL,
-    link_id integer NOT NULL REFERENCES links(id)
+    link_text text NOT NULL,
+    link text NOT NULL
 );
 
 
@@ -84,4 +73,3 @@ CREATE TABLE votes (
 
 
 INSERT INTO config (max_papers, max_votes, max_votes_per_paper) VALUES (5, 15, 5);
-INSERT INTO users (name, address, admin) VALUES ('Jim', 'jrootham@gmail.com', TRUE);

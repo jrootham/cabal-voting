@@ -11,7 +11,7 @@
 	(let 
 		[
 			columns "max_papers,max_votes,max_votes_per_paper"
-			query (str "SELECT " columns " FROM config WHERE config_id=1")
+			query (str "SELECT " columns " FROM config WHERE id=1")
 			record (first (jdbc/query stuff/db-spec [query]))
 		]
 		{:body record}

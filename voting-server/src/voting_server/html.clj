@@ -62,7 +62,7 @@
 )
 
 (defn elm-page [server-token]
-	(let [script "var app = Elm.main.init({node: document.getElementById('voting') flags: %016x})"]
+	(let [script "var app = Elm.Main.init({node: document.getElementById('voting'), flags: '%016x'})"]
 		(hiccup/html
 			[:head
 				[:link {:rel "stylesheet" :type "text/css" :href "voting.css"}]

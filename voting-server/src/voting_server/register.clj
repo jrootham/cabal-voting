@@ -2,8 +2,7 @@
 	(:gen-class)
 	(:require [clojure.java.jdbc :as jdbc])
 	(:require [clojure.string :as str])
-;	(:require [hiccup.core :as hiccup])
-	(:require [hiccup.util :as util])
+	(:require [hiccup.util :as hiccup])
 	(:require [hiccup.form :as form])
 	(:require [valip.core :as valip])
 	(:require [valip.predicates :as pred])
@@ -11,7 +10,6 @@
 	(:require [voting-server.stuff :as stuff])
 	(:require [voting-server.html :as html])
 	(:require [voting-server.login :as login])
-;	(:require [voting-server.app :as app])
 )
 
 (defn register-prompt-form [name address useapp error-list]
@@ -104,14 +102,14 @@
 
 (defn register-contents [name address]
 	[:div
-		[:div (str (util/escape-html name) " has been registered at " (util/escape-html address))]
+		[:div (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
 		[:div "An email will be sent to the email address you entered with a link to log in to the site with."]	
 	]
 )
 
 (defn register-app-contents [name address]
 	[:div
-		[:div (str (util/escape-html name) " has been registered at " (util/escape-html address))]
+		[:div (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
 		(config/config-link name)
 	]
 )
