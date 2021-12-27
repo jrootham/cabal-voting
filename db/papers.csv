@@ -1,0 +1,70 @@
+1,1,Session types,http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=69E5B5006CDFA36D21D7BC24381E642D?doi=10.1.1.212.5293&rep=rep1&type=pdf,"
+
+Other some other paper on session types 😿 🔮 ",1489782110,
+2,4,"""Theorems For Free""",https://people.mpi-sws.org/~dreyer/tor/papers/wadler.pdf,"",1489783597,
+3,4,"""Teaching Languages in a Post-Linnean Age""",http://cs.brown.edu/~sk/Publications/Papers/Published/sk-teach-pl-post-linnaean/paper.pdf,"",1489783810,
+4,6,"""Closed Timelike Curves Make Quantum and Classical Computing Equivalent""",https://cs.uwaterloo.ca/~watrous/Papers/ClosedTimelikeCurves.pdf,"",1489836667,
+5,5,Hopscotch Hashing,http://mcg.cs.tau.ac.il/papers/disc2008-hopscotch.pdf,"",1489941644,
+6,5,Epidemic Broadcast Trees,https://github.com/papers-we-love/papers-we-love/blob/master/data_structures/epidemic-broadcast-trees.pdf,"",1489942994,
+7,5,Auctions and Bidding,http://www.sci.brooklyn.cuny.edu/%7Eparsons/projects/mech-design/publications/bluffers-final.pdf,"",1489943129,
+8,3,A unifying view of linear-time suffix tree construction,http://europa.zbh.uni-hamburg.de/pubs/pdf/GieKur1997.pdf,"",1489947202,
+9,9,Neural Turing Machines,https://arxiv.org/pdf/1410.5401.pdf,"Neural nets for differentiable Turing machines, ",1490002045,
+10,7,Phonotactic Reconstruction of Encrypted VoIP Conversations: Hookt on fon-iks,http://www.cs.unc.edu/~amw/resources/hooktonfoniks.pdf, ,1493578334,
+11,7,Stigmergic construction and topochemical information shape ant nest architecture,http://www.pnas.org/content/113/5/1303.full.pdf,"",1493578422,
+12,5,Software Engineering Economics,http://csse.usc.edu/TECHRPTS/1984/usccse84-500/usccse84-500.pdf,"",1494490559,
+13,9,World of Simple Programs: Chapter 3 of A New Kind of Science,http://www.wolframscience.com/nks/chap-3--the-world-of-simple-programs/,"",1495270268,
+14,3,Dependent Types and Multi-monadic Effects in F⋆,https://www.fstar-lang.org/papers/mumon/paper.pdf,"Maybe the coolest programming language of today?
+
+",1495410658,
+15,2,"Growing a Language, Guy Steele",https://www.cs.virginia.edu/~evans/cs655/readings/steele.pdf,"",1496358432,
+16,2,The universality and expressiveness of fold,http://www.cs.nott.ac.uk/~pszgmh/fold.pdf,"",1497647143,
+17,3,Modelling Homogeneous Generative Meta-Programming,http://drops.dagstuhl.de/opus/volltexte/2017/7277/pdf/LIPIcs-ECOOP-2017-5.pdf,"",1497725886,
+18,7,Julia: A Fast Dynamic Language for Technical Computing,https://arxiv.org/pdf/1209.5145.pdf,"",1498485869,
+19,2,Semi-Indexing Semi-Structured Data in Tiny Space,http://www.di.unipi.it/~ottavian/files/semi_index_cikm.pdf,"
+
+Imagine you have a collection of large JSON or XML documents, and you want to run queries over them that just grab a small subset of the data.  You don't want to fully parse each document for each query, so you should index the documents somehow, but they all have different tree structures, and it's not clear what an index would look like.  This paper shows how to augment each document with a small amount of data that makes it very fast to search inside them.",1500448698,
+20,3,Satisfiability modulo theories: an appetizer,https://moodle.risc.jku.at/pluginfile.php/3240/mod_resource/content/1/sbmf09.pdf,"",1501338269,
+21,6,A Functional Correspondence between Evaluators and Abstract Machines,http://www.brics.dk/RS/03/13/BRICS-RS-03-13.pdf,"From section 6: What is the difference between an abstract machine and a virtual machine? In a companion article [1], we propose to distinguish them based on the notion of instruction set: A virtual machine has an instruction set whereas an abstract machine does not. An abstract machine directly operates on a λ-term, but a virtual machine operates on a compiled representation of a λ-term, expressed using an instruction set",1503242596,
+22,3,Complete and easy bidirectional typechecking for higher-rank polymorphism,https://arxiv.org/pdf/1306.6032.pdf,"",1503271432,
+23,10,"Pierre Landin invents the Abstract Machine, Denotational Semantics, and basically Functional Programming",https://www.cs.cmu.edu/~crary/819-f09/Landin64.pdf,"These are all historical, more of an interesting ""how things got started"" than cutting edge research; but then, Landin is a really smart guy and the papers are really readable.",1505762160,
+24,10,Compiling Haskell By Program Transformation,https://www.microsoft.com/en-us/research/wp-content/uploads/1996/01/comp-by-trans.pdf,"By: Simon Peyton Jones
+
+
+
+Comes with its own cliff notes! [1]
+
+> Many compilers do some of their work by means of correctness-preserving, and hopefully performance-improving, program transformations. The Glasgow Haskell Compiler (GHC) takes this idea of “compilation by transformation” as its war-cry, trying to express as much as possible of the compilation process in the form of program transformations.
+> 
+> This paper reports on our practical experience of the transformational approach to compilation, in the context of a substantial compiler.
+
+",1505764087,
+25,10,State in Haskell,https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/state-lasc.pdf,"By John Launchbury and Simon Peyton Jones
+
+
+Basically ""The IO Monad, as seen from the other side.""
+
+> In this paper we describe a way to express stateful algorithms in non-strict, purely functional languages. The approach is a development of our earlier work on monadic I/O and state encapsulation..., but with an important technical innovation: we use parametric polymorphism to achieve safe encapsulation of state. It turns out that this allows mutable objects to be named without losing safety, and it also allows input/output to be smoothly integrated with other state manipulation.",1505764675,
+26,10,Lambda The Ultimate Goto,http://repository.readscheme.org/ftp/papers/ai-lab-pubs/AIM-443.pdf,"By Guy Steele and Gerald Sussman
+
+
+All the Lambda the Ultimate papers are great, but this one is (a) the most stand-alone and (b) the most generally useful, I feel. Plus it's the paper that invented tail-recursion _and_ still explains it better than pretty much anybody else!",1505779629,
+27,3,Unification under a mixed prefix,http://www.lix.polytechnique.fr/~dale/papers/jsc92.pdf,"
+
+Relevant to logic programming, theorem proving, and dependent pattern matching as, e.g., found in the highly-voted ""Why dependent types matter"" (#74).",1506377170,
+28,3,"Deny Capabilities for Safe, Fast Actors",https://www.ponylang.org/media/papers/fast-cheap.pdf,"
+
+**Abstract**
+
+Combining the actor-model with shared memory for performance is efficient but can introduce data-races. Existing approaches to static data-race freedom are based on uniqueness and immutability, but lack flexibility and high performance implementations. Our approach, based on deny properties, allows reading, writing and traversing unique references, introduces a new form of write uniqueness, and guarantees atomic behaviours.",1509042326,
+29,3,Is the Optimal Implementation Inefficient? Elementarily Not,http://drops.dagstuhl.de/opus/volltexte/2017/7733/pdf/LIPIcs-FSCD-2017-17.pdf,"
+
+*Abstract*
+
+Sharing graphs are a local and asynchronous implementation of lambda-calculus beta-reduction (or linear logic proof-net cut-elimination) that avoids useless duplications. Empirical benchmarks suggest that they are one of the most efficient machineries, when one wants to fully exploit the higher-order features of lambda-calculus.  However, we still lack confirming grounds with theoretical solidity to dispel uncertainties about the adoption of sharing graphs.  Aiming at analysing in detail the worst-case overhead cost of sharing operators, we restrict to the case of elementary and light linear logic, two subsystems with bounded computational complexity of multiplicative exponential linear logic.  In these two cases, the bookkeeping component is unnecessary, and sharing graphs are simplified to the so-called “abstract algorithm”. By a modular cost comparison over a syntactical simulation, we prove that the overhead of shared reductions is quadratically bounded to cost of the naive implementation, i.e. proof-net reduction. This result generalises and strengthens a previous complexity result, and implies that the price of sharing is negligible, if compared to the obtainable benefits on reductions requiring a large amount of duplication.",1510786442,
+30,3,The View from the Left,http://strictlypositive.org/vfl.pdf,"",1511709281,
+31,11,A Theory of Changes for Higher-Order Languages: Incrementalizing λ-Calculi by Static Differentiation,http://www.informatik.uni-marburg.de/~pgiarrusso/papers/pldi14-ilc-author-final.pdf,"",1511860475,
+32,11,"ADAPTON: Composable, DemandDriven Incremental Computation",http://matthewhammer.org/adapton/adapton-pldi2014.pdf,"",1511861296,
+33,11,Datafun: A Functional Datalog,http://www.rntz.net/files/datafun.pdf,"",1511861641,
+34,11,Dedalus: Datalog in Time and Space,https://www2.eecs.berkeley.edu/Pubs/TechRpts/2009/EECS-2009-173.pdf,"",1511862332,
+35,9,Rethinking Supercompilation,http://ndmitchell.com/downloads/paper-rethinking_supercompilation-29_sep_2010.pdf,"",1518162853,
+36,6,Call-by-Name Gradual Type Theory,https://arxiv.org/pdf/1802.00061.pdf,"",1519051304,
