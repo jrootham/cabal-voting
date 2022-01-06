@@ -10,6 +10,11 @@ body
 	background-color: LightSkyBlue;
 }
 
+h1
+{
+	text-align: center;
+}
+
 #outer
 {
 	width: 28em;
@@ -134,10 +139,19 @@ body
 	color: grey;
 }
 
-
 .heading
 {
 	font-size: large;
 	font-weight: bold;
 	margin-bottom: .5em;
+}
+
+.paper-title
+{
+	margin-bottom: .5em;
+}
+
+.comment
+{
+	margin: 0;
 }

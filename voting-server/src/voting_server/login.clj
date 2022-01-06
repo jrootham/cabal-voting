@@ -19,7 +19,7 @@
 
 (defn request-prompt-contents [name error-list]
 	[:div
-		[:div (str "Please enter your user name for the site" stuff/site-name ".")]
+		[:div (str "Please enter your user name for the site " stuff/site-name ".")]
 		[:div "An email will be sent to the email address we have on file with a link to signon to the site with."]
 		(form/form-to [:post "/servers/voting/request"]
 			(html/show-errors error-list)

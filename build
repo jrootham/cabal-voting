@@ -6,3 +6,5 @@ echo " "
 echo " "
 
 elm make src/Main.elm --output voting-server/resources/public/main.js
+
+

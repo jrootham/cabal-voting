@@ -124,7 +124,7 @@
 
 (defn config-request-prompt-contents [name error-list]
 	[:div
-		[:div (str "Please enter your user name for the site" stuff/site-name ".")]
+		[:div (str "Please enter your user name for the site " stuff/site-name ".")]
 		(form/form-to [:post "/servers/voting/config-request"]
 			(html/show-errors error-list)
 			(html/group [:div {:id "login-group"}] [(html/label-text-field :name "User name " name)])

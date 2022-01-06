@@ -16,7 +16,12 @@ import Update as U
 
 -- MAIN
 
-main : Program String M.Model M.Msg
+type alias Flags =
+  { title : String
+  , token : String
+  }
+
+main : Program Flags M.Model M.Msg
 main =
   Browser.element
     { init = init
@@ -25,11 +30,10 @@ main =
     , subscriptions = subscriptions
     }
 
-
-init : String -> ( M.Model, Cmd M.Msg )
-init token =
-  ( M.initialModel
-  , login token
+init : Flags -> ( M.Model, Cmd M.Msg )
+init flags =
+  ( M.initialModel flags.title
+  , login flags.token
   )
 
 login : String -> Cmd M.Msg
@@ -92,22 +96,22 @@ update msg model =
 
 view : M.Model -> H.Html M.Msg
 view model =
-    H.div [ A.class "outer" ]
-        [
-          (H.div [] [H.h1 [] [H.text "Cabal Voting System"]])
+  H.div [ A.class "outer" ]
+    [
+      (H.div [] [H.h1 [] [H.text model.title]])
 
-          ,case (M.getError model) of
-            Nothing ->
-              case (M.getPage model) of
-                M.Display ->
-                  DisplayPage.page model
+      ,case (M.getError model) of
+        Nothing ->
+          case (M.getPage model) of
+            M.Display ->
+              DisplayPage.page model
 
-                M.Edit ->
-                  EditPage.page model
+            M.Edit ->
+              EditPage.page model
 
-            Just error ->
-              errorPage model error
-        ]
+        Just error ->
+          errorPage model error
+    ]
 
 
 errorPage : M.Model -> M.Error -> H.Html M.Msg

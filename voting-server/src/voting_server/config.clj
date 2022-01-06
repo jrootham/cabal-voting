@@ -7,7 +7,7 @@
 )
 
 (defn config-link [name]
-	(let [href (str stuff/site "servers/voting/config?name=" name)]
+	(let [href (str stuff/site "/servers/voting/config?name=" name)]
 		[:div [:a {:href href} "Configuration"]]
 	)
 )
@@ -17,7 +17,7 @@
 		[
 			record (first result)
 			{name :name address :address} record
-			endpoint (str stuff/site "servers/voting/app-request")
+			endpoint (str stuff/site "/servers/voting/app-request")
 		]
 		(json/write-str
 			{

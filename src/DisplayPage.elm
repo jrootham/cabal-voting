@@ -1,6 +1,7 @@
 module DisplayPage exposing (page)
 
 import List
+import String
 import Html as H
 import Html.Attributes as A
 import Html.Events as E
@@ -249,13 +250,16 @@ contents paper =
   H.div []
     (
       [ H.div [A.class "paper-title"] [ C.makeLink paper.title paper.link ]
-      , H.div [ A.class "contents" ] [ H.text paper.comment ]
+      , H.div [ A.class "contents" ] (makeParagraphs paper.comment)
       ]
       ++ (List.map 
           (\ref -> H.div [] [ C.makeLink ref.text ref.link ]) 
           (List.sortBy .index paper.referenceList)
         )
     )
+
+makeParagraphs comment =
+  List.map (\line -> H.p [A.class "comment"] [H.text line]) (String.split "\n" comment)
 
 voting : M.Model -> M.Paper -> H.Html M.Msg
 voting model paper =

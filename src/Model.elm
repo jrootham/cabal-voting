@@ -42,7 +42,8 @@ type Msg
 
 
 type alias Model =
-  { currentUser : Maybe User
+  { title : String
+  , currentUser : Maybe User
   , page : Page
   , order : PaperOrder
   , sortByVoter : User
@@ -54,12 +55,13 @@ type alias Model =
 
 -- Initialize 
 
-initialModel =
+initialModel : String -> Model 
+initialModel title =
   let
     rules = Rules 5 15 5
     data = Data rules []
   in
-  Model Nothing Display Title "" Nothing True Nothing data 
+  Model title Nothing Display Title "" Nothing True Nothing data 
 
 
 type alias User = String
