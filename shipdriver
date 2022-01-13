@@ -1,0 +1,7 @@
+#!/bin/bash
+
+elm make src/Main.elm --output voting-server/resources/public/main.js
+
+./ship demo
+./ship cabal
+./ship david

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PREFIX=/home/jrootham/dev/cabal/cabalVoting/voting-server
+UBERJAR=/target/uberjar/voting-server.jar
+
+elm make src/Main.elm --output voting-server/resources/public/main.js
+
+cd voting-server
+
+ln -sf $PREFIX/src/voting_server/demostuff.clj $PREFIX/src/voting_server/stuff.clj
+
+lein uberjar
+
+cp $PREFIX$UBERJAR local 
+
+cd ..

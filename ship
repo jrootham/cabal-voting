@@ -1,0 +1,24 @@
+#!/bin/bash
+
+LOCAL=voting-server/resources/public/main.js
+REMOTE=jrootham@jrootham.ca:
+BASE=/var/www/vhosts/jrootham.ca
+SUFFIX=resources/public/
+
+PREFIX=/home/jrootham/dev/cabal/cabalVoting/voting-server
+UBERJAR=/target/uberjar/voting-server.jar
+DOCROOT=/home/jrootham/dev/cabal/cabalVoting/docroot
+
+ssh jrootham@jrootham.ca "mkdir -p $BASE/$1.jrootham.ca/$SUFFIX"
+ssh jrootham@jrootham.ca "mkdir -p $BASE/servers/$1"
+scp $DOCROOT/* $REMOTE$BASE/$1.jrootham.ca
+
+scp $LOCAL $REMOTE$BASE/$1.jrootham.ca/$SUFFIX
+
+cd voting-server
+
+ln -sf $PREFIX/src/voting_server/$1stuff.clj $PREFIX/src/voting_server/stuff.clj
+
+lein uberjar
+
+scp $PREFIX$UBERJAR $REMOTE$BASE/servers/$1

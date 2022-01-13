@@ -1,0 +1,13 @@
+[Unit]
+Description=Local instance of voting
+After=nginx.service postgresql.service
+
+[Service]
+Type=simple
+# Restart=always
+RestartSec=10
+WorkingDirectory=/home/jrootham/dev/cabal/cabalVoting/voting-server/local/
+ExecStart=/usr/bin/java voting-server.jar 4012
+
+[Install]
+WantedBy=multi-user.target
