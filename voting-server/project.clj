@@ -22,8 +22,14 @@
 		[bananaoomarang/ring-debug-logging "1.1.0"]
 	]
 	:min-lein-version "2.0.0"
-	:main ^:skip-aot voting-server.core
-	:aot [voting-server.core]
+	:main voting-server.core
 	:target-path "target/%s"
-	:uberjar-name "voting-server.jar"
+	:profiles 
+	{
+		:uberjar 
+		{
+			:uberjar-name "voting-server.jar"
+			:aot [voting-server.core]
+		}
+	}
 )

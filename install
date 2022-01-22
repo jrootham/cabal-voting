@@ -7,7 +7,7 @@ elm make src/Main.elm --output voting-server/resources/public/main.js
 
 cd voting-server
 
-ln -sf $PREFIX/src/voting_server/demostuff.clj $PREFIX/src/voting_server/stuff.clj
+ln -sf $PREFIX/src/voting_server/localstuff.clj $PREFIX/src/voting_server/stuff.clj
 
 lein uberjar
 

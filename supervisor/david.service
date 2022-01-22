@@ -1,0 +1,14 @@
+[Unit]
+Description=David instance of voting
+After=nginx.service postgresql.service
+Want=nginx.service postgresql.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/home/voting/servers/david
+ExecStart=/usr/bin/java -jar voting-server.jar 4003
+
+[Install]
+WantedBy=multi-user.target

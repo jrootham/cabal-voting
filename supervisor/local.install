@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo ln -s /home/jrootham/dev/cabal/cabalVoting/supervisor/localvote.service /etc/systemd/system

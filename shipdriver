@@ -1,7 +1,17 @@
 #!/bin/bash
 
+REMOTE=voting@jrootham.ca:
+ATHOME=/home/voting
+
 elm make src/Main.elm --output voting-server/resources/public/main.js
+
+ssh voting@jrootham.ca "mkdir -p /home/voting/servers"
+ssh jrootham@jrootham.ca "mkdir -p /home/jrootham/voting"
+ssh jrootham@jrootham.ca "mkdir -p /home/jrootham/voting/supervisor"
+
+scp /home/jrootham/dev/cabal/cabalVoting/supervisor/remote.install jrootham@jrootham.ca:/home/jrootham/voting/supervisor
 
 ./ship demo
 ./ship cabal
 ./ship david
+

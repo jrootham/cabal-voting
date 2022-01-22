@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo ln -s /home/jrootham/voting/supervisor/demo.service /etc/systemd/system
+sudo ln -s /home/jrootham/voting/supervisor/cabal.service /etc/systemd/system
+sudo ln -s /home/jrootham/voting/supervisor/david.service /etc/systemd/system
