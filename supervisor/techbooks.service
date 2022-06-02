@@ -1,5 +1,5 @@
 [Unit]
-Description=David instance of voting
+Description=Civic Tech instance of voting
 After=nginx.service postgresql.service
 Wants=nginx.service postgresql.service
 
@@ -7,8 +7,8 @@ Wants=nginx.service postgresql.service
 Type=simple
 Restart=always
 RestartSec=10
-WorkingDirectory=/home/jrootham/voting/servers/david
-ExecStart=/usr/bin/java -jar voting-server.jar 4003
+WorkingDirectory=/home/jrootham/voting/servers/techbooks
+ExecStart=/usr/bin/java -jar voting-server.jar 4001
 
 [Install]
 WantedBy=multi-user.target

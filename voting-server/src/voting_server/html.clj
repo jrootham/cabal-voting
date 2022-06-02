@@ -6,6 +6,14 @@
 	(:require [voting-server.stuff :as stuff])
 )
 
+;  css
+
+(def body-css "background-color: LightSkyBlue;")
+
+(def container-css "width: 50em; padding: 1em;")
+
+(def title-css "text-align: center;")
+
 ;  General html functions
 
 
@@ -54,9 +62,21 @@
 (defn page [contents]
 	(hiccup/html
 		(browser-head)
-		[:div {:id "outer"}
+		[:body
 			[:div {:id "title"} stuff/site-name]
 			[:div {:id "container"} contents]
+		]
+	)
+)
+
+; The 404 browser page
+
+(defn notfound-page [contents]
+	(hiccup/html
+		[:head [:title stuff/site-name]]
+		[:body {:style body-css}
+			[:div {:style title-css} stuff/site-name]
+			[:div {:style container-css} contents]
 		]
 	)
 )

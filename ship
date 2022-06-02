@@ -4,26 +4,23 @@ echo ""
 echo "Creating $1"
 
 LOCAL=voting-server/resources/public/main.js
-REMOTE=voting@jrootham.ca:
-BASE=/var/www/vhosts/jrootham.ca
+REMOTE_VOTING=jrootham@jrootham.ca:voting
+REMOTE_DOCROOT=website@jrootham.ca:$1/$1
 SUFFIX=resources/public/
 
 PREFIX=/home/jrootham/dev/cabal/cabalVoting/voting-server
 UBERJAR=/target/uberjar/voting-server.jar
-ATHOME=/home/voting
 VOTING=/home/jrootham/dev/cabal/cabalVoting
 DOCROOT=/home/jrootham/dev/cabal/cabalVoting/docroot
-SUPERVISOR=$ATHOME/supervisor
 
-ssh voting@jrootham.ca "mkdir -p $ATHOME/servers/$1"
-ssh voting@jrootham.ca "mkdir -p $ATHOME/servers/$1/resources"
-ssh voting@jrootham.ca "mkdir -p $ATHOME/servers/$1/resources/public"
+ssh jrootham.ca "mkdir -p voting/servers/$1/resources/public"
+ssh jrootham.ca "mkdir -p voting/supervisor/"
 
-scp $VOTING/supervisor/$1.service jrootham@jrootham.ca:/home/jrootham/voting/supervisor
+rsync -v $VOTING/supervisor/$1.service $REMOTE_VOTING/supervisor
 
-scp $DOCROOT/* jrootham@jrootham.ca:$BASE/$1.jrootham.ca
+rsync -v $DOCROOT/* $REMOTE_DOCROOT
 
-scp $LOCAL $REMOTE$ATHOME/servers/$1/resources/public
+rsync -v $LOCAL $REMOTE_VOTING/servers/$1/resources/public
 
 cd voting-server
 
@@ -31,4 +28,5 @@ ln -sf $PREFIX/src/voting_server/$1stuff.clj $PREFIX/src/voting_server/stuff.clj
 
 lein uberjar
 
-scp $PREFIX$UBERJAR $REMOTE$ATHOME/servers/$1
+rsync -v $PREFIX$UBERJAR $REMOTE_VOTING/servers/$1
+
