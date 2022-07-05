@@ -3,9 +3,8 @@
 echo ""
 echo "Creating $1"
 
-LOCAL=voting-server/resources/public/main.js
 REMOTE_VOTING=jrootham@jrootham.ca:voting
-REMOTE_DOCROOT=website@jrootham.ca:$1/$1
+REMOTE_DOCROOT=website@jrootham.ca:httpdocs/voting/$1
 SUFFIX=resources/public/
 
 PREFIX=/home/jrootham/dev/cabal/cabalVoting/voting-server
@@ -13,14 +12,12 @@ UBERJAR=/target/uberjar/voting-server.jar
 VOTING=/home/jrootham/dev/cabal/cabalVoting
 DOCROOT=/home/jrootham/dev/cabal/cabalVoting/docroot
 
-ssh jrootham.ca "mkdir -p voting/servers/$1/resources/public"
+ssh jrootham.ca "mkdir -p voting/servers/$1/"
 ssh jrootham.ca "mkdir -p voting/supervisor/"
 
 rsync -v $VOTING/supervisor/$1.service $REMOTE_VOTING/supervisor
 
 rsync -v $DOCROOT/* $REMOTE_DOCROOT
-
-rsync -v $LOCAL $REMOTE_VOTING/servers/$1/resources/public
 
 cd voting-server
 

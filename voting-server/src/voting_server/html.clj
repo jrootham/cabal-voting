@@ -3,16 +3,9 @@
 	(:require [hiccup.core :as hiccup])
 	(:require [hiccup.form :as form])
 	(:require [hiccup.util :as util])
+	(:require [voting-server.styles :as styles])
 	(:require [voting-server.stuff :as stuff])
 )
-
-;  css
-
-(def body-css "background-color: LightSkyBlue;")
-
-(def container-css "width: 50em; padding: 1em;")
-
-(def title-css "text-align: center;")
 
 ;  General html functions
 
@@ -33,7 +26,7 @@
 )
 
 (defn show-errors [error-list]
-	[:div (map (fn [line] [:div (util/escape-html line)]) error-list)]
+	[:div {:style styles/para} (map (fn [line] [:div (util/escape-html line)]) error-list)]
 )
 
 (defn href [server-token]
@@ -49,7 +42,6 @@
 (defn browser-head []
 	[:head 
 		[:title stuff/site-name]
-		[:link {:rel "stylesheet" :type "text/css" :href "voting.css"}]
 	]
 )
 
@@ -62,21 +54,11 @@
 (defn page [contents]
 	(hiccup/html
 		(browser-head)
-		[:body
-			[:div {:id "title"} stuff/site-name]
-			[:div {:id "container"} contents]
-		]
-	)
-)
-
-; The 404 browser page
-
-(defn notfound-page [contents]
-	(hiccup/html
-		[:head [:title stuff/site-name]]
-		[:body {:style body-css}
-			[:div {:style title-css} stuff/site-name]
-			[:div {:style container-css} contents]
+		[:body {:style styles/body}
+			[:div {:style styles/outer}
+				[:h1 {:style styles/h1} stuff/site-name]
+				[:div {:style styles/container} contents]
+			]
 		]
 	)
 )

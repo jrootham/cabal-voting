@@ -17,7 +17,7 @@ h1
 
 #outer
 {
-	width: 28em;
+	width: 300px;
 }
 
 #title
@@ -31,11 +31,11 @@ h1
 #container
 {
 	width: 80%;
-	margin-top: 1em;
-	margin-bottom: 1em;
+	margin-top: 10px;
+	margin-bottom: 10px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 1em;
+	padding: 10px;
 	border-width: 3px;
 	border-color: Blue;
 	border-style: solid;
@@ -89,6 +89,7 @@ h1
 
 #paper-base
 {
+	max-width: 1600px;
 	display: grid;
 	grid-template-columns: 10em auto 5em 10em;
 	grid-row-gap: 1em;

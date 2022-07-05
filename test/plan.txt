@@ -1,0 +1,5 @@
+Add user														success
+Add duplicate name												fail
+Add duplicate email												fail
+Add user														success
+Add paper

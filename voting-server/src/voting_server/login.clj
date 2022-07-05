@@ -9,6 +9,7 @@
 	(:require [crypto.random :as random])
 	(:require [voting-server.mail :as mail])
 	(:require [voting-server.html :as html])
+	(:require [voting-server.styles :as styles])
 	(:require [voting-server.stuff :as stuff])
 )
 
@@ -19,12 +20,13 @@
 
 (defn request-prompt-contents [name error-list]
 	[:div
-		[:div (str "Please enter your user name for the site " stuff/site-name ".")]
-		[:div "An email will be sent to the email address we have on file with a link to signon to the site with."]
-		(form/form-to [:post "/servers/voting/request"]
+		[:h2 {:style styles/h2} "Request Signon"]
+		[:div {:style styles/para} (str "Please enter your user name for the site " stuff/site-name ".")]
+		[:div {:style styles/para} "An email will be sent to the email address we have on file with a link to sign on to the site with."]
+		(form/form-to [:post "request"]
 			(html/show-errors error-list)
-			(html/group [:div {:id "login-group"}] [(html/label-text-field :name "User name " name)])
-			(form/submit-button "Request login")
+			(html/group [:div {:style styles/login-group}] [(html/label-text-field :name "User name " name)])
+			(form/submit-button "Request Signon")
 		)
 	]
 )
@@ -36,9 +38,9 @@
 (defn mail-contents [server-token name]
 	[:body
 		[:div
-			[:h1 (str  stuff/site-name " Login")]
-			[:div (str "Voting System login for " name)]
-			[:div [:a {:href (html/href server-token)} "Login"]]
+			[:h1 (str  stuff/site-name " Sign on")]
+			[:div (str "Voting System sign on for " name)]
+			[:div [:a {:href (html/href server-token)} "Sign on"]]
 		]
 	]
 )
@@ -54,8 +56,9 @@
 
 (defn request-body [name address]
 	[:div 
-		[:div (str "User " name " at " address " has requested a log in")]
-		[:div "An email will be sent to the email address we have on file with a link to log in to the site with."]	
+		[:h2 {:style styles/h2} "Signon Requested"]
+		[:div {:style styles/para} (str "User " name " at " address " has requested a sign on")]
+		[:div {:style styles/para} "An email will be sent to the email address we have on file with a link to sign on to the site with."]	
 	]
 )
 
@@ -82,7 +85,7 @@
 )
 
 (defn app-subject [app-token]
-	(format "[#! emlogin %s] Voting Login" app-token)
+	(format "[#! emsignon %s] Voting Login" app-token)
 )
 
 (defn app-found [name address]
@@ -165,7 +168,9 @@
 )
 
 (defn parse-token-string [server-token-string]
-	(Long/parseUnsignedLong server-token-string 16)
+	(let [trimmed (str/trim server-token-string)]
+		(Long/parseUnsignedLong trimmed 16)
+	)
 )
 
 (defn launch [server-token-string]

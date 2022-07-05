@@ -1,0 +1,5 @@
+sudo systemctl daemon-reload
+sudo systemctl restart cabal
+sudo systemctl restart techbooks
+sudo systemctl restart nginx
+sleep 20

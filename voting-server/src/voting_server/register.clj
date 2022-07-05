@@ -9,34 +9,35 @@
 	(:require [voting-server.config :as config])
 	(:require [voting-server.stuff :as stuff])
 	(:require [voting-server.html :as html])
+	(:require [voting-server.styles :as styles])
 	(:require [voting-server.login :as login])
 )
 
-(defn register-prompt-form [name address useapp error-list]
+(defn register-prompt-form [name address error-list]
 	[:div
-		(form/form-to [:post "/servers/voting/register"]
+		[:h2 {:style styles/h2} "Request Registration"]
+		(form/form-to [:post "register"]
 			[:div
 				(html/show-errors error-list)
-				(html/group [:div {:id "register-group"}]
+				(html/group [:div {:style styles/register-group}]
 					[
 						(html/label-text-field :name "User name" name) 
 						(html/label-text-field :address "Email address" address)
-						(html/label-checkbox :useapp "Use EMLogin application" useapp)
 					]
 				)
 
-				(form/submit-button "Register")
+				(form/submit-button "Request Registration")
 			]
 		)
 	]
 )
 
-(defn register-prompt-contents [name address useapp error-list]
-	[:body [:div (register-prompt-form name address useapp error-list)]]
+(defn register-prompt-contents [name address error-list]
+	[:body [:div (register-prompt-form name address error-list)]]
 )
 
-(defn register-prompt [name address useapp error-list]
-	(html/page (register-prompt-contents name address useapp error-list))
+(defn register-prompt [name address error-list]
+	(html/page (register-prompt-contents name address error-list))
 )
 
 ;  registration actions, mail, page
@@ -102,14 +103,16 @@
 
 (defn register-contents [name address]
 	[:div
-		[:div (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
-		[:div "An email will be sent to the email address you entered with a link to log in to the site with."]	
+		[:h2 {:style styles/h2} "Request Registration"]
+		[:div {:style styles/para} (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
+		[:div {:style styles/para} "An email will be sent to the email address you entered with a link to log in to the site with."]	
 	]
 )
 
 (defn register-app-contents [name address]
 	[:div
-		[:div (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
+		[:h2 {:style styles/h2} "Request Registration"]
+		[:div {:style styles/para} (str (hiccup/escape-html name) " has been registered at " (hiccup/escape-html address))]
 		(config/config-link name)
 	]
 )
@@ -124,11 +127,12 @@
 
 (defn config-request-prompt-contents [name error-list]
 	[:div
-		[:div (str "Please enter your user name for the site " stuff/site-name ".")]
-		(form/form-to [:post "/servers/voting/config-request"]
+		[:h2 {:style styles/h2} "Request Registration"]
+		[:div {:style styles/para} (str "Please enter your desired user name for the site " stuff/site-name ".")]
+		(form/form-to [:post "config-request"]
 			(html/show-errors error-list)
-			(html/group [:div {:id "login-group"}] [(html/label-text-field :name "User name " name)])
-			(form/submit-button "Configuration")
+			(html/group [:div {:style styles/login-group}] [(html/label-text-field :name "User name " name)])
+			(form/submit-button "Request Registration")
 		)
 	]
 )
@@ -150,12 +154,12 @@
 	)
 )
 
-(defn register [useapp name address]
+(defn register [name address]
 	(jdbc/with-db-transaction [db stuff/db-spec]
 		(let [error-list (concat (validate-address db address) (validate-name-new db name))]
 			(if (== 0 (count error-list))
 				(let [user-id (insert-user db name address)]
-					(if useapp
+					(if false
 						(register-app-page name address)
 						(do
 							(login/login-email db user-id name address)
@@ -163,7 +167,7 @@
 						)
 					)
 				)
-				(register-prompt name address useapp error-list) 
+				(register-prompt name address error-list) 
 			)
 		)
 	)

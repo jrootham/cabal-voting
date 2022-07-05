@@ -1,0 +1,17 @@
+server 
+{
+    listen 127.0.0.1:8000;
+
+    root /home/jrootham/dev/cabal/cabalVoting/docroot/;
+    index index.html;
+
+    location /servers/voting/ 
+    {
+        proxy_pass http://127.0.0.1:4012;
+    }
+
+    location / 
+    {
+    	try_files $uri $uri/ =404;
+    }
+}

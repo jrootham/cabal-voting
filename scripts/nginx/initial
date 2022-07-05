@@ -1,0 +1,24 @@
+server 
+{
+    listen 127.0.0.1:80;
+
+    root /home/jrootham/dev/untracked//docroot;
+    index index.html;
+
+    server_name localhost;
+
+    location /servers/hello/ 
+    {
+        proxy_pass http://127.0.0.1:4000;
+    }
+
+    location /servers/emlogin/ 
+    {
+        proxy_pass http://127.0.0.1:4001;
+    }
+
+    location / 
+    {
+    	try_files $uri $uri/ =404;
+    }
+}
